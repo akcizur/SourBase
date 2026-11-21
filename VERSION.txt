@@ -1,4 +1,5 @@
-AVMCMP+ Media Center
-TV-first adaptive UI
-Storage-compatible with WAVE IPTV 1.6.0
+Sourbase Media Center
+TV-first responsive UI
+Languages: Czech / English
+Themes: Light / Dark
 Windows x64

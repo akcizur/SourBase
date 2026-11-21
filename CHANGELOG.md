@@ -16,3 +16,11 @@
 - Add a central source hub for M3U/M3U8 URLs and files, Xtream Codes, XMLTV EPG, local media, RSS and qBittorrent.
 - Introduce responsive desktop / TV, tablet and mobile sizing, clearer focus states and arrow-key spatial navigation for remote-style controls.
 - Keep the existing Go local host, player, EPG, library, Xtream, RSS and qBittorrent modules intact.
+
+## Sourbase · language and appearance refresh
+
+- Rename the visible product identity to Sourbase.
+- Add Czech / English language switching across static and dynamically rendered UI text, notifications and locale-aware date/time labels.
+- Add persistent light / dark theme controls in the global toolbar.
+- Store presentation preferences independently from the legacy media profile to avoid overwriting existing user media data.
+- Rename the Windows executable and Actions artifact to Sourbase while retaining the WAVE IPTV profile path for upgrade compatibility.

@@ -1,4 +1,4 @@
-name: AVMCMP+ Windows build
+name: Sourbase Windows build
 
 on:
   push:
@@ -40,9 +40,9 @@ jobs:
           $env:GOOS = 'windows'
           $env:GOARCH = 'amd64'
           $env:CGO_ENABLED = '0'
-          go build -trimpath -ldflags='-s -w -H=windowsgui' -o 'AVMCMP+.exe' .
+          go build -trimpath -ldflags='-s -w -H=windowsgui' -o 'Sourbase.exe' .
       - name: Upload executable
         uses: actions/upload-artifact@v4
         with:
-          name: avmcmp-plus-windows-x64
-          path: AVMCMP+.exe
+          name: sourbase-windows-x64
+          path: Sourbase.exe

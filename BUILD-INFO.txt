@@ -1,10 +1,12 @@
-AVMCMP+ Media Center
+Sourbase Media Center
 Target: Windows x64
 Go: 1.23+
 CGO_ENABLED: 0
-Persistence: DPAPI-protected state.dpapi + credentials.dpapi
+Persistence: DPAPI-protected legacy WAVE IPTV profile (upgrade-compatible)
 UI: embedded web/index.html
-Desktop profile: %AppData%\WAVE IPTV (retained for compatibility)
+UI preferences: sourbase-ui-preferences-v1
+Languages: Czech / English
+Themes: Light / Dark
 Local host: 127.0.0.1 only
 
 Verification workflow:
@@ -12,7 +14,7 @@ Verification workflow:
 - go vet ./...
 - Node.js syntax check of embedded JavaScript
 - Windows x64 GUI EXE build
-- Artifact upload: avmcmp-plus-windows-x64
+- Artifact upload: sourbase-windows-x64
 
 Not verified until run on a physical Windows host:
 - desktop GUI launch and DPAPI runtime round-trip

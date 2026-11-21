@@ -6,6 +6,6 @@ set GOARCH=amd64
 set CGO_ENABLED=0
 go test ./... || exit /b 1
 go vet ./... || exit /b 1
-go build -trimpath -ldflags="-s -w -H=windowsgui" -o "AVMCMP+.exe" .
+go build -trimpath -ldflags="-s -w -H=windowsgui" -o "Sourbase.exe" .
 if errorlevel 1 exit /b 1
-echo Build complete: AVMCMP+.exe
+echo Build complete: Sourbase.exe
