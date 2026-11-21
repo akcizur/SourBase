@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<tv generator-info-name="WAVE IPTV sample">
+  <channel id="demo.abc"><display-name>ABC</display-name></channel>
+  <channel id="demo.news"><display-name>News 24</display-name></channel>
+  <channel id="demo.music"><display-name>Music TV</display-name></channel>
+  <programme start="20261105180000 +0100" stop="20261105190000 +0100" channel="demo.abc"><title>Evening News</title><desc>Souhrn nejdůležitějších událostí dne.</desc><category>News</category></programme>
+  <programme start="20261105190000 +0100" stop="20261105200000 +0100" channel="demo.abc"><title>Prime Time</title><desc>Večerní magazín a rozhovory.</desc><category>Entertainment</category></programme>
+  <programme start="20261105180000 +0100" stop="20261105193000 +0100" channel="demo.news"><title>World Report</title><desc>Zpravodajství z domova i ze světa.</desc><category>News</category></programme>
+  <programme start="20261105193000 +0100" stop="20261105210000 +0100" channel="demo.news"><title>Documentary</title><desc>Dokumentární pásmo.</desc><category>Documentary</category></programme>
+  <programme start="20261105180000 +0100" stop="20261105200000 +0100" channel="demo.music"><title>Music Mix</title><desc>Hudební výběr napříč žánry.</desc><category>Music</category></programme>
+</tv>

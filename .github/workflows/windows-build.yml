@@ -1,0 +1,36 @@
+name: WAVE Windows build
+
+on:
+  push:
+    branches: [main]
+    tags: ['v*']
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version: '1.23.x'
+          cache: true
+      - name: Unit tests
+        run: go test ./...
+      - name: Static analysis
+        run: go vet ./...
+      - name: Build Windows x64 EXE
+        shell: pwsh
+        run: |
+          $env:GOOS = 'windows'
+          $env:GOARCH = 'amd64'
+          $env:CGO_ENABLED = '0'
+          go build -trimpath -ldflags='-s -w -H=windowsgui' -o 'WAVE IPTV 1.6.0.exe' .
+      - name: Upload executable
+        uses: actions/upload-artifact@v4
+        with:
+          name: wave-iptv-1.6.0-windows-x64
+          path: WAVE IPTV 1.6.0.exe

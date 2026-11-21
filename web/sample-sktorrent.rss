@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0">
+  <channel>
+    <title>WAVE IPTV - Offline demo catalogue</title>
+    <description>Fiktivní ukázkové položky pro otestování SKTorrent pluginu. Neobsahují torrent ani stream odkazy.</description>
+    <item>
+      <title>Big Buck Bunny - Demo položka</title>
+      <guid>wave-demo-movie-001</guid>
+      <category>Movies - Demo</category>
+      <description>Ukázkový filmový záznam pro ověření katalogu, detailu titulu a ukládání do knihovny. Tento záznam nemá torrent odkaz.</description>
+      <pubDate>Thu, 05 Nov 2026 12:00:00 +0100</pubDate>
+    </item>
+    <item>
+      <title>Sintel - Demo položka</title>
+      <guid>wave-demo-movie-002</guid>
+      <category>Movies - Demo</category>
+      <description>Druhý ukázkový filmový záznam. Plakát lze doplnit z metadat feedu nebo z vlastní databáze.</description>
+      <pubDate>Wed, 04 Nov 2026 12:00:00 +0100</pubDate>
+    </item>
+    <item>
+      <title>WAVE Test Series S01E01</title>
+      <guid>wave-demo-series-001</guid>
+      <category>TV - Demo</category>
+      <description>Ukázková epizoda seriálu pro ověření automatického rozpoznání TV / seriálu.</description>
+      <pubDate>Tue, 03 Nov 2026 12:00:00 +0100</pubDate>
+    </item>
+  </channel>
+</rss>

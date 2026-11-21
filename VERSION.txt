@@ -1,0 +1,3 @@
+WAVE IPTV 1.6.0
+Research implementation
+Windows x64

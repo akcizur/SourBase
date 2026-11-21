@@ -1,0 +1,19 @@
+WAVE IPTV 1.6.0
+Target: Windows x64
+Go: 1.23+
+CGO_ENABLED: 0
+Persistence: DPAPI-protected state.dpapi + credentials.dpapi
+UI: embedded web/index.html
+Local host: 127.0.0.1 only
+
+Verification performed in this build environment:
+- go test ./...
+- go vet ./...
+- Node.js syntax check of embedded JavaScript
+- Windows x64 cross-compile (go build)
+- Windows x64 test binary compile (go test -c)
+
+Not verified here:
+- physical Windows GUI launch
+- DPAPI runtime round-trip on a Windows host
+- real IPTV / Xtream / SKTorrent account playback or sync
