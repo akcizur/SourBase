@@ -1,4 +1,4 @@
-name: WAVE Windows build
+name: AVMCMP+ Windows build
 
 on:
   push:
@@ -18,19 +18,31 @@ jobs:
         with:
           go-version: '1.23.x'
           cache: true
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
       - name: Unit tests
         run: go test ./...
       - name: Static analysis
         run: go vet ./...
+      - name: Embedded UI JavaScript syntax
+        shell: pwsh
+        run: |
+          $html = Get-Content -Raw web/index.html
+          $script = [regex]::Match($html, '(?s)<script>(.*?)</script>').Groups[1].Value
+          if (-not $script) { throw 'Embedded application script was not found.' }
+          $script | Set-Content -NoNewline -Encoding utf8 app-check.js
+          node --check app-check.js
+          Remove-Item app-check.js
       - name: Build Windows x64 EXE
         shell: pwsh
         run: |
           $env:GOOS = 'windows'
           $env:GOARCH = 'amd64'
           $env:CGO_ENABLED = '0'
-          go build -trimpath -ldflags='-s -w -H=windowsgui' -o 'WAVE IPTV 1.6.0.exe' .
+          go build -trimpath -ldflags='-s -w -H=windowsgui' -o 'AVMCMP+.exe' .
       - name: Upload executable
         uses: actions/upload-artifact@v4
         with:
-          name: wave-iptv-1.6.0-windows-x64
-          path: WAVE IPTV 1.6.0.exe
+          name: avmcmp-plus-windows-x64
+          path: AVMCMP+.exe

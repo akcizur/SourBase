@@ -4,8 +4,8 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="theme-color" content="#11141d" />
-  <meta name="description" content="WAVE IPTV. Lokální streamovací knihovna pro M3U, M3U8, Xtream Codes, XMLTV EPG, SKTorrent a qBittorrent." />
-  <title>WAVE IPTV · Home</title>
+  <meta name="description" content="AVMCMP+ Media Center. Lokální streamovací knihovna pro M3U, M3U8, Xtream Codes, XMLTV EPG, SKTorrent a qBittorrent." />
+  <title>AVMCMP+ · Media Center</title>
   <meta name="app-token" content="__WAVE_TOKEN__">
   <style>
     :root {
@@ -471,7 +471,7 @@
     .app { grid-template-columns:218px minmax(0,1fr); }
     .rail { width:218px;align-items:stretch;padding:22px 14px 16px;background:rgba(14,15,21,.97);border-right-color:rgba(255,255,255,.065); }
     .brand { width:100%;height:48px;min-height:48px;margin:0 0 27px;padding:0 13px;display:flex;align-items:center;justify-content:flex-start;border-radius:14px; }
-    .brand:after { content:'WAVE IPTV';margin-left:12px;font-size:12px;letter-spacing:2.1px;font-weight:850; }
+    .brand:after { content:'AVMCMP+';margin-left:12px;font-size:12px;letter-spacing:2.1px;font-weight:850; }
     .rail-menu { width:100%;display:flex;flex-direction:column;gap:5px; }
     .rail-section-label { text-align:left;padding:0 12px;margin:0 0 7px;color:#666879;font-size:9px;letter-spacing:1.55px; }
     .rail-separator { margin:12px 10px 11px; }
@@ -612,12 +612,98 @@
     @media(max-width:1000px) { .player-page-view .below-grid { grid-template-columns:1fr; }.player-page-view .detail-card { min-height:220px; }.player-detail-actions { margin-top:10px; }.player-page-view .video-wrap { min-height:260px;max-height:none; } }
     @media(max-width:760px) { .mini-player-dock { left:10px;right:10px;bottom:78px;min-height:62px;padding:8px;border-radius:12px;gap:8px; }.mini-player-art { width:34px;height:40px; }.mini-player-dock .btn { padding:0 9px;font-size:10px; }.mini-player-live { display:none; }.player-page-view .video-wrap { min-height:220px; }.library-toolbar { align-items:stretch; }.library-tabs { flex:1; }.library-tab { padding:8px 9px;font-size:10px; } }
     @media(max-width:440px) { .mini-player-dock .btn { font-size:0;width:36px;padding:0; }.mini-player-dock .btn:after { content:'↗';font-size:15px; }.mini-player-dock .icon-btn { width:33px; }.player-page-view .video-wrap { min-height:190px; }.player-page-view .player-controls { flex-wrap:wrap; } }
-  </style>
+
+    /* AVMCMP+ · universal source hub */
+    .source-hub-modal{width:min(820px,100%);padding:24px}
+    .source-hub-modal .modal-head{align-items:center;margin-bottom:0}
+    .source-hub-intro{margin:12px 0 20px;color:#9698a5;font-size:12px;line-height:1.65;max-width:620px}
+    .source-hub-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+    .source-choice{min-width:0;min-height:88px;display:flex;align-items:center;gap:13px;padding:14px;border:1px solid rgba(255,255,255,.075);border-radius:13px;background:#22232d;color:#f4f3fa;text-align:left;cursor:pointer;transition:transform .18s,border-color .18s,background .18s}
+    .source-choice:hover{transform:translateY(-2px);border-color:rgba(153,137,255,.48);background:#2a2939}
+    .source-choice-icon{flex:none;width:42px;height:42px;display:grid;place-items:center;border:1px solid rgba(166,151,255,.16);border-radius:12px;background:rgba(132,112,255,.11);color:#b9adff}
+    .source-choice-icon svg{width:21px;height:21px;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+    .source-choice-qbt{font-size:13px;font-weight:900;letter-spacing:-1px}
+    .source-choice strong{display:block;font-size:12px;font-weight:750}
+    .source-choice small{display:block;margin-top:5px;color:#9293a2;font-size:10px;line-height:1.4}
+    .source-choice-arrow{margin-left:auto;flex:none;color:#77788b;font-size:17px}
+    .source-hub-foot{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-top:18px;padding-top:14px;border-top:1px solid rgba(255,255,255,.065);color:#686a79;font-size:8px;font-weight:800;letter-spacing:1.1px}
+    .source-hub-status{display:flex;align-items:center;gap:7px;color:#8e92a4;font-size:9px;letter-spacing:.35px;font-weight:600}
+    .source-hub-status i{width:6px;height:6px;border-radius:50%;background:#66c6aa;box-shadow:0 0 10px rgba(102,198,170,.4)}
+    button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline:3px solid rgba(169,156,255,.9);outline-offset:3px}
+    @media(min-width:1400px){
+      .app{grid-template-columns:clamp(220px,14vw,280px) minmax(0,1fr)}
+      .rail{width:auto;padding:clamp(22px,2vw,34px) clamp(14px,1.2vw,24px)}
+      .main{width:100%;max-width:2240px;margin:0 auto;padding-left:clamp(36px,3vw,76px);padding-right:clamp(36px,3vw,76px);padding-bottom:70px}
+      .topbar{height:clamp(76px,5vw,96px);gap:clamp(20px,1.8vw,34px)}
+      .wordmark{font-size:clamp(14px,.9vw,18px);letter-spacing:clamp(2px,.2vw,4px)}
+      .rail-btn{width:100%;height:clamp(58px,4.2vw,76px);min-height:clamp(58px,4.2vw,76px);flex-direction:row;justify-content:flex-start;gap:14px;padding:0 16px}
+      .rail-btn svg{width:clamp(20px,1.3vw,25px);height:clamp(20px,1.3vw,25px)}
+      .rail-btn span{font-size:clamp(12px,.75vw,15px)}
+      .rail-section-label{font-size:10px;letter-spacing:1.6px}
+      .page-head h1{font-size:clamp(30px,2vw,42px)}
+      .subhead{font-size:clamp(12px,.8vw,16px)}
+      .home-hero{min-height:clamp(430px,30vw,610px)}
+      .hero-copy{padding:clamp(58px,4.2vw,92px) 0 clamp(48px,3.2vw,72px) clamp(52px,4vw,90px)}
+      .hero-copy h1{font-size:clamp(50px,4.2vw,82px)}
+      .hero-copy p{font-size:clamp(14px,.95vw,18px);max-width:620px}
+      .hero-kicker,.hero-overline{font-size:clamp(10px,.7vw,13px)}
+      .hero-actions .btn{height:clamp(44px,3vw,58px);padding-inline:clamp(18px,1.4vw,28px);font-size:clamp(12px,.8vw,15px)}
+      .home-welcome-row h2{font-size:clamp(22px,1.5vw,30px)}
+      .home-welcome-row p{font-size:clamp(11px,.72vw,14px)}
+      .poster-card{flex-basis:clamp(170px,11vw,225px);width:clamp(170px,11vw,225px)}
+      .poster-title,.catalog-title{font-size:clamp(12px,.82vw,16px)}
+      .poster-meta,.catalog-meta{font-size:clamp(10px,.68vw,13px)}
+      .catalog-grid{grid-template-columns:repeat(auto-fill,minmax(clamp(170px,10.5vw,220px),1fr));gap:clamp(20px,1.5vw,30px)}
+      .channel-card{min-height:clamp(68px,4.6vw,88px)}
+      .channel-card-name{font-size:clamp(12px,.8vw,15px)}
+      .channel-card-group{font-size:clamp(10px,.65vw,13px)}
+      .guide-scroll{max-height:calc(100vh - 300px);min-height:520px}
+      .channel-row{height:clamp(82px,5vw,100px)}
+      .program-title{font-size:clamp(12px,.8vw,15px)}
+      .program-time{font-size:clamp(10px,.67vw,13px)}
+      .video-wrap{min-height:clamp(390px,30vw,620px)}
+      .source-hub-modal{width:min(1040px,100%);padding:clamp(26px,2.1vw,42px)}
+      .source-choice{min-height:clamp(92px,6vw,120px);padding:clamp(16px,1.2vw,24px);gap:16px}
+      .source-choice-icon{width:clamp(46px,3vw,58px);height:clamp(46px,3vw,58px)}
+      .source-choice strong{font-size:clamp(13px,.9vw,17px)}
+      .source-choice small{font-size:clamp(10px,.7vw,13px)}
+    }
+    @media(min-width:2000px){
+      .home-shelf{margin-top:38px;margin-bottom:42px}
+      .home-shelf-head h3{font-size:clamp(18px,1vw,22px)}
+      .guide-toolbar{min-height:66px;padding-inline:22px}
+      .guide-tab,.filter-select{font-size:13px}
+      .player-page-view .video-wrap{min-height:clamp(520px,34vw,760px)}
+    }
+    @media(min-width:761px) and (max-width:1120px){
+      .main{padding-left:20px;padding-right:20px}
+      .topnav{display:none}
+      .search{width:min(240px,28vw)}
+      .top-actions{gap:7px}
+    }
+    @media(max-width:760px){
+      .top-actions #addPlaylistBtn{display:inline-flex!important;white-space:nowrap}
+      .source-hub-modal{width:min(560px,100%);padding:17px}
+      .source-hub-grid{grid-template-columns:1fr;gap:8px}
+      .source-choice{min-height:70px;padding:11px}
+      .source-choice-icon{width:38px;height:38px}
+      .source-hub-foot{flex-wrap:wrap}
+    }
+    @media(max-width:430px){
+      .wordmark{font-size:10px;letter-spacing:1px}
+      .search{width:clamp(96px,34vw,140px)}
+      .top-actions #addPlaylistBtn{width:36px;padding:0;font-size:0}
+      .top-actions #addPlaylistBtn svg{width:17px;height:17px}
+      .source-hub-modal{padding:14px}
+      .source-hub-intro{font-size:11px}
+    }
+
+  </style>  </style>
 </head>
 <body>
 <div class="app">
   <aside class="rail" aria-label="Hlavní navigace">
-    <button class="brand" data-page="home" title="WAVE Home" aria-label="Domů"><span>W</span></button>
+    <button class="brand" data-page="home" title="AVMCMP+ Home" aria-label="Domů"><span>A+</span></button>
     <div class="rail-menu">
       <div class="rail-section-label">MENU</div>
       <button class="rail-btn active" data-page="home" data-label="Domů" title="Domů"><svg viewBox="0 0 24 24"><path d="m3 10 9-7 9 7v10a1 1 0 0 1-1 1h-5v-7H9v7H4a1 1 0 0 1-1-1z"/></svg><span>Domů</span></button>
@@ -637,26 +723,26 @@
   </aside>
   <main class="main">
     <header class="topbar">
-      <div class="wordmark">WAVE<span>•</span></div>
+      <div class="wordmark">AVMCMP<span>+</span></div>
       <nav class="topnav" aria-label="Obsah"><button class="nav-link active" data-page="home">Domů</button><button class="nav-link" data-page="player">Přehrávač</button><button class="nav-link" data-page="movies">Objevit</button><button class="nav-link" data-page="favorites">Knihovna</button><button class="nav-link" data-page="guide">Live TV</button></nav>
       <div class="top-actions">
         <label class="search"><svg viewBox="0 0 24 24"><circle cx="10.8" cy="10.8" r="6.8"/><path d="m16 16 5 5"/></svg><input id="globalSearch" type="search" placeholder="Hledat filmy, seriály, kanály…" autocomplete="off"></label>
         <button class="icon-btn" id="refreshBtn" title="Obnovit knihovnu"><svg viewBox="0 0 24 24"><path d="M20 7v5h-5M4 17v-5h5"/><path d="M5.6 9A7 7 0 0 1 18 6l2 6M4 12l2 6a7 7 0 0 0 12.4-3"/></svg></button>
-        <button class="btn primary" id="addPlaylistBtn"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg><span>Přidat zdroj</span></button>
+        <button class="btn primary" id="addPlaylistBtn"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg><span>Přidat vstup</span></button>
       </div>
     </header>
 
     <section class="page-view active" id="view-home">
       <div class="home-hero" id="homeHero">
         <div class="hero-copy">
-          <div class="hero-kicker"><span class="hero-kicker-dot"></span> WAVE STREAMING</div>
+          <div class="hero-kicker"><span class="hero-kicker-dot"></span> AVMCMP+ MEDIA</div>
           <div class="hero-overline" id="homeHeroOverline">VŠE NA JEDNOM MÍSTĚ</div>
           <h1 id="homeHeroTitle">Váš svět zábavy.<br>Bez hranic.</h1>
           <p id="homeHeroDesc">Filmy, seriály a živé vysílání z vašich vlastních zdrojů. Jedna knihovna, jeden přehled.</p>
           <div class="hero-meta" id="homeHeroMeta"><span>LOKÁLNÍ KNIHOVNA</span><i></i><span>M3U · M3U8 · XMLTV</span></div>
-          <div class="hero-actions"><button class="btn primary hero-main-action" id="homePrimary"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg><span>Přidat zdroj</span></button><button class="btn hero-secondary-action" id="homeSecondary">Procházet TV program</button></div>
+          <div class="hero-actions"><button class="btn primary hero-main-action" id="homePrimary"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg><span>Přidat vstup</span></button><button class="btn hero-secondary-action" id="homeSecondary">Procházet TV program</button></div>
         </div>
-        <div class="hero-art" id="homeHeroArt" aria-hidden="true"><div class="hero-art-orbit orbit-one"></div><div class="hero-art-orbit orbit-two"></div><div class="hero-art-core"><span>W</span></div></div>
+        <div class="hero-art" id="homeHeroArt" aria-hidden="true"><div class="hero-art-orbit orbit-one"></div><div class="hero-art-orbit orbit-two"></div><div class="hero-art-core"><span>A+</span></div></div>
         <div class="hero-bottom-fade"></div>
       </div>
       <div class="home-welcome-row"><div><div class="section-kicker">VAŠE STREAMOVACÍ MÍSTO</div><h2>Objevte svůj obsah</h2><p>Všechny zdroje zůstávají uložené lokálně v tomto zařízení.</p></div><div class="home-stats"><div><strong id="homeChannelCount">0</strong><span>kanálů</span></div><div><strong id="homeMovieCount">0</strong><span>filmů</span></div><div><strong id="homeSeriesCount">0</strong><span>seriálů</span></div></div></div>
@@ -681,7 +767,7 @@
     </section>
 
     <section class="page-view player-page-view" id="view-player">
-      <div class="page-head"><div><div class="eyebrow">WAVE MEDIA ENGINE</div><h1>Přehrávač</h1><p class="subhead">Jedno místo pro živé vysílání, filmy, epizody i lokální soubory.</p></div><div class="head-right"><span class="player-hint" id="playerEngineStatus">LOKÁLNÍ PŘEHRÁVAČ</span></div></div>
+      <div class="page-head"><div><div class="eyebrow">AVMCMP+ MEDIA</div><h1>Přehrávač</h1><p class="subhead">Jedno místo pro živé vysílání, filmy, epizody i lokální soubory.</p></div><div class="head-right"><span class="player-hint" id="playerEngineStatus">LOKÁLNÍ PŘEHRÁVAČ</span></div></div>
       <div id="playerPageMount">
         <div class="below-grid" id="belowGrid">
           <section class="player-card">
@@ -735,7 +821,7 @@
       <section class="qbt-panel" aria-label="qBittorrent download manager">
         <div class="qbt-panel-head">
           <div class="qbt-brand-mark">qB</div>
-          <div class="qbt-title-wrap"><div class="eyebrow">DOWNLOAD MANAGER</div><h2>qBittorrent</h2><p>Napojte místní torrent klient a spravujte stahování přímo ve WAVE.</p></div>
+          <div class="qbt-title-wrap"><div class="eyebrow">DOWNLOAD MANAGER</div><h2>qBittorrent</h2><p>Napojte místní torrent klient a spravujte stahování přímo v AVMCMP+.</p></div>
           <span class="qbt-state disconnected" id="qbtState"><i></i> Odpojeno</span>
         </div>
         <div class="qbt-connect-form">
@@ -758,20 +844,41 @@
         <label class="sk-sort-label" for="sktorrentSort">Řadit</label><select id="sktorrentSort" class="filter-select"><option value="newest">Nejnovější</option><option value="title">Název A–Z</option><option value="category">Kategorie</option></select>
         <span class="sk-sync-status" id="sktorrentStatus">RSS není připojeno · lze importovat lokální RSS</span>
       </div>
-      <div class="sk-grid" id="sktorrentGrid"><div class="sk-empty"><strong>SKTorrent katalog čeká na připojení</strong><p>Vložte vlastní RSS URL nebo importujte RSS XML soubor. Položky se uloží do lokální knihovny WAVE IPTV.</p><button class="btn" id="sktorrentInitialSetup">Otevřít nastavení RSS trackeru</button></div></div>
+      <div class="sk-grid" id="sktorrentGrid"><div class="sk-empty"><strong>SKTorrent katalog čeká na připojení</strong><p>Vložte vlastní RSS URL nebo importujte RSS XML soubor. Položky se uloží do lokální knihovny AVMCMP+.</p><button class="btn" id="sktorrentInitialSetup">Otevřít nastavení RSS trackeru</button></div></div>
       <input id="sktorrentFile" type="file" accept=".rss,.xml,.atom,application/rss+xml,application/xml,text/xml" hidden>
     </section>
 
     <section class="page-view" id="view-settings">
       <div class="page-head"><div><div class="eyebrow">PREFERENCES</div><h1>Nastavení</h1><p class="subhead">Playlisty, programový průvodce a lokální data.</p></div></div>
-      <div class="settings-card"><h3>Datové zdroje</h3><p>Playlisty, EPG a katalogy se ukládají lokálně do tohoto zařízení. Vzdálené zdroje se načítají přímo od vašeho poskytovatele.</p><div class="settings-row"><div><strong>Aktuální playlist</strong><small id="activePlaylistName">Ukázkový playlist</small></div><button class="btn" id="managePlaylistBtn">Přidat zdroj</button></div><div class="settings-row playlist-manager"><div><strong>Uložené M3U playlisty</strong><small>Přepínejte mezi dříve importovanými seznamy.</small></div><select class="filter-select" id="savedPlaylists" aria-label="Uložené playlisty"><option value="">Žádné uložené playlisty</option></select><button class="btn" id="activatePlaylistBtn">Otevřít</button><button class="btn" id="deletePlaylistBtn">Odebrat</button></div><div class="settings-row"><div><strong>Programový průvodce (EPG)</strong><small id="epgStatus">Ukázková data · XMLTV lze importovat</small></div><button class="btn" id="addEpgBtn">Přidat EPG</button></div></div>
-      <div class="settings-card"><h3>Přehrávání a soukromí</h3><p>Ve Windows jsou knihovna, stream adresy i uložené přihlašovací údaje chráněny šifrováním DPAPI pro aktuální účet Windows. Qbittorrent přihlašovací údaje zůstávají pouze v paměti po dobu běhu aplikace.</p><div class="settings-row"><div><strong>Automaticky spustit stream po výběru kanálu</strong><small>Po kliknutí na kanál zahájí přehrávání.</small></div><button class="toggle on" id="autoplayToggle" aria-label="Automatické přehrávání"></button></div><div class="settings-row"><div><strong>Vymazat lokální data</strong><small>Odstraní uložené playlisty, EPG, katalogy a přihlašovací údaje.</small></div><button class="btn" id="clearDataBtn">Vymazat data</button></div><div class="settings-row" id="quitAppRow" style="display:none"><div><strong>Ukončit WAVE IPTV</strong><small>Zavře lokální server aplikace.</small></div><button class="btn" id="quitApp">Ukončit aplikaci</button></div></div>
-      <div class="settings-card"><h3>O aplikaci WAVE IPTV</h3><p>Lokální IPTV přehrávač pro M3U/M3U8, Xtream Codes a XMLTV EPG. Aplikace neodesílá playlisty do žádného vlastního cloudu. HLS přehrávání závisí na podpoře prohlížeče; pro spolehlivé HLS lze použít VLC / MPV.</p></div>
+      <div class="settings-card"><h3>Datové zdroje</h3><p>Playlisty, EPG a katalogy se ukládají lokálně do tohoto zařízení. Vzdálené zdroje se načítají přímo od vašeho poskytovatele.</p><div class="settings-row"><div><strong>Aktuální playlist</strong><small id="activePlaylistName">Ukázkový playlist</small></div><button class="btn" id="managePlaylistBtn">Přidat vstup</button></div><div class="settings-row playlist-manager"><div><strong>Uložené M3U playlisty</strong><small>Přepínejte mezi dříve importovanými seznamy.</small></div><select class="filter-select" id="savedPlaylists" aria-label="Uložené playlisty"><option value="">Žádné uložené playlisty</option></select><button class="btn" id="activatePlaylistBtn">Otevřít</button><button class="btn" id="deletePlaylistBtn">Odebrat</button></div><div class="settings-row"><div><strong>Programový průvodce (EPG)</strong><small id="epgStatus">Ukázková data · XMLTV lze importovat</small></div><button class="btn" id="addEpgBtn">Přidat EPG</button></div></div>
+      <div class="settings-card"><h3>Přehrávání a soukromí</h3><p>Ve Windows jsou knihovna, stream adresy i uložené přihlašovací údaje chráněny šifrováním DPAPI pro aktuální účet Windows. Qbittorrent přihlašovací údaje zůstávají pouze v paměti po dobu běhu aplikace.</p><div class="settings-row"><div><strong>Automaticky spustit stream po výběru kanálu</strong><small>Po kliknutí na kanál zahájí přehrávání.</small></div><button class="toggle on" id="autoplayToggle" aria-label="Automatické přehrávání"></button></div><div class="settings-row"><div><strong>Vymazat lokální data</strong><small>Odstraní uložené playlisty, EPG, katalogy a přihlašovací údaje.</small></div><button class="btn" id="clearDataBtn">Vymazat data</button></div><div class="settings-row" id="quitAppRow" style="display:none"><div><strong>Ukončit AVMCMP+</strong><small>Zavře lokální server aplikace.</small></div><button class="btn" id="quitApp">Ukončit aplikaci</button></div></div>
+      <div class="settings-card"><h3>O aplikaci AVMCMP+</h3><p>Lokální IPTV přehrávač pro M3U/M3U8, Xtream Codes a XMLTV EPG. Aplikace neodesílá playlisty do žádného vlastního cloudu. HLS přehrávání závisí na podpoře prohlížeče; pro spolehlivé HLS lze použít VLC / MPV.</p></div>
     </section>
   </main>
 </div>
 
-<div class="modal-backdrop" id="playlistModal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+
+<div class="modal-backdrop source-hub-backdrop" id="sourceHubModal" role="dialog" aria-modal="true" aria-labelledby="sourceHubTitle">
+  <div class="modal source-hub-modal">
+    <div class="modal-head">
+      <div><div class="eyebrow">AVMCMP+ INPUT CENTER</div><h2 id="sourceHubTitle">Přidat nový vstup</h2></div>
+      <button class="close" data-close="sourceHubModal" aria-label="Zavřít">×</button>
+    </div>
+    <p class="source-hub-intro">Vyberte zdroj médií. Všechny vstupy jsou dostupné z tohoto menu a jejich nastavení zůstává přehledně oddělené.</p>
+    <div class="source-hub-grid">
+      <button class="source-choice" data-source-action="m3u-url"><span class="source-choice-icon"><svg viewBox="0 0 24 24"><path d="M4 5h16M4 10h16M4 15h10M4 20h7"/><path d="m17 14 4 4-4 4"/></svg></span><span><strong>IPTV playlist URL</strong><small>M3U / M3U8 · internetový odkaz</small></span><span class="source-choice-arrow">↗</span></button>
+      <button class="source-choice" data-source-action="m3u-file"><span class="source-choice-icon"><svg viewBox="0 0 24 24"><path d="M13 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V10z"/><path d="M13 3v7h7M8 15h8M8 18h5"/></svg></span><span><strong>Playlist soubor</strong><small>Import M3U / M3U8 z disku</small></span><span class="source-choice-arrow">↗</span></button>
+      <button class="source-choice" data-source-action="xtream"><span class="source-choice-icon"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="3"/><path d="M8 9h8M8 13h5M8 17h8"/></svg></span><span><strong>Xtream Codes</strong><small>Server, uživatel a heslo · Live / VOD</small></span><span class="source-choice-arrow">↗</span></button>
+      <button class="source-choice" data-source-action="epg"><span class="source-choice-icon"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="17" rx="2"/><path d="M8 2v4M16 2v4M3 9h18M8 13h3M8 17h7"/></svg></span><span><strong>TV program · XMLTV</strong><small>EPG průvodce z URL nebo souboru</small></span><span class="source-choice-arrow">↗</span></button>
+      <button class="source-choice" data-source-action="local"><span class="source-choice-icon"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m10 9 5 3-5 3zM8 22h8"/></svg></span><span><strong>Lokální média</strong><small>Video soubory z tohoto zařízení</small></span><span class="source-choice-arrow">↗</span></button>
+      <button class="source-choice" data-source-action="rss"><span class="source-choice-icon"><svg viewBox="0 0 24 24"><path d="M5 19a2 2 0 1 0 0 .01M4 4a16 16 0 0 1 16 16M4 10a10 10 0 0 1 10 10"/></svg></span><span><strong>RSS katalog</strong><small>Vlastní RSS feed nebo XML import</small></span><span class="source-choice-arrow">↗</span></button>
+      <button class="source-choice" data-source-action="qbt"><span class="source-choice-icon source-choice-qbt">qB</span><span><strong>qBittorrent</strong><small>Lokální klient a fronta stahování</small></span><span class="source-choice-arrow">↗</span></button>
+    </div>
+    <div class="source-hub-foot"><span class="source-hub-status"><i></i> Lokální knihovna · bez vlastního cloudu</span><span>AVMCMP+ MEDIA CENTER</span></div>
+  </div>
+</div>
+
+<div class="modal-backdrop" id="playlistModal"<div class="modal-backdrop" id="playlistModal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
   <div class="modal wide"><div class="modal-head"><h2 id="modalTitle">Přidat zdroj</h2><button class="close" data-close="playlistModal" aria-label="Zavřít">×</button></div>
     <div class="modal-tabs"><button class="modal-tab active" data-mode="url">M3U URL</button><button class="modal-tab" data-mode="file">Soubor M3U</button><button class="modal-tab" data-mode="xtream">Xtream Codes</button></div>
     <div id="playlistUrlMode"><div class="field"><label for="playlistName">Název playlistu</label><input id="playlistName" placeholder="Např. Moje IPTV" value="Můj playlist"></div><div class="field"><label for="playlistUrl">URL playlistu (.m3u / .m3u8)</label><input id="playlistUrl" type="url" placeholder="https://server.example/playlist.m3u"></div><div class="field-note">URL se načítá přes lokální aplikaci. Přístupové údaje ve stream URL zůstávají pouze v lokálních datech.</div></div>
@@ -792,7 +899,7 @@
     <button class="content-modal-close" data-close="contentModal" aria-label="Zavřít">×</button>
     <div class="content-modal-art" id="contentModalArt"></div>
     <div class="content-modal-body">
-      <div class="content-modal-kicker" id="contentModalKicker">WAVE LIBRARY</div>
+      <div class="content-modal-kicker" id="contentModalKicker">AVMCMP+ LIBRARY</div>
       <h2 id="contentModalTitle">Název titulu</h2>
       <div class="content-modal-meta" id="contentModalMeta"></div>
       <p id="contentModalDesc">Informace o titulu.</p>
@@ -818,13 +925,13 @@
         <button class="btn" id="sktorrentDetailTracker">Otevřít stránku</button>
         <button class="btn" id="sktorrentDetailPlay">Přehrát stažené video</button>
       </div>
-      <div class="sk-detail-help">Přidání do klienta předá magnet nebo torrent odkaz systému Windows. Stažené MP4/WebM soubory lze přehrávat přímo ve WAVE. MKV a další formáty lze předat do VLC / MPV. Samotné stahování zajišťuje váš torrent klient.</div>
+      <div class="sk-detail-help">Přidání do klienta předá magnet nebo torrent odkaz systému Windows. Stažené MP4/WebM soubory lze přehrávat přímo v AVMCMP+. MKV a další formáty lze předat do VLC / MPV. Samotné stahování zajišťuje váš torrent klient.</div>
     </div>
   </div>
 </div>
 
 <div class="mini-player-dock" id="miniPlayerDock" hidden>
-  <div class="mini-player-art">W</div><div class="mini-player-copy"><strong id="miniPlayerTitle">WAVE Player</strong><span id="miniPlayerSubtitle">Připraveno k přehrávání</span></div><span class="mini-player-live" id="miniPlayerStatus">READY</span><button class="btn" id="miniPlayerOpen">Otevřít přehrávač</button><button class="icon-btn" id="miniPlayerStop" title="Zastavit">×</button>
+  <div class="mini-player-art">A+</div><div class="mini-player-copy"><strong id="miniPlayerTitle">AVMCMP+ Player</strong><span id="miniPlayerSubtitle">Připraveno k přehrávání</span></div><span class="mini-player-live" id="miniPlayerStatus">READY</span><button class="btn" id="miniPlayerOpen">Otevřít přehrávač</button><button class="icon-btn" id="miniPlayerStop" title="Zastavit">×</button>
 </div>
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
@@ -1061,7 +1168,7 @@
     const dock=$('#miniPlayerDock');if(!dock)return;
     const visible=!!state.activeMediaUrl;dock.hidden=!visible;
     if(!visible)return;
-    $('#miniPlayerTitle').textContent=state.activeMediaTitle||'WAVE Player';
+    $('#miniPlayerTitle').textContent=state.activeMediaTitle||'AVMCMP+ Player';
     $('#miniPlayerSubtitle').textContent=state.activeMediaCaption||'Přehrávání';
     $('#miniPlayerStatus').textContent=$('#playerStatus')?.textContent||'READY';
   }
@@ -1073,9 +1180,9 @@
   }
   function playMedia(url,title,caption='',meta={}) {
     if(!url){toast('Tato položka nemá dostupnou stream adresu.');return;}
-    const video=$('#video');const wrap=$('#videoWrap');state.activeMediaUrl=url;state.activeMediaTitle=title||'WAVE Player';state.activeMediaCaption=caption||'Přehrávání z vaší knihovny';state.activeMediaMeta=meta||{};
+    const video=$('#video');const wrap=$('#videoWrap');state.activeMediaUrl=url;state.activeMediaTitle=title||'AVMCMP+ Player';state.activeMediaCaption=caption||'Přehrávání z vaší knihovny';state.activeMediaMeta=meta||{};
     if(state.hls){state.hls.destroy();state.hls=null;}video.pause();video.removeAttribute('src');video.load();
-    $('#playerLogo').textContent='W.';$('#playerChannel').textContent=title;$('#playerCaption').textContent=caption||'Přehrávání z knihovny';$('#playerStatus').textContent='LOADING';$('#playerLibraryToggle').textContent=meta?.saveItem?(catalogIsSaved(meta.saveKind||meta.kind,meta.saveItem)?'Odebrat z knihovny':'Přidat do knihovny'):'Uložit titul';
+    $('#playerLogo').textContent='A+';$('#playerChannel').textContent=title;$('#playerCaption').textContent=caption||'Přehrávání z knihovny';$('#playerStatus').textContent='LOADING';$('#playerLibraryToggle').textContent=meta?.saveItem?(catalogIsSaved(meta.saveKind||meta.kind,meta.saveItem)?'Odebrat z knihovny':'Přidat do knihovny'):'Uložit titul';
     $('#videoPlaceholder').style.display='none';wrap.classList.add('playing');
     rememberPlayback(url,title,caption,meta);
     const isHls=/\.m3u8(?:$|[?#])/i.test(url);const resumeEntry=(state.watchHistory||[]).find(x=>x.key===(meta.localPath||url));let fallbackStarted=false;
@@ -1145,7 +1252,7 @@
       const title=x.title||x.name||'Bez názvu';const cover=x.cover||x.stream_icon||'';const type=x.source==='local'?'LOKÁLNÍ VIDEO':x.source==='sktorrent'?'SKTORRENT':x.kind==='series'?'SERIÁL':'FILM';
       const src=x.source==='local'?'local':x.source==='sktorrent'?'sktorrent':'catalog';
       const key=x.source==='local'?(x.path||x.id||''):(x.id??'');
-      return `<button class="library-media-card" data-lib-source="${attr(src)}" data-lib-id="${attr(key)}"><span class="library-media-cover">${cover?`<img loading="lazy" referrerpolicy="no-referrer" src="${attr(cover)}" alt="" onerror="this.remove()">`:`<span>${esc(initials(title))}</span>`}<span class="library-media-label">${type}</span><span class="library-media-play"><b>▶</b></span></span><span class="library-media-title">${esc(title)}</span><span class="library-media-meta">${esc(x.category||x.extension||'WAVE Library')}${x.year?` · ${esc(x.year)}`:''}</span></button>`;
+      return `<button class="library-media-card" data-lib-source="${attr(src)}" data-lib-id="${attr(key)}"><span class="library-media-cover">${cover?`<img loading="lazy" referrerpolicy="no-referrer" src="${attr(cover)}" alt="" onerror="this.remove()">`:`<span>${esc(initials(title))}</span>`}<span class="library-media-label">${type}</span><span class="library-media-play"><b>▶</b></span></span><span class="library-media-title">${esc(title)}</span><span class="library-media-meta">${esc(x.category||x.extension||'AVMCMP+ Library')}${x.year?` · ${esc(x.year)}`:''}</span></button>`;
     }).join(''):`<div class="sk-empty"><strong>${q?'Žádné výsledky':'Knihovna je zatím prázdná'}</strong><p>${q?'Zkuste jiný výraz nebo filtr.':'Ukládejte filmy a seriály, přidejte lokální videa nebo označte kanály jako oblíbené.'}</p><button class="btn" data-page="movies">Objevit obsah</button></div>`;
     $$('#favoriteSktorrentGrid [data-lib-source]').forEach(btn=>btn.addEventListener('click',async()=>{
       const source=btn.dataset.libSource,id=btn.dataset.libId;
@@ -1360,7 +1467,7 @@
     $('#homePrimary').dataset.kind=featured?type:'';$('#homePrimary').dataset.id=featured?String(featured.id):'';
     const cover=featured?mediaCover(featured):'';
     hero.classList.toggle('has-feature',!!cover);
-    $('#homeHeroArt').innerHTML=cover?`<img src="${attr(cover)}" alt="" referrerpolicy="no-referrer" onerror="this.remove()">`:'<div class="hero-art-orbit orbit-one"></div><div class="hero-art-orbit orbit-two"></div><div class="hero-art-core"><span>W</span></div>';
+    $('#homeHeroArt').innerHTML=cover?`<img src="${attr(cover)}" alt="" referrerpolicy="no-referrer" onerror="this.remove()">`:'<div class="hero-art-orbit orbit-one"></div><div class="hero-art-orbit orbit-two"></div><div class="hero-art-core"><span>A+</span></div>';
     $('#homeChannelCount').textContent=state.channels.filter(c=>c.url).length||state.channels.length;
     $('#homeMovieCount').textContent=state.vod.length+(state.sktorrentItems||[]).filter(x=>x.kind==='movie').length;$('#homeSeriesCount').textContent=state.series.length+(state.sktorrentItems||[]).filter(x=>x.kind==='series').length;
     const sections=[];
@@ -1370,9 +1477,9 @@
       sections.push(homeShelf('Vaše TV kanály','Rychlý přístup k oblíbeným stanicím',`<div class="home-channel-row">${channelTiles}</div>`,'channels'));
     }
     if(visibleVod.length) sections.push(homeShelf('Filmy',query?'Výsledky vyhledávání':'Filmový katalog z aktivního zdroje',visibleVod.slice(0,16).map(x=>homePoster(x,'movie')).join(''),'movies',true));
-    else sections.push(homeShelf('Filmy','Váš katalog se zobrazí zde',`<div class="home-empty-tile"><strong>Filmová knihovna čeká na zdroj</strong><p>Přidejte Xtream Codes účet a načtěte svůj VOD katalog.</p><button class="btn" data-home-add>+ Přidat zdroj</button></div>`,'',true));
+    else sections.push(homeShelf('Filmy','Váš katalog se zobrazí zde',`<div class="home-empty-tile"><strong>Filmová knihovna čeká na zdroj</strong><p>Přidejte Xtream Codes účet a načtěte svůj VOD katalog.</p><button class="btn" data-home-add>+ Přidat vstup</button></div>`,'',true));
     if(visibleSeries.length) sections.push(homeShelf('Seriály',query?'Výsledky vyhledávání':'Sezóny a epizody z vašeho katalogu',visibleSeries.slice(0,16).map(x=>homePoster(x,'series')).join(''),'series',true));
-    else sections.push(homeShelf('Seriály','Všechny sezóny na jednom místě',`<div class="home-empty-tile"><strong>Seriálová knihovna je připravena</strong><p>Po připojení Xtream zdroje se zde zobrazí vaše seriály.</p><button class="btn" data-home-add>+ Přidat zdroj</button></div>`,'',true));
+    else sections.push(homeShelf('Seriály','Všechny sezóny na jednom místě',`<div class="home-empty-tile"><strong>Seriálová knihovna je připravena</strong><p>Po připojení Xtream zdroje se zde zobrazí vaše seriály.</p><button class="btn" data-home-add>+ Přidat vstup</button></div>`,'',true));
     const visibleSktorrent=(state.sktorrentItems||[]).filter(x=>!query||`${x.title} ${x.category} ${x.description||''}`.toLowerCase().includes(query));
     if(visibleSktorrent.length) {
       const tiles=visibleSktorrent.slice(0,16).map(item=>`<button class="poster-card" data-home-skitem="${attr(item.id)}"><span class="poster-cover">${item.cover?`<img loading="lazy" referrerpolicy="no-referrer" src="${attr(item.cover)}" alt="" onerror="this.remove()">`:`<span class="poster-placeholder"><span>${esc(initials(item.title))}</span></span>`}</span><span class="poster-title">${esc(item.title)}</span><span class="poster-meta">SKTorrent · ${item.kind==='series'?'TV / Seriál':'Film'}</span></button>`).join('');
@@ -1383,14 +1490,14 @@
       const cards=nowItems.map(({ch,p})=>`<button class="home-channel-card" data-home-program-channel="${attr(ch.id)}" data-home-program="${attr(p.id)}">${logoHTML(ch)}<span style="min-width:0"><span class="home-channel-name">${esc(p.title)}</span><span class="home-channel-group">${esc(ch.name)} · ${timeLabel(p.start)}–${timeLabel(p.stop)}</span></span></button>`).join('');
       sections.push(homeShelf('Právě v TV','Co právě běží na vašich kanálech',`<div class="home-channel-row">${cards}</div>`,'guide'));
     }
-    if(!channels.length&&!visibleVod.length&&!visibleSeries.length) sections.push(homeShelf(query?'Žádné výsledky':'Začněte tady',query?'Zkuste upravit hledaný výraz':'Přidejte vlastní obsah',`<div class="home-empty-tile"><strong>${query?'Nic jsme nenašli':'Zatím nemáte žádný obsah'}</strong><p>${query?'Pro tento výraz neodpovídají žádné kanály, filmy ani seriály.':'Importujte lokální M3U, URL playlist nebo Xtream Codes.'}</p><button class="btn primary" data-home-add>+ Přidat zdroj</button></div>`,'',true));
+    if(!channels.length&&!visibleVod.length&&!visibleSeries.length) sections.push(homeShelf(query?'Žádné výsledky':'Začněte tady',query?'Zkuste upravit hledaný výraz':'Přidejte vlastní obsah',`<div class="home-empty-tile"><strong>${query?'Nic jsme nenašli':'Zatím nemáte žádný obsah'}</strong><p>${query?'Pro tento výraz neodpovídají žádné kanály, filmy ani seriály.':'Importujte lokální M3U, URL playlist nebo Xtream Codes.'}</p><button class="btn primary" data-home-add>+ Přidat vstup</button></div>`,'',true));
     $('#homeSections').innerHTML=sections.join('');
     $$('#homeSections [data-home-channel]').forEach(btn=>btn.addEventListener('click',()=>{const ch=state.channels.find(x=>x.id===btn.dataset.homeChannel);if(!ch)return;state.selectedChannel=ch.id;const p=getCurrentProgram(ch);if(p){state.selectedProgram=p;renderDetails(ch,p);}if(ch.url)playChannel(ch);else toast('Tento ukázkový kanál nemá stream. Importujte vlastní playlist.');}));
     $$('#homeSections [data-home-program-channel]').forEach(btn=>btn.addEventListener('click',()=>{selectProgram(btn.dataset.homeProgramChannel,btn.dataset.homeProgram);const ch=state.channels.find(x=>x.id===btn.dataset.homeProgramChannel);if(!state.autoplay||!ch?.url)navigate('guide');}));
     $$('#homeSections [data-catalog-kind]').forEach(btn=>btn.addEventListener('click',()=>openContentDetails(btn.dataset.catalogKind,btn.dataset.id)));
     $$('#homeSections [data-home-skitem]').forEach(btn=>btn.addEventListener('click',()=>{const item=(state.sktorrentItems||[]).find(x=>String(x.id)===btn.dataset.homeSkitem);if(item)openSktorrentDetails(item);}));
     $$('#homeSections [data-home-page]').forEach(btn=>btn.addEventListener('click',()=>navigate(btn.dataset.homePage)));
-    $$('#homeSections [data-home-add]').forEach(btn=>btn.addEventListener('click',()=>openModal('playlistModal')));
+    $('#homeSections [data-home-add]').forEach(btn=>btn.addEventListener('click',()=>openModal('sourceHubModal')));
   }
   function catalogCard(item,kind) {
     const cover=mediaCover(item);const title=safeMediaTitle(item);
@@ -1440,7 +1547,7 @@
   // qBittorrent Web API integration. Credentials are sent only for the current
   // session and kept in the Go process cookie jar, never in browser storage or plaintext state files.
   async function qbtRequest(path, options={}) {
-    if(!IS_LOCAL_APP)throw new Error('qBittorrent vyžaduje desktopovou verzi WAVE IPTV.');
+    if(!IS_LOCAL_APP)throw new Error('qBittorrent vyžaduje desktopovou verzi AVMCMP+.');
     const response=await fetch(`/api/qbt/${path}?token=${encodeURIComponent(APP_TOKEN)}`,options);
     const body=await response.text();let data={};try{data=body?JSON.parse(body):{};}catch(e){data={error:body};}
     if(!response.ok)throw new Error(data.error||`qBittorrent API: HTTP ${response.status}`);
@@ -1727,17 +1834,48 @@
   function openSktorrentSetup() { openSktorrentSystemLink(SktorrentSetupUrl); }
   async function playSktorrentLocalFile() { await addLocalMedia(); }
 
-  function openModal(id) { $('#'+id).classList.add('open'); }
+  function openSourceInput(action) {
+    closeModal('sourceHubModal');
+    if(action==='m3u-url'||action==='m3u-file'||action==='xtream') {
+      const mode=action==='xtream'?'xtream':action==='m3u-file'?'file':'url';
+      const tab=$('.modal-tab[data-mode="'+mode+'"]',$('#playlistModal'));
+      if(tab&&!tab.classList.contains('active'))tab.click();
+      openModal('playlistModal');return;
+    }
+    if(action==='epg'){openModal('epgModal');return;}
+    if(action==='local'){addLocalMedia();return;}
+    if(action==='rss'){navigate('sktorrent');$('#sktorrentFeedUrl').focus({preventScroll:true});return;}
+    if(action==='qbt'){navigate('sktorrent');$('#qbtHost').focus({preventScroll:true});return;}
+  }
+
+    function openModal(id) { $('#'+id).classList.add('open'); }
   function closeModal(id) { $('#'+id).classList.remove('open'); }
   function updateClock() { const now=new Date();$('#clock').textContent=new Intl.DateTimeFormat('cs-CZ',{hour:'2-digit',minute:'2-digit',second:'2-digit'}).format(now);$('#dateLabel').textContent=new Intl.DateTimeFormat('cs-CZ',{weekday:'short',day:'numeric',month:'short',year:'numeric'}).format(now); }
   function jumpNow() { const el=$('#guideScroll');const start=new Date();start.setMinutes(Math.floor(start.getMinutes()/30)*30-60,0,0);const offset=(new Date()-start)/60000/30*Number(getComputedStyle(document.documentElement).getPropertyValue('--slot').replace('px',''));el.scrollTo({left:Math.max(0,offset-260),behavior:'smooth'}); }
+  function focusSpatialTarget(key) {
+    const active=document.activeElement;
+    if(!active||!(active.matches('button,[role="button"],a[href]')))return false;
+    const origin=active.getBoundingClientRect(),ox=origin.left+origin.width/2,oy=origin.top+origin.height/2;
+    const candidates=$('button:not([disabled]),[role="button"],a[href],input:not([disabled]),select:not([disabled])').filter(el=>el!==active&&el.getClientRects().length&&!el.closest('[hidden]'));
+    let best=null,bestScore=Infinity;
+    for(const el of candidates){
+      const r=el.getBoundingClientRect(),x=r.left+r.width/2,y=r.top+r.height/2,dx=x-ox,dy=y-oy;
+      const primary=key==='ArrowRight'?dx:key==='ArrowLeft'?-dx:key==='ArrowDown'?dy:-dy;
+      if(primary<=4)continue;
+      const cross=(key==='ArrowLeft'||key==='ArrowRight')?Math.abs(dy):Math.abs(dx),score=primary+cross*1.65;
+      if(score<bestScore){best=el;bestScore=score;}
+    }
+    if(!best)return false;
+    best.focus({preventScroll:true});best.scrollIntoView({block:'nearest',inline:'nearest',behavior:'smooth'});return true;
+  }
+
   function bindEvents() {
     $$('[data-page]').forEach(b=>b.addEventListener('click',()=>navigate(b.dataset.page)));
-    $('#addPlaylistBtn').addEventListener('click',()=>openModal('playlistModal'));$('#managePlaylistBtn').addEventListener('click',()=>openModal('playlistModal'));$('#addEpgBtn').addEventListener('click',()=>openModal('epgModal'));
+    $('#addPlaylistBtn').addEventListener('click',()=>openModal('sourceHubModal'));$('#managePlaylistBtn').addEventListener('click',()=>openModal('sourceHubModal'));$('#addEpgBtn').addEventListener('click',()=>openModal('epgModal'));$('[data-source-action]').forEach(b=>b.addEventListener('click',()=>openSourceInput(b.dataset.sourceAction)));
     $$('[data-close]').forEach(b=>b.addEventListener('click',()=>closeModal(b.dataset.close)));
     $$('.modal-backdrop').forEach(m=>m.addEventListener('click',e=>{if(e.target===m)m.classList.remove('open');}));
     $$('.modal-tab').forEach(b=>b.addEventListener('click',()=>{const modal=b.closest('.modal');$$('.modal-tab',modal).forEach(x=>x.classList.remove('active'));b.classList.add('active');if(b.dataset.mode){$('#playlistUrlMode').style.display=b.dataset.mode==='url'?'block':'none';$('#playlistFileMode').style.display=b.dataset.mode==='file'?'block':'none';$('#playlistXtreamMode').style.display=b.dataset.mode==='xtream'?'block':'none';}else{const mode=b.dataset.epgmode;$('#epgUrlMode').style.display=mode==='url'?'block':'none';$('#epgFileMode').style.display=mode==='file'?'block':'none';}}));
-    $('#homePrimary').addEventListener('click',()=>{const kind=$('#homePrimary').dataset.kind,id=$('#homePrimary').dataset.id;if(kind&&id)openContentDetails(kind,id);else openModal('playlistModal');});$('#homeSecondary').addEventListener('click',()=>navigate('guide'));$('#contentModalPlay').addEventListener('click',()=>{if(!selectedCatalog)return;const {kind,item}=selectedCatalog;closeModal('contentModal');if(kind==='movie'){playMedia(item.url,safeMediaTitle(item),item.category||'Film',{kind:'movie',cover:mediaCover(item),saveKind:kind,saveItem:item});}else openSeries(item.id);});$('#contentModalSave').addEventListener('click',()=>{if(selectedCatalog)toggleCatalogSave(selectedCatalog.kind,selectedCatalog.item);});$('#playerLibraryToggle').addEventListener('click',()=>{const m=state.activeMediaMeta;if(m?.saveItem){toggleCatalogSave(m.saveKind||m.kind,m.saveItem);}else toast('Tento zdroj nelze uložit jako katalogový titul.');});
+    $('#homePrimary').addEventListener('click',()=>{const kind=$('#homePrimary').dataset.kind,id=$('#homePrimary').dataset.id;if(kind&&id)openContentDetails(kind,id);else openModal('sourceHubModal');});$('#homeSecondary').addEventListener('click',()=>navigate('guide'));$('#contentModalPlay').addEventListener('click',()=>{if(!selectedCatalog)return;const {kind,item}=selectedCatalog;closeModal('contentModal');if(kind==='movie'){playMedia(item.url,safeMediaTitle(item),item.category||'Film',{kind:'movie',cover:mediaCover(item),saveKind:kind,saveItem:item});}else openSeries(item.id);});$('#contentModalSave').addEventListener('click',()=>{if(selectedCatalog)toggleCatalogSave(selectedCatalog.kind,selectedCatalog.item);});$('#playerLibraryToggle').addEventListener('click',()=>{const m=state.activeMediaMeta;if(m?.saveItem){toggleCatalogSave(m.saveKind||m.kind,m.saveItem);}else toast('Tento zdroj nelze uložit jako katalogový titul.');});
     $('#loadPlaylistBtn').addEventListener('click',loadPlaylist);$('#activatePlaylistBtn').addEventListener('click',activateSavedPlaylist);$('#deletePlaylistBtn').addEventListener('click',removeSavedPlaylist);$('#loadEpgBtn').addEventListener('click',loadEpg);$('#externalPlayer').addEventListener('click',openExternalPlayer);$('#playerPickLocal').addEventListener('click',addLocalMedia);$('#libraryAddLocal').addEventListener('click',addLocalMedia);$('#miniPlayerOpen').addEventListener('click',()=>navigate('player'));$('#miniPlayerStop').addEventListener('click',stopPlayer);$('#quitApp')?.addEventListener('click',()=>{if(IS_LOCAL_APP)fetch(`/api/quit?token=${encodeURIComponent(APP_TOKEN)}`,{method:'POST'}).then(()=>window.close());});$$('.library-tab').forEach(b=>b.addEventListener('click',()=>{$$('.library-tab').forEach(x=>x.classList.remove('active'));b.classList.add('active');state.libraryFilter=b.dataset.libraryFilter;renderLibraryView();}));$('#movieCategory').addEventListener('change',renderMovies);$('#seriesCategory').addEventListener('change',renderSeries);$('#sktorrentLoadBtn').addEventListener('click',()=>loadSktorrentFeed().catch(e=>toast(e.message)));$('#sktorrentImportBtn').addEventListener('click',()=>$('#sktorrentFile').click());$('#sktorrentDemoBtn').addEventListener('click',()=>loadSktorrentDemo().catch(e=>toast(e.message)));$('#sktorrentFile').addEventListener('change',e=>importSktorrentFile(e.target.files[0]).catch(err=>toast(err.message)));$('#sktorrentDetailTracker').addEventListener('click',()=>{if(selectedSktorrentItem?.link)openSktorrentSystemLink(selectedSktorrentItem.link);});$('#sktorrentDetailSave').addEventListener('click',()=>{if(selectedSktorrentItem)toggleSktorrentSaved(selectedSktorrentItem);});$('#sktorrentDetailTorrent').addEventListener('click',()=>{if(selectedSktorrentItem?.downloadUrl)openSktorrentTorrent(selectedSktorrentItem.downloadUrl);});$('#sktorrentDetailPlay').addEventListener('click',()=>{closeModal('sktorrentDetailModal');playSktorrentLocalFile();});$$('.sk-filter').forEach(b=>b.addEventListener('click',()=>{state.sktorrentFilter=b.dataset.skfilter;renderSktorrent();}));$('#sktorrentSort').addEventListener('change',e=>{state.sktorrentSort=e.target.value;renderSktorrent();});$('#sktorrentSetupBtn')?.addEventListener('click',openSktorrentSetup);$('#qbtConnectBtn')?.addEventListener('click',connectQbt);$('#qbtDisconnectBtn')?.addEventListener('click',disconnectQbt);$('#qbtRefreshBtn')?.addEventListener('click',()=>refreshQbtTasks());$('#qbtTasks')?.addEventListener('click',e=>{const play=e.target.closest('[data-qbt-play]');if(play){qbtPlayTorrent(play.dataset.qbtPlay);return;}const btn=e.target.closest('[data-qbt-action]');if(btn)qbtTorrentAction(btn.dataset.qbtHash,btn.dataset.qbtAction);});
     $$('.guide-tab').forEach(b=>b.addEventListener('click',()=>{$$('.guide-tab').forEach(x=>x.classList.remove('active'));b.classList.add('active');state.guideFilter=b.dataset.filter;renderGuide();}));
     $('#groupFilter').addEventListener('change',e=>{state.groupFilter=e.target.value;renderGuide();});$('#jumpNow').addEventListener('click',jumpNow);$('#refreshBtn').addEventListener('click',()=>{renderAll();toast('TV průvodce byl obnoven.');});
@@ -1746,7 +1884,7 @@
     $('#autoplayToggle').addEventListener('click',()=>{state.autoplay=!state.autoplay;$('#autoplayToggle').classList.toggle('on',state.autoplay);saveState();});
     $('#clearDataBtn').addEventListener('click',()=>{if(confirm('Opravdu odstranit všechny lokálně uložené playlisty, EPG a oblíbené kanály?')){localStorage.removeItem(STORAGE_KEY);clearTimeout(window.__waveSaveTimer);if(IS_LOCAL_APP)fetch(`/api/state?token=${encodeURIComponent(APP_TOKEN)}`,{method:'DELETE'}).catch(()=>{});stopPlayer();state.favorites=[];state.vod=[];state.series=[];state.movieCategories=[];state.seriesCategories=[];state.xtreamBase='';state.xtreamUser='';state.xtreamPass='';state.sktorrentFeedUrl='';state.sktorrentSourceName='';state.sktorrentItems=[];state.sktorrentSaved=[];state.sktorrentSavedItems=[];state.sktorrentUpdatedAt=0;state.savedCatalog=[];state.localLibrary=[];state.watchHistory=[];state.activeMediaUrl='';state.programs={};state.savedAt=0;state.playlists=[];state.currentPlaylistId='';setDemoChannels();renderAll();toast('Lokální data byla vymazána.');}});
     $('#video').addEventListener('pause',()=>{if(state.activeMediaUrl){const key=state.activeMediaMeta?.localPath||state.activeMediaUrl;const item=(state.watchHistory||[]).find(x=>x.key===key);if(item){item.currentTime=Number($('#video').currentTime||0);item.duration=Number($('#video').duration||0);item.updatedAt=Date.now();saveState();renderPlayerHistory();}}});
-    document.addEventListener('keydown',e=>{if(e.target.matches('input,textarea,select')||e.altKey||e.ctrlKey||e.metaKey)return;const v=$('#video');if(e.key===' '&&state.currentPage==='player'){e.preventDefault();if(v.paused)v.play().catch(()=>{});else v.pause();}else if(e.key.toLowerCase()==='f'&&state.currentPage==='player'){if(document.fullscreenElement)document.exitFullscreen?.();else $('#videoWrap').requestFullscreen?.();}else if(e.key==='Escape'&&document.fullscreenElement)document.exitFullscreen?.();});
+    document.addEventListener('keydown',e=>{if(e.altKey||e.ctrlKey||e.metaKey)return;if(['ArrowUp','ArrowDown','ArrowLeft','ArrowRight'].includes(e.key)&&!e.target.matches('input,textarea,select,video')&&focusSpatialTarget(e.key)){e.preventDefault();return;}if(e.target.matches('input,textarea,select'))return;const v=$('#video');if(e.key===' '&&state.currentPage==='player'){e.preventDefault();if(v.paused)v.play().catch(()=>{});else v.pause();}else if(e.key.toLowerCase()==='f'&&state.currentPage==='player'){if(document.fullscreenElement)document.exitFullscreen?.();else $('#videoWrap').requestFullscreen?.();}else if(e.key==='Escape'&&document.fullscreenElement)document.exitFullscreen?.();});
   }
   async function loadDiskState() {
     if(!IS_LOCAL_APP)return;

@@ -1,19 +1,19 @@
-WAVE IPTV 1.6.0
+AVMCMP+ Media Center
 Target: Windows x64
 Go: 1.23+
 CGO_ENABLED: 0
 Persistence: DPAPI-protected state.dpapi + credentials.dpapi
 UI: embedded web/index.html
+Desktop profile: %AppData%\WAVE IPTV (retained for compatibility)
 Local host: 127.0.0.1 only
 
-Verification performed in this build environment:
+Verification workflow:
 - go test ./...
 - go vet ./...
 - Node.js syntax check of embedded JavaScript
-- Windows x64 cross-compile (go build)
-- Windows x64 test binary compile (go test -c)
+- Windows x64 GUI EXE build
+- Artifact upload: avmcmp-plus-windows-x64
 
-Not verified here:
-- physical Windows GUI launch
-- DPAPI runtime round-trip on a Windows host
-- real IPTV / Xtream / SKTorrent account playback or sync
+Not verified until run on a physical Windows host:
+- desktop GUI launch and DPAPI runtime round-trip
+- real IPTV / Xtream / RSS account sync and playback
