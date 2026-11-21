@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="cs"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="app-token" content="__WAVE_TOKEN__"><meta name="theme-color" content="#101117">
+<title>WAVE IPTV</title><link rel="stylesheet" href="/styles.css"><script src="/app.js" defer></script>
+</head><body>
+<div class="shell">
+<aside class="sidebar"><a class="brand" href="#"><b>W</b><span>WAVE</span></a><small class="caption">WORKSPACE</small>
+<nav><button class="nav active" data-page="home">⌂ <span>Domů</span></button><button class="nav" data-page="live">▻ <span>Live TV</span></button><button class="nav" data-page="library">▤ <span>Knihovna</span></button><button class="nav" data-page="sources">⌁ <span>Zdroje</span></button></nav>
+<div class="side-bottom"><i></i> Lokální režim<small>WAVE · 0.1.0</small></div></aside>
+<main><header><div>WAVE <b>/</b> <strong id="breadcrumb">Domů</strong></div><label class="search">⌕ <input id="search" type="search" placeholder="Hledat kanály…"><kbd>CTRL K</kbd></label><span class="avatar">W</span></header>
+<section class="page active" id="page-home">
+<div class="hero"><div class="eyebrow">YOUR PERSONAL MEDIA SPACE</div><h1>Všechno, co<br><em>chcete sledovat.</em></h1><p>Vaše televize, vlastní playlisty a osobní knihovna. Jedno místo. Vaše pravidla.</p><button class="primary" id="importHome">＋ Přidat playlist</button><button class="secondary" data-page="live">Otevřít Live TV ↗</button><div class="hero-mark">W</div></div>
+<div class="section-title"><div><small>YOUR SPACE</small><h2>Vaše knihovna</h2></div><span id="sourceCount">0 zdrojů</span></div>
+<div class="metrics"><article><small>Playlisty</small><strong id="metricPlaylists">0</strong></article><article><small>Kanály</small><strong id="metricChannels">0</strong></article><article><small>Skupiny</small><strong id="metricGroups">0</strong></article></div>
+<h2 class="shelf-title">Nedávno přidané kanály</h2><div class="channel-grid" id="homeChannels"></div><div class="empty" id="homeEmpty"><h3>Začněte přidáním playlistu</h3><p>Importujte lokální M3U / M3U8. Data zůstávají ve vašem zařízení.</p><button class="primary" id="emptyImport">Importovat playlist</button></div>
+</section>
+<section class="page" id="page-live"><div class="page-heading"><div><small>TELEVISION</small><h1>Live TV</h1><p>Kanály z vašich vlastních M3U / M3U8 playlistů.</p></div><button class="primary" id="importLive">＋ Importovat playlist</button></div>
+<div class="toolbar"><select id="playlistSelect"><option value="">Všechny playlisty</option></select><div id="groupFilters"></div></div>
+<div class="live-layout"><div class="panel"><div class="panel-head">STANICE <span id="channelCount">0</span></div><div id="channelList" class="channel-list"></div></div>
+<aside class="player"><div class="panel-head">WAVE PLAYER <span id="playerStatus">READY</span></div><div class="video-wrap"><video id="video" controls playsinline></video><div id="videoEmpty"><b>▶</b><strong>Připraveno k přehrávání</strong><small>Vyberte kanál ze seznamu</small></div></div><div class="now-playing"><small>NOW PLAYING</small><h3 id="nowTitle">Žádný kanál není vybrán</h3><p id="nowSub">Vyberte stanici a spusťte přehrávání.</p></div></aside></div></section>
+<section class="page" id="page-library"><div class="page-heading"><div><small>YOUR COLLECTION</small><h1>Knihovna</h1><p>Oblíbené stanice a vlastní zdroje.</p></div></div><div id="favorites" class="channel-grid"></div></section>
+<section class="page" id="page-sources"><div class="page-heading"><div><small>SOURCE MANAGER</small><h1>Zdroje</h1><p>Správa lokálně importovaných playlistů.</p></div><button class="primary" id="importSources">＋ Přidat zdroj</button></div><div id="sourceList" class="panel source-list"></div></section>
+<input id="playlistFile" type="file" accept=".m3u,.m3u8" hidden><div id="toast" role="status"></div>
+</main></div></body></html>
