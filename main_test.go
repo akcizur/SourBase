@@ -15,7 +15,7 @@ func TestImportPlaylistAPIRequiresTokenAndPersists(t *testing.T) {
 	store, err := state.Open(filepath.Join(t.TempDir(), "library.dat"))
 	if err != nil { t.Fatal(err) }
 	app := &application{store: store, token: "test-token"}
-	payload := `{"name":"Local test","content":"#EXTM3U\n#EXTINF:-1 group-title=\\"News\\",Demo TV\nhttps://media.example/live/demo.m3u8\n"}`
+	payload := `{"name":"Local test","content":"#EXTM3U\n#EXTINF:-1,Demo TV\nhttps://media.example/live/demo.m3u8\n"}`
 
 	unauthorized := httptest.NewRequest(http.MethodPost, "/api/playlists/import", strings.NewReader(payload))
 	unauthorizedRec := httptest.NewRecorder()
