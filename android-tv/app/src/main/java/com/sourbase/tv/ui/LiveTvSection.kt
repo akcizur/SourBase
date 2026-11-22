@@ -19,6 +19,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -39,6 +40,7 @@ import androidx.tv.material3.Button
 import androidx.tv.material3.Text
 import com.sourbase.tv.data.EpgProgramme
 import com.sourbase.tv.data.RemoteMediaSourceRepository
+import com.sourbase.tv.data.SecureSourceStore
 import com.sourbase.tv.data.TvChannel
 import com.sourbase.tv.data.XmltvGuide
 import com.sourbase.tv.playback.PlayerEngine
@@ -46,7 +48,9 @@ import com.sourbase.tv.playback.SourbasePlayerView
 import java.time.Instant
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 private val liveAccent = Color(0xFFFF7043)
 private val livePanel = Color(0xFF1B2430)
@@ -56,6 +60,7 @@ private val liveMuted = Color(0xFF9BA8B8)
 fun LiveTvSection(modifier: Modifier = Modifier) {
     val context = LocalContext.current
     val repository = remember { RemoteMediaSourceRepository() }
+    val sourceStore = remember(context) { SecureSourceStore(context) }
     val playerEngine = remember(context) { PlayerEngine(context) }
     val scope = rememberCoroutineScope()
 
@@ -64,13 +69,33 @@ fun LiveTvSection(modifier: Modifier = Modifier) {
     var channels by remember { mutableStateOf(emptyList<TvChannel>()) }
     var guide by remember { mutableStateOf<XmltvGuide?>(null) }
     var selectedChannel by remember { mutableStateOf<TvChannel?>(null) }
-    var status by remember { mutableStateOf("Přidejte M3U/M3U8 playlist. Zdroj se zatím ukládá pouze po dobu této obrazovky.") }
+    var status by remember { mutableStateOf("Načítám uložené zdroje…") }
+    var sourcesReady by remember { mutableStateOf(false) }
+    var sourceStorageError by remember { mutableStateOf(false) }
     var loadingPlaylist by remember { mutableStateOf(false) }
     var loadingGuide by remember { mutableStateOf(false) }
     var playingError by remember { mutableStateOf<String?>(null) }
 
     DisposableEffect(playerEngine) {
         onDispose { playerEngine.release() }
+    }
+
+    LaunchedEffect(sourceStore) {
+        try {
+            val saved = withContext(Dispatchers.IO) { sourceStore.load() }
+            playlistUrl = saved.playlistUrl.orEmpty()
+            xmltvUrl = saved.xmltvUrl.orEmpty()
+            status = if (playlistUrl.isNotBlank() || xmltvUrl.isNotBlank()) {
+                "Uložené URL zdrojů byly bezpečně načteny."
+            } else {
+                "Přidejte M3U/M3U8 playlist a volitelný XMLTV EPG zdroj."
+            }
+        } catch (_: Exception) {
+            sourceStorageError = true
+            status = "Uložená URL nelze dešifrovat. Nebyla smazána ani přepsána."
+        } finally {
+            sourcesReady = true
+        }
     }
 
     Column(
@@ -114,6 +139,15 @@ fun LiveTvSection(modifier: Modifier = Modifier) {
                                 channels = parsed.channels
                                 selectedChannel = null
                                 playingError = null
+                                persistSourceUrls(
+                                    store = sourceStore,
+                                    playlistUrl = playlistUrl,
+                                    xmltvUrl = xmltvUrl,
+                                    onFailure = {
+                                        sourceStorageError = true
+                                        status = "Playlist načten, ale jeho URL se nepodařilo bezpečně uložit."
+                                    }
+                                )
                                 status = buildString {
                                     append("Načteno ")
                                     append(parsed.channels.size)
@@ -131,7 +165,7 @@ fun LiveTvSection(modifier: Modifier = Modifier) {
                         }
                     }
                 },
-                enabled = !loadingPlaylist
+                enabled = sourcesReady && !loadingPlaylist
             ) {
                 Text(if (loadingPlaylist) "Načítám…" else "Načíst playlist")
             }
@@ -147,6 +181,15 @@ fun LiveTvSection(modifier: Modifier = Modifier) {
                             val result = runCatching { repository.loadXmltv(xmltvUrl) }
                             result.onSuccess { parsed ->
                                 guide = parsed
+                                persistSourceUrls(
+                                    store = sourceStore,
+                                    playlistUrl = playlistUrl,
+                                    xmltvUrl = xmltvUrl,
+                                    onFailure = {
+                                        sourceStorageError = true
+                                        status = "EPG načteno, ale URL zdrojů se nepodařilo bezpečně uložit."
+                                    }
+                                )
                                 status = "EPG načteno: ${parsed.channels.size} stanic, ${parsed.programmes.size} pořadů."
                             }.onFailure { error ->
                                 status = error.message ?: "XMLTV průvodce se nepodařilo načíst."
@@ -155,7 +198,7 @@ fun LiveTvSection(modifier: Modifier = Modifier) {
                         }
                     }
                 },
-                enabled = !loadingGuide
+                enabled = sourcesReady && !loadingGuide
             ) {
                 Text(if (loadingGuide) "Načítám EPG…" else "Načíst EPG")
             }
@@ -290,11 +333,28 @@ fun LiveTvSection(modifier: Modifier = Modifier) {
         }
 
         Text(
-            text = "ZDROJE SE ZATÍM NEUKLÁDAJÍ NA ZAŘÍZENÍ · POUŽÍVEJTE VLASTNÍ OPRÁVNĚNÉ PLAYLISTY",
+            text = if (sourceStorageError) "ÚLOŽIŠTĚ ZDROJŮ VYŽADUJE KONTROLU · ULOŽENÁ DATA ZŮSTALA ZACHOVÁNA" else "URL JSOU ŠIFROVÁNA POMOCÍ ANDROID KEYSTORE · POUŽÍVEJTE VLASTNÍ OPRÁVNĚNÉ PLAYLISTY",
             color = Color(0xFF657386),
             fontSize = 9.sp,
             letterSpacing = 1.sp
         )
+    }
+}
+
+
+private fun kotlinx.coroutines.CoroutineScope.persistSourceUrls(
+    store: SecureSourceStore,
+    playlistUrl: String,
+    xmltvUrl: String,
+    onFailure: () -> Unit
+) {
+    launch {
+        val result = runCatching {
+            withContext(Dispatchers.IO) {
+                store.save(playlistUrl, xmltvUrl)
+            }
+        }
+        if (result.isFailure) onFailure()
     }
 }
 
