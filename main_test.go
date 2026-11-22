@@ -648,3 +648,39 @@ func TestCSFDMovieUsesExpectedEndpoint(t *testing.T) {
 		t.Fatalf("unexpected detail response %d: %s", rec.Code, rec.Body.String())
 	}
 }
+
+
+func TestCSFDRedirectCannotLeaveLocalService(t *testing.T) {
+	destinationHit := false
+	destination := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		destinationHit = true
+		w.Header().Set("Content-Type", "application/json")
+		io.WriteString(w, `{"unexpected":true}`)
+	}))
+	defer destination.Close()
+
+	redirector := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		http.Redirect(w, r, destination.URL+"/", http.StatusFound)
+	}))
+	defer redirector.Close()
+
+	identity := func(b []byte) ([]byte, error) { return append([]byte(nil), b...), nil }
+	app := &appServer{
+		token:           "secret",
+		credentialsPath: filepath.Join(t.TempDir(), "credentials.dpapi"),
+		protectData:     identity,
+		unprotectData:   identity,
+	}
+	if err := app.writeCredentials(privateCredentials{CSFDBaseURL: redirector.URL}); err != nil {
+		t.Fatal(err)
+	}
+	req := httptest.NewRequest(http.MethodGet, "/api/csfd/status?token=secret", nil)
+	rec := httptest.NewRecorder()
+	app.handleCSFDStatus(rec, req)
+	if rec.Code != http.StatusBadGateway {
+		t.Fatalf("expected redirect to be rejected as 502, got %d: %s", rec.Code, rec.Body.String())
+	}
+	if destinationHit {
+		t.Fatal("ČSFD adapter followed a redirect to a different local service")
+	}
+}
