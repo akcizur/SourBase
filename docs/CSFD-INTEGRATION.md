@@ -1,7 +1,7 @@
 # ČSFD metadata integration — technical record
 
 **Record date:** 2026-11-22  
-**Status:** implemented in the Windows desktop client; CI verification pending  
+**Status:** implemented in the Windows desktop client; Windows CI passed (run `44981380540`); live ČSFD/Docker and physical-device smoke tests remain pending  
 **Scope:** optional enrichment of the local movie and series catalogue. This is not an official ČSFD integration or partnership.
 
 ## 1. Product decision
@@ -147,6 +147,17 @@ This is **not an official ČSFD API**. The upstream package describes itself as 
 Use it only where you have a lawful basis and permission under the current ČSFD terms. This implementation is intentionally limited to individual, user-initiated lookups for a local personal catalogue. It does not circumvent login, anti-bot challenges, access controls or rate limits. Do not use it to build or distribute a competing copy of the ČSFD catalogue, mirror posters, harvest user data or resell metadata. If ČSFD blocks access, returns 429/503 or changes its terms, disable the connector and obtain permission or a licensed data source instead. This record is an engineering decision log, not legal advice.
 
 ## 9. Verification checklist
+
+**CI result — passed:** [Windows workflow run 44981380540](https://github.com/akcizur/SourBase/actions/runs/44981380540), code commit `279b41cc4510d9e148985af1370104397d4193bb`. The runner completed all of these steps successfully:
+
+- `go test ./...`
+- `go vet ./...`
+- Embedded UI JavaScript syntax check
+- PowerShell parser validation of both CSFD launcher scripts
+- Windows x64 `Sourbase.exe` build
+- Windows executable artifact upload (`sourbase-windows-x64`)
+
+The final documentation-only revisions followed that code commit; no CSFD runtime code changed after the verified build. This CI run validates the build and mocks, not a live ČSFD request.
 
 | Check | Expected |
 |---|---|
