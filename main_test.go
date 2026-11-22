@@ -591,3 +591,60 @@ func TestCSFDMovieRejectsInvalidID(t *testing.T) {
 		t.Fatalf("expected 400 for invalid ČSFD ID, got %d: %s", rec.Code, rec.Body.String())
 	}
 }
+
+
+func TestCSFDStatusUsesLocalServiceRoot(t *testing.T) {
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.URL.Path != "/" {
+			t.Errorf("expected service root, got %q", r.URL.Path)
+		}
+		w.Header().Set("Content-Type", "application/json")
+		io.WriteString(w, `{"name":"node-csfd-api","version":"5.16.1","links":["/search/:query","/movie/:id"]}`)
+	}))
+	defer server.Close()
+
+	identity := func(b []byte) ([]byte, error) { return append([]byte(nil), b...), nil }
+	app := &appServer{
+		token:           "secret",
+		credentialsPath: filepath.Join(t.TempDir(), "credentials.dpapi"),
+		protectData:     identity,
+		unprotectData:   identity,
+	}
+	if err := app.writeCredentials(privateCredentials{CSFDBaseURL: server.URL}); err != nil {
+		t.Fatal(err)
+	}
+	req := httptest.NewRequest(http.MethodGet, "/api/csfd/status?token=secret", nil)
+	rec := httptest.NewRecorder()
+	app.handleCSFDStatus(rec, req)
+	if rec.Code != http.StatusOK || !strings.Contains(rec.Body.String(), "node-csfd-api") {
+		t.Fatalf("unexpected status response %d: %s", rec.Code, rec.Body.String())
+	}
+}
+
+func TestCSFDMovieUsesExpectedEndpoint(t *testing.T) {
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.URL.Path != "/movie/535121" || r.URL.Query().Get("language") != "cs" {
+			t.Errorf("unexpected movie endpoint: %s", r.URL.String())
+		}
+		w.Header().Set("Content-Type", "application/json")
+		io.WriteString(w, `{"id":535121,"title":"Na špatné straně","year":"2018","rating":73,"ratingCount":6654,"poster":"https://image.pmgstatic.com/poster.jpg","genres":["Krimi","Drama"],"descriptions":["Popis filmu"],"creators":{"directors":[{"name":"S. Craig Zahler"}],"actors":[{"name":"Mel Gibson"}]}}`)
+	}))
+	defer server.Close()
+
+	identity := func(b []byte) ([]byte, error) { return append([]byte(nil), b...), nil }
+	app := &appServer{
+		token:           "secret",
+		credentialsPath: filepath.Join(t.TempDir(), "credentials.dpapi"),
+		protectData:     identity,
+		unprotectData:   identity,
+	}
+	if err := app.writeCredentials(privateCredentials{CSFDBaseURL: server.URL}); err != nil {
+		t.Fatal(err)
+	}
+	req := httptest.NewRequest(http.MethodGet, "/api/csfd/movie/535121?token=secret", nil)
+	rec := httptest.NewRecorder()
+	app.handleCSFDMovie(rec, req)
+	if rec.Code != http.StatusOK || !strings.Contains(rec.Body.String(), "ratingCount") {
+		t.Fatalf("unexpected detail response %d: %s", rec.Code, rec.Body.String())
+	}
+}
