@@ -19,11 +19,12 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
-import androidx.compose.material3.darkColorScheme
+import androidx.tv.material3.MaterialTheme
+import androidx.tv.material3.Surface
+import androidx.tv.material3.Text
+import androidx.tv.material3.darkColorScheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -31,6 +32,9 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusGroup
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
@@ -49,7 +53,8 @@ private val sections = listOf(
     TvSection("Živá TV", "IPTV", "Kanály, skupiny a televizní program na jednom místě."),
     TvSection("Filmy", "VOD", "Filmová knihovna a přehledné žánrové kolekce."),
     TvSection("Seriály", "VOD", "Sezóny, epizody a navazování ve sledování."),
-    TvSection("Knihovna", "MOJE SOURBASE", "Oblíbené položky a historie přehrávání.")
+    TvSection("Knihovna", "MOJE SOURBASE", "Oblíbené položky a historie přehrávání."),
+    TvSection("Hledat", "UNIVERZÁLNÍ", "Hledejte kanály, pořady, filmy a seriály.")
 )
 
 private val accent = Color(0xFFFF7043)
@@ -123,7 +128,7 @@ fun SourbaseTvApp() {
                             )
                         }
                         Text(
-                            text = "CZ  ·  DARK",
+                            text = "NÁHLED  ·  CZ",
                             color = muted,
                             fontSize = 13.sp,
                             fontWeight = FontWeight.SemiBold
@@ -174,8 +179,16 @@ private fun NavigationRail(
     onSelect: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
+    val initialFocusRequester = remember { FocusRequester() }
+
+    LaunchedEffect(Unit) {
+        initialFocusRequester.requestFocus()
+    }
+
     Column(
-        modifier = modifier.padding(top = 10.dp),
+        modifier = modifier
+            .padding(top = 10.dp)
+            .focusGroup(),
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
         Text(
@@ -193,7 +206,7 @@ private fun NavigationRail(
         )
         Spacer(modifier = Modifier.height(24.dp))
 
-        sections.forEach { section ->
+        sections.forEachIndexed { index, section ->
             var focused by remember { mutableStateOf(false) }
             val isSelected = selectedSection == section.title
             val shape = RoundedCornerShape(12.dp)
@@ -214,6 +227,10 @@ private fun NavigationRail(
                         width = if (focused) 2.dp else 1.dp,
                         color = if (focused) accent else Color.Transparent,
                         shape = shape
+                    )
+                    .then(
+                        if (index == 0) Modifier.focusRequester(initialFocusRequester)
+                        else Modifier
                     )
                     .clickable { onSelect(section.title) }
                     .focusable()

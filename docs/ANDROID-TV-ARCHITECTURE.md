@@ -18,7 +18,8 @@ Do not expose the loopback API to the network and do not attempt to read Windows
 The new `android-tv/` project is a native Android TV application:
 
 - Kotlin with AGP built-in Kotlin and Jetpack Compose for TV.
-- TV-first navigation with visible D-pad focus states.
+- TV-first navigation with visible D-pad focus states, initial focus on Domů and grouped focus traversal.
+- TV Material 3 components from `androidx.tv:tv-material`.
 - AndroidX Media3 / ExoPlayer with HLS and DASH modules.
 - Validated HTTP(S) playback sources with optional MIME hints and request headers.
 - App-private persistence and Android Keystore for any future secrets.
@@ -48,7 +49,7 @@ The Android models are an initial client-side contract. When the domain layer is
 
 ## Build locally
 
-Requirements: JDK 17, Android SDK platform 37, Android Gradle Plugin 9.1.1 and Gradle 9.3.1.
+Requirements: JDK 17, Android 17 preview SDK platform 37.0 (SDK channel 3), Android Gradle Plugin 9.2.0 and Gradle 9.4.1.
 
 ```bash
 cd android-tv

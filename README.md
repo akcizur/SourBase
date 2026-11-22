@@ -99,7 +99,7 @@ go build -trimpath -ldflags="-s -w -H=windowsgui" -o "Sourbase.exe" .
 
 ### Android TV
 
-Requires JDK 17, Android SDK platform 37, Android Gradle Plugin 9.1.1 and Gradle 9.3.1.
+Requires JDK 17, Android 17 preview SDK platform 37.0, Android Gradle Plugin 9.2.0 and Gradle 9.4.1.
 
 ```bash
 cd android-tv

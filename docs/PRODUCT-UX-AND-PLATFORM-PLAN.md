@@ -25,7 +25,7 @@ Současná Windows větev zachovává Go host, lokální webové UI, DPAPI úlo�
 
 V android-tv je Kotlin/Compose navigační shell, klientské modely MediaEntry, TvChannel, EpgProgramme a PlaybackSource a základ Media3/ExoPlayer. Aktuální home obrazovka je preview. Nejsou připojené M3U/M3U8 importy, Xtream autentizace, XMLTV parser a matching, 2D EPG grid, trvalý katalog, watch history, favourites, unified search, profily ani produkční ovládací overlay přehrávače.
 
-Přidání Maven Central mirroru překonalo opakované HTTP 429. Následující CI běh se dostal ke kontrole AAR metadat a odhalil nesoulad verzí: Compose 1.12.1 vyžaduje compileSdk 37 a AGP 9.1+. Toolchain je proto aktualizován na AGP 9.1.1, Gradle 9.3.1 a compileSdk 37; KGP plugin je nahrazen vestavěnou Kotlin podporou AGP 9.1.1. Dokud nový workflow neskončí úspěchem a nevytvoří APK artefakt, build není ověřený.
+Přidání Maven Central mirroru překonalo opakované HTTP 429. Následující CI běh se dostal ke kontrole AAR metadat a odhalil nesoulad verzí: Compose 1.12.1 vyžaduje compileSdk 37 a AGP 9.1+. Toolchain je proto aktualizován na AGP 9.2.0, Gradle 9.4.1 a compileSdk 37; Android 17 Preview se instaluje jako `platforms;android-37.0` přes SDK channel 3. KGP Android plugin je nahrazen vestavěnou Kotlin podporou AGP. Dokud nový workflow neskončí úspěchem a nevytvoří APK artefakt, build není ověřený.
 
 ### Chybějící platformy a služby
 
@@ -162,7 +162,8 @@ Budoucí návrh může zvažovat Widevine, FairPlay a PlayReady, ale reálné na
 
 - [Compose for TV release notes](https://developer.android.com/jetpack/androidx/releases/tv): tv-material 1.1.0 a tv-foundation 1.0.0 jsou uvedeny jako stable.
 - [Compose BOM a kompatibilita](https://developer.android.com/develop/ui/compose/setup-compose-dependencies-and-compiler): Compose 1.12.0+ vyžaduje compileSdk 37 a AGP 9.0+; používáme BOM 2026.09.00.
-- [Android Gradle Plugin 9.1.1](https://developer.android.com/build/releases/agp-9-1-0-release-notes): podporuje API 37, vyžaduje Gradle 9.3.1 a JDK 17.
+- [Android Gradle Plugin 9.2.0](https://developer.android.com/build/releases/agp-9-2-0-release-notes): podporuje API 37, vyžaduje Gradle 9.4.1 a JDK 17.
+- [Android 17 SDK setup](https://developer.android.com/about/versions/17/setup-sdk): API 37 je v Android Studio uvedeno jako Android Cinnamon Bun Preview; SDK manager musí instalovat preview platformu.
 - [AGP built-in Kotlin migration](https://developer.android.com/build/migrate-to-built-in-kotlin): AGP 9+ nahrazuje plugin org.jetbrains.kotlin.android vestavěnou podporou Kotlin.
 - [AndroidX Media3 releases](https://developer.android.com/jetpack/androidx/releases/media3): Media3 1.11.1 bylo publikováno 10. září 2026.
 - [Apple AVPlayer](https://developer.apple.com/documentation/avfoundation/avplayer): systémový přehrávač pro lokální/vzdálená média včetně HLS.
