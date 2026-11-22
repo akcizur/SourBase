@@ -136,38 +136,42 @@ fun SourbaseTvApp() {
                         )
                     }
 
-                    HeroPanel(
-                        selectedSection = selectedSection,
-                        description = section.description
-                    )
-
-                    Text(
-                        text = if (selectedSection == "Domů") "Prozkoumat Sourbase" else "Sekce",
-                        color = Color.White,
-                        fontSize = 21.sp,
-                        fontWeight = FontWeight.SemiBold
-                    )
-
-                    LazyRow(
-                        horizontalArrangement = Arrangement.spacedBy(16.dp),
-                        contentPadding = PaddingValues(end = 28.dp)
-                    ) {
-                        items(sections.filterNot { it.title == selectedSection }) { item ->
-                            SectionCard(
-                                section = item,
-                                onClick = { selectedSection = item.title }
-                            )
+                    if (selectedSection == "Živá TV") {
+                        LiveTvSection(modifier = Modifier.weight(1f))
+                    } else {
+                        HeroPanel(
+                            selectedSection = selectedSection,
+                            description = section.description
+                        )
+    
+                        Text(
+                            text = if (selectedSection == "Domů") "Prozkoumat Sourbase" else "Sekce",
+                            color = Color.White,
+                            fontSize = 21.sp,
+                            fontWeight = FontWeight.SemiBold
+                        )
+    
+                        LazyRow(
+                            horizontalArrangement = Arrangement.spacedBy(16.dp),
+                            contentPadding = PaddingValues(end = 28.dp)
+                        ) {
+                            items(sections.filterNot { it.title == selectedSection }) { item ->
+                                SectionCard(
+                                    section = item,
+                                    onClick = { selectedSection = item.title }
+                                )
+                            }
                         }
+    
+                        Spacer(modifier = Modifier.weight(1f))
+    
+                        Text(
+                            text = "ANDROID TV PREVIEW  ·  ZÁKLADNÍ ROZHRANÍ",
+                            color = Color(0xFF657386),
+                            fontSize = 11.sp,
+                            letterSpacing = 1.5.sp
+                        )
                     }
-
-                    Spacer(modifier = Modifier.weight(1f))
-
-                    Text(
-                        text = "ANDROID TV PREVIEW  ·  ZÁKLADNÍ ROZHRANÍ",
-                        color = Color(0xFF657386),
-                        fontSize = 11.sp,
-                        letterSpacing = 1.5.sp
-                    )
                 }
             }
         }
