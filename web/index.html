@@ -2701,7 +2701,7 @@
     const active=document.activeElement;
     if(!active||!(active.matches('button,[role="button"],a[href]')))return false;
     const origin=active.getBoundingClientRect(),ox=origin.left+origin.width/2,oy=origin.top+origin.height/2;
-    const candidates=$('button:not([disabled]),[role="button"],a[href],input:not([disabled]),select:not([disabled])').filter(el=>el!==active&&el.getClientRects().length&&!el.closest('[hidden]'));
+    const candidates=$$('button:not([disabled]),[role="button"],a[href],input:not([disabled]),select:not([disabled])').filter(el=>el!==active&&el.getClientRects().length&&!el.closest('[hidden]'));
     let best=null,bestScore=Infinity;
     for(const el of candidates){
       const r=el.getBoundingClientRect(),x=r.left+r.width/2,y=r.top+r.height/2,dx=x-ox,dy=y-oy;
