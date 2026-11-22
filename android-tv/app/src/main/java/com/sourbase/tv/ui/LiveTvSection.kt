@@ -270,9 +270,9 @@ fun LiveTvSection(modifier: Modifier = Modifier) {
                 channels = channels,
                 guide = currentGuide,
                 onProgrammeSelected = { channel, programme ->
-                    selectedChannel = channel
                     val now = System.currentTimeMillis()
                     if (now >= programme.startEpochMs && now < programme.endEpochMs) {
+                        selectedChannel = channel
                         playingError = null
                         runCatching { playerEngine.play(channel.stream) }
                             .onSuccess {
@@ -295,7 +295,7 @@ fun LiveTvSection(modifier: Modifier = Modifier) {
                                 append(" · ")
                                 append(it)
                             }
-                            append(" · Archivní přehrávání není dostupné; lze spustit živý kanál.")
+                            append(" · Catch-up není dostupný; živý kanál lze spustit v nabídce Kanály.")
                         }
                     }
                 },
