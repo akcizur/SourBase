@@ -968,6 +968,20 @@
       .hero-copy h1 { font-size:29px; }
     }
 
+  
+    @media(min-width:761px) {
+      .app { grid-template-columns:68px minmax(0,1fr); }
+      .rail { width:68px; padding:16px 5px 12px; }
+      .rail-section-label,.rail-separator,
+      .rail-btn[data-page="home"],.rail-btn[data-page="movies"],
+      .rail-btn[data-page="series"],.rail-btn[data-page="favorites"],
+      .rail-btn[data-page="guide"] { display:none; }
+      .rail-menu { gap:9px; }
+      .rail-btn { width:48px; height:48px; min-height:48px; gap:0; border-radius:13px; }
+      .rail-btn span { display:none; }
+      .main { padding-left:30px; padding-right:30px; }
+    }
+
   </style>
 </head>
 <body>
@@ -994,7 +1008,7 @@
   <main class="main">
     <header class="topbar">
       <div class="wordmark">Sourbase</div>
-      <nav class="topnav" aria-label="Obsah"><button class="nav-link active" data-page="home">Domů</button><button class="nav-link" data-page="player">Přehrávač</button><button class="nav-link" data-page="movies">Objevit</button><button class="nav-link" data-page="favorites">Knihovna</button><button class="nav-link" data-page="guide">Live TV</button></nav>
+      <nav class="topnav" aria-label="Obsah"><button class="nav-link active" data-page="home">Domů</button><button class="nav-link" data-page="movies">Filmy</button><button class="nav-link" data-page="series">Seriály</button><button class="nav-link" data-page="favorites">Knihovna</button><button class="nav-link" data-page="guide">Live TV</button></nav>
       <div class="top-actions">
         <label class="search"><svg viewBox="0 0 24 24"><circle cx="10.8" cy="10.8" r="6.8"/><path d="m16 16 5 5"/></svg><input id="globalSearch" type="search" placeholder="Hledat filmy, seriály, kanály…" autocomplete="off"></label>
         <button class="icon-btn preference-toggle language-toggle" id="languageToggle" title="Switch language to English" aria-label="Switch language to English">EN</button>
