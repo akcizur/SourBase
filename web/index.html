@@ -1798,7 +1798,7 @@
   function channelCardHTML(ch) { const fav=state.favorites.includes(ch.id);return `<button class="channel-card" data-channel="${attr(ch.id)}">${logoHTML(ch)}<span style="min-width:0"><span class="channel-card-name">${esc(ch.name)}</span><span class="channel-card-group">${esc(ch.group||'Ostatní')}</span></span><span class="fav" data-fav="${attr(ch.id)}" title="Oblíbené">${fav?'★':'☆'}</span></button>`; }
   function bindChannelCard(btn) { btn.addEventListener('click',(e)=>{const ch=state.channels.find(c=>c.id===btn.dataset.channel);if(!ch)return;if(e.target.closest('[data-fav]')){toggleFavorite(ch.id);return;}state.selectedChannel=ch.id;const p=getCurrentProgram(ch);if(p){state.selectedProgram=p;renderDetails(ch,p);}if(ch.url)playChannel(ch);else toast('Ukázkový kanál. Přidejte vlastní playlist pro přehrávání.');}); }
   function toggleFavorite(id) { state.favorites=state.favorites.includes(id)?state.favorites.filter(x=>x!==id):[...state.favorites,id];saveState();renderChannelLibrary();renderGuide(); }
-  function navigate(page) { state.currentPage=page;$$('.page-view').forEach(x=>x.classList.toggle('active',x.id===`view-${page}`));$$('[data-page]').forEach(x=>x.classList.toggle('active',x.dataset.page===page));if(page==='home')renderHome();if(page==='channels'||page==='favorites')renderChannelLibrary();if(page==='guide')renderGuide();if(page==='player')renderPlayerHistory();if(page==='movies')renderMovies();if(page==='series')renderSeries();if(page==='sktorrent')renderSktorrent(); }
+  function navigate(page) { state.currentPage=page;$$('.page-view').forEach(x=>x.classList.toggle('active',x.id===`view-${page}`));$$$('[data-page]').forEach(x=>x.classList.toggle('active',x.dataset.page===page));if(page==='home')renderHome();if(page==='channels'||page==='favorites')renderChannelLibrary();if(page==='guide')renderGuide();if(page==='player')renderPlayerHistory();if(page==='movies')renderMovies();if(page==='series')renderSeries();if(page==='sktorrent')renderSktorrent(); }
   function renderAll() { renderGroupFilter();renderGuide();renderChannelLibrary();renderMovies();renderSeries();renderSktorrent();renderHome();renderPlaylistManager();$('#activePlaylistName').textContent=state.playlistName;$('#epgStatus').textContent=state.epgName;$('#autoplayToggle').classList.toggle('on',state.autoplay); }
   let privateCredentialsLastSaved='',privateCredentialsWarningShown=false;
   async function persistPrivateCredentials() {
@@ -2249,7 +2249,7 @@
     $$('#homeSections [data-home-page]').forEach(button=>
       button.addEventListener('click',()=>navigate(button.dataset.homePage))
     );
-    $('#homeSections [data-home-add]').forEach(button=>
+    $$('#homeSections [data-home-add]').forEach(button=>
       button.addEventListener('click',()=>openModal('sourceHubModal'))
     );
   }
@@ -2716,9 +2716,9 @@
 
   function bindEvents() {
     bindSourbasePreferences();
-    $('[data-page]').forEach(b=>b.addEventListener('click',()=>navigate(b.dataset.page)));
-    $('.nav-more-menu [data-page]').forEach(b=>b.addEventListener('click',()=>{const menu=b.closest('.nav-more');if(menu)menu.open=false;}));
-    $('#addPlaylistBtn').addEventListener('click',()=>openModal('sourceHubModal'));$('#managePlaylistBtn').addEventListener('click',()=>openModal('sourceHubModal'));$('#addEpgBtn').addEventListener('click',()=>openModal('epgModal'));$('[data-source-action]').forEach(b=>b.addEventListener('click',()=>openSourceInput(b.dataset.sourceAction)));
+    $$('[data-page]').forEach(b=>b.addEventListener('click',()=>navigate(b.dataset.page)));
+    $$('.nav-more-menu [data-page]').forEach(b=>b.addEventListener('click',()=>{const menu=b.closest('.nav-more');if(menu)menu.open=false;}));
+    $('#addPlaylistBtn').addEventListener('click',()=>openModal('sourceHubModal'));$('#managePlaylistBtn').addEventListener('click',()=>openModal('sourceHubModal'));$('#addEpgBtn').addEventListener('click',()=>openModal('epgModal'));$$('[data-source-action]').forEach(b=>b.addEventListener('click',()=>openSourceInput(b.dataset.sourceAction)));
     $$('[data-close]').forEach(b=>b.addEventListener('click',()=>closeModal(b.dataset.close)));
     $$('.modal-backdrop').forEach(m=>m.addEventListener('click',e=>{if(e.target===m)m.classList.remove('open');}));
     $$('.modal-tab').forEach(b=>b.addEventListener('click',()=>{const modal=b.closest('.modal');$$('.modal-tab',modal).forEach(x=>x.classList.remove('active'));b.classList.add('active');if(b.dataset.mode){$('#playlistUrlMode').style.display=b.dataset.mode==='url'?'block':'none';$('#playlistFileMode').style.display=b.dataset.mode==='file'?'block':'none';$('#playlistXtreamMode').style.display=b.dataset.mode==='xtream'?'block':'none';}else{const mode=b.dataset.epgmode;$('#epgUrlMode').style.display=mode==='url'?'block':'none';$('#epgFileMode').style.display=mode==='file'?'block':'none';}}));
