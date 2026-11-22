@@ -1,8 +1,19 @@
 # Sourbase · Media Center
 
-Sourbase is a local-first media center for Windows. It combines IPTV, a personal media library, a shared player, EPG, Xtream VOD, local files, RSS catalogues and an optional local qBittorrent connection in one adaptive, TV-first interface.
+Sourbase is a local-first media center for Windows, with a new native Android TV client foundation. It combines IPTV, a personal media library, a shared player, EPG, Xtream VOD, local files, RSS catalogues and an optional local qBittorrent connection in one adaptive, TV-first product direction.
 
-## Interface
+## Platform direction
+
+- **Android TV first:** native Kotlin + Jetpack Compose interface designed for TV remotes and D-pad focus navigation. AndroidX Media3 provides the playback foundation for HLS and DASH.
+- **Web second:** responsive companion for source, catalogue and library management.
+- **Mobile third:** a future companion client based on the same platform-neutral domain contracts.
+- **Windows preserved:** the existing `Sourbase.exe` remains supported, including its embedded web interface and local media host.
+
+The Android project currently contains the TV navigation shell, data contracts for media/channels/EPG and a Media3 playback host. Playlist import, XMLTV parsing, provider login and persistent Android library storage are the next integration phases; the current Android home screen is explicitly a foundation preview, not a claim that those modules are already connected.
+
+See [Android TV architecture and delivery phases](docs/ANDROID-TV-ARCHITECTURE.md).
+
+## Windows interface
 
 - **TV-first desktop:** spacious large-screen layout, readable controls, strong focus states and keyboard / remote navigation.
 - **Responsive UI:** adapted layouts for desktop TVs, laptops, tablets and phones.
@@ -10,7 +21,7 @@ Sourbase is a local-first media center for Windows. It combines IPTV, a personal
 - **Appearance:** light and dark themes, switchable from the top bar.
 - **Source hub:** add M3U/M3U8 URLs or files, Xtream Codes, XMLTV EPG, local media, RSS catalogues or configure qBittorrent from one menu.
 
-## Included modules
+## Included Windows modules
 
 | Area | Purpose |
 |---|---|
@@ -23,7 +34,7 @@ Sourbase is a local-first media center for Windows. It combines IPTV, a personal
 | qBittorrent | Local Web UI connection, download queue and completed-file handoff |
 | Local Media | File picker and authenticated loopback byte-range streaming |
 
-## Local operation
+## Windows local operation
 
 1. Build and run `Sourbase.exe` on Windows 10/11 x64, or download it from the GitHub Actions build artifact.
 2. Sourbase binds its local host to `127.0.0.1` only and opens its media-center window.
@@ -49,15 +60,20 @@ Sourbase reuses the previous WAVE IPTV profile and encrypted data. Your existing
 
 Language and theme preferences are stored separately in browser local storage under `sourbase-ui-preferences-v1`; they do not overwrite the media library or protected credentials. DPAPI-protected files are intended to be opened by the same Windows account on the same machine. qBittorrent credentials are session-only and remain in memory while the application is running. Keep qBittorrent Web UI on localhost; do not expose it to the public internet.
 
+Android uses a separate app-private storage boundary. The Android client must not attempt to read Windows files protected by DPAPI. Device-side secret storage will use Android Keystore when source persistence is implemented.
+
 ## Playback notes
 
-- MP4/WebM playback depends on codecs available in the embedded browser runtime.
-- HLS `.m3u8` can use browser-native support where available; otherwise use VLC/MPV.
-- MKV and uncommon codecs may require VLC/MPV.
+- Windows MP4/WebM playback depends on codecs available in the embedded browser runtime.
+- Windows HLS `.m3u8` can use browser-native support where available; otherwise use VLC/MPV.
+- MKV and uncommon codecs may require VLC/MPV on Windows.
 - Torrent playback starts from completed files. Streaming partially downloaded pieces is not implemented.
-- Local media streams use an authenticated loopback endpoint with HTTP Range support for seeking.
+- Windows local media streams use an authenticated loopback endpoint with HTTP Range support for seeking.
+- Android playback is being built on AndroidX Media3; supported codecs remain device-dependent.
 
 ## Build from source
+
+### Windows
 
 Requires Go 1.23+ and Windows x64.
 
@@ -76,6 +92,19 @@ go vet ./...
 go build -trimpath -ldflags="-s -w -H=windowsgui" -o "Sourbase.exe" .
 ```
 
+### Android TV
+
+Requires JDK 17, Android SDK platform 36 and Gradle 8.13.
+
+```bash
+cd android-tv
+gradle :app:assembleDebug
+```
+
+The debug APK is written to `android-tv/app/build/outputs/apk/debug/app-debug.apk`. GitHub Actions also builds and uploads the debug APK on Android TV project changes.
+
 ## Verification boundaries
 
-CI runs the Go unit tests, static analysis, embedded UI JavaScript syntax check and the Windows x64 executable build. A physical Windows launch, DPAPI round-trip, real provider accounts and playback against a specific IPTV provider still require testing on Windows with the user's own accounts and permitted content.
+Windows CI runs Go unit tests, static analysis, embedded UI JavaScript syntax checks and the Windows x64 executable build. Physical Windows launch, DPAPI round-trip, real provider accounts and playback against a specific provider still require testing on Windows with the user's own accounts and permitted content.
+
+Android CI validates the Gradle project and assembles a debug APK. D-pad navigation and playback still need device/emulator validation on Android TV hardware.
