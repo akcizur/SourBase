@@ -1,5 +1,9 @@
 package com.sourbase.tv.ui
 
+import android.content.Intent
+import android.net.Uri
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -69,6 +73,8 @@ fun LiveTvSection(modifier: Modifier = Modifier) {
 
     var playlistUrl by remember { mutableStateOf("") }
     var xmltvUrl by remember { mutableStateOf("") }
+    var playlistDocumentUri by remember { mutableStateOf<String?>(null) }
+    var xmltvDocumentUri by remember { mutableStateOf<String?>(null) }
     var channels by remember { mutableStateOf(emptyList<TvChannel>()) }
     var guide by remember { mutableStateOf<XmltvGuide?>(null) }
     var selectedChannel by remember { mutableStateOf<TvChannel?>(null) }
@@ -91,7 +97,12 @@ fun LiveTvSection(modifier: Modifier = Modifier) {
             val saved = withContext(Dispatchers.IO) { sourceStore.load() }
             playlistUrl = saved.playlistUrl.orEmpty()
             xmltvUrl = saved.xmltvUrl.orEmpty()
-            status = if (playlistUrl.isNotBlank() || xmltvUrl.isNotBlank()) {
+            playlistDocumentUri = saved.playlistUri
+            xmltvDocumentUri = saved.xmltvUri
+            status = if (
+                playlistUrl.isNotBlank() || xmltvUrl.isNotBlank() ||
+                playlistDocumentUri != null || xmltvDocumentUri != null
+            ) {
                 "Uložené URL zdrojů byly bezpečně načteny."
             } else {
                 "Přidejte M3U/M3U8 playlist a volitelný XMLTV EPG zdroj."
@@ -105,6 +116,112 @@ fun LiveTvSection(modifier: Modifier = Modifier) {
         }
     }
 
+    fun loadPlaylistDocument(uri: Uri) {
+        val oldUri = playlistDocumentUri
+        val persistedUri = if (takePersistableDocumentReadPermission(context, uri)) {
+            uri.toString()
+        } else {
+            null
+        }
+        if (oldUri != persistedUri) releasePersistedDocumentReadPermission(context, oldUri)
+        playlistDocumentUri = persistedUri
+        playlistUrl = ""
+
+        scope.launch {
+            loadingPlaylist = true
+            status = "Načítám místní M3U soubor…"
+            val result = runCatching { repository.loadM3u(context, uri) }
+            result.onSuccess { parsed ->
+                channels = parsed.channels
+                selectedChannel = null
+                playingError = null
+                persistSourceUrls(
+                    store = sourceStore,
+                    playlistUrl = "",
+                    xmltvUrl = xmltvUrl,
+                    playlistUri = persistedUri,
+                    xmltvUri = xmltvDocumentUri,
+                    canPersist = !sourceReadError,
+                    onSaved = { sourceStorageError = false },
+                    onFailure = {
+                        sourceStorageError = true
+                        status = "Soubor načten, ale jeho URI se nepodařilo bezpečně uložit."
+                    }
+                )
+                status = buildString {
+                    append("Ze souboru načteno ")
+                    append(parsed.channels.size)
+                    append(" kanálů.")
+                    if (persistedUri == null) append(" Přístup k souboru se nemusí zachovat po restartu.")
+                    if (parsed.warnings.isNotEmpty()) {
+                        append(" Upozornění: ")
+                        append(parsed.warnings.size)
+                    }
+                }
+            }.onFailure { error ->
+                status = error.message ?: "M3U soubor se nepodařilo načíst."
+            }
+            loadingPlaylist = false
+        }
+    }
+
+    fun loadXmltvDocument(uri: Uri) {
+        val oldUri = xmltvDocumentUri
+        val persistedUri = if (takePersistableDocumentReadPermission(context, uri)) {
+            uri.toString()
+        } else {
+            null
+        }
+        if (oldUri != persistedUri) releasePersistedDocumentReadPermission(context, oldUri)
+        xmltvDocumentUri = persistedUri
+        xmltvUrl = ""
+
+        scope.launch {
+            loadingGuide = true
+            status = "Načítám místní XMLTV soubor…"
+            val result = runCatching { repository.loadXmltv(context, uri) }
+            result.onSuccess { parsed ->
+                guide = parsed
+                persistSourceUrls(
+                    store = sourceStore,
+                    playlistUrl = playlistUrl,
+                    xmltvUrl = "",
+                    playlistUri = playlistDocumentUri,
+                    xmltvUri = persistedUri,
+                    canPersist = !sourceReadError,
+                    onSaved = { sourceStorageError = false },
+                    onFailure = {
+                        sourceStorageError = true
+                        status = "EPG soubor načten, ale jeho URI se nepodařilo bezpečně uložit."
+                    }
+                )
+                status = buildString {
+                    append("Ze souboru načteno EPG: ")
+                    append(parsed.channels.size)
+                    append(" stanic, ")
+                    append(parsed.programmes.size)
+                    append(" pořadů.")
+                    if (persistedUri == null) append(" Přístup k souboru se nemusí zachovat po restartu.")
+                }
+            }.onFailure { error ->
+                status = error.message ?: "XMLTV soubor se nepodařilo načíst."
+            }
+            loadingGuide = false
+        }
+    }
+
+    val playlistDocumentPicker = rememberLauncherForActivityResult(
+        ActivityResultContracts.OpenDocument()
+    ) { uri ->
+        if (uri != null) loadPlaylistDocument(uri)
+    }
+
+    val xmltvDocumentPicker = rememberLauncherForActivityResult(
+        ActivityResultContracts.OpenDocument()
+    ) { uri ->
+        if (uri != null) loadXmltvDocument(uri)
+    }
+
     Column(
         modifier = modifier.fillMaxWidth(),
         verticalArrangement = Arrangement.spacedBy(10.dp)
@@ -116,13 +233,25 @@ fun LiveTvSection(modifier: Modifier = Modifier) {
         ) {
             SourceUrlField(
                 value = playlistUrl,
-                onValueChange = { playlistUrl = it },
+                onValueChange = {
+                    playlistUrl = it
+                    if (it.isNotBlank() && playlistDocumentUri != null) {
+                        releasePersistedDocumentReadPermission(context, playlistDocumentUri)
+                        playlistDocumentUri = null
+                    }
+                },
                 label = "M3U / M3U8 URL",
                 modifier = Modifier.weight(1f)
             )
             SourceUrlField(
                 value = xmltvUrl,
-                onValueChange = { xmltvUrl = it },
+                onValueChange = {
+                    xmltvUrl = it
+                    if (it.isNotBlank() && xmltvDocumentUri != null) {
+                        releasePersistedDocumentReadPermission(context, xmltvDocumentUri)
+                        xmltvDocumentUri = null
+                    }
+                },
                 label = "XMLTV EPG URL",
                 modifier = Modifier.weight(1f)
             )
@@ -134,14 +263,39 @@ fun LiveTvSection(modifier: Modifier = Modifier) {
             verticalAlignment = Alignment.CenterVertically
         ) {
             Button(
+                onClick = { playlistDocumentPicker.launch(arrayOf("*/*")) },
+                enabled = sourcesReady && !loadingPlaylist
+            ) {
+                Text("Vybrat soubor M3U")
+            }
+            Button(
+                onClick = { xmltvDocumentPicker.launch(arrayOf("*/*")) },
+                enabled = sourcesReady && !loadingGuide
+            ) {
+                Text("Vybrat soubor XMLTV")
+            }
+        }
+
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(10.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Button(
                 onClick = {
-                    if (playlistUrl.isBlank()) {
+                    if (playlistUrl.isBlank() && playlistDocumentUri.isNullOrBlank()) {
                         status = "Nejdříve zadejte URL M3U/M3U8 playlistu."
                     } else {
                         scope.launch {
                             loadingPlaylist = true
                             status = "Načítám playlist…"
-                            val result = runCatching { repository.loadM3u(playlistUrl) }
+                            val result = runCatching {
+                                if (playlistUrl.isNotBlank()) {
+                                    repository.loadM3u(playlistUrl)
+                                } else {
+                                    repository.loadM3u(context, Uri.parse(playlistDocumentUri))
+                                }
+                            }
                             result.onSuccess { parsed ->
                                 channels = parsed.channels
                                 selectedChannel = null
@@ -150,6 +304,8 @@ fun LiveTvSection(modifier: Modifier = Modifier) {
                                     store = sourceStore,
                                     playlistUrl = playlistUrl,
                                     xmltvUrl = xmltvUrl,
+                                    playlistUri = playlistDocumentUri,
+                                    xmltvUri = xmltvDocumentUri,
                                     canPersist = !sourceReadError,
                                     onSaved = { sourceStorageError = false },
                                     onFailure = {
@@ -185,19 +341,27 @@ fun LiveTvSection(modifier: Modifier = Modifier) {
 
             Button(
                 onClick = {
-                    if (xmltvUrl.isBlank()) {
-                        status = "Nejdříve zadejte URL XMLTV programu."
+                    if (xmltvUrl.isBlank() && xmltvDocumentUri.isNullOrBlank()) {
+                        status = "Nejdříve zadejte URL nebo vyberte XMLTV soubor."
                     } else {
                         scope.launch {
                             loadingGuide = true
                             status = "Načítám EPG…"
-                            val result = runCatching { repository.loadXmltv(xmltvUrl) }
+                            val result = runCatching {
+                                if (xmltvUrl.isNotBlank()) {
+                                    repository.loadXmltv(xmltvUrl)
+                                } else {
+                                    repository.loadXmltv(context, Uri.parse(xmltvDocumentUri))
+                                }
+                            }
                             result.onSuccess { parsed ->
                                 guide = parsed
                                 persistSourceUrls(
                                     store = sourceStore,
                                     playlistUrl = playlistUrl,
                                     xmltvUrl = xmltvUrl,
+                                    playlistUri = playlistDocumentUri,
+                                    xmltvUri = xmltvDocumentUri,
                                     canPersist = !sourceReadError,
                                     onSaved = { sourceStorageError = false },
                                     onFailure = {
@@ -228,7 +392,11 @@ fun LiveTvSection(modifier: Modifier = Modifier) {
                 }
             }
 
-            if ((playlistUrl.isNotBlank() || xmltvUrl.isNotBlank()) && !sourceReadError) {
+            if (
+                (playlistUrl.isNotBlank() || xmltvUrl.isNotBlank() ||
+                    playlistDocumentUri != null || xmltvDocumentUri != null) &&
+                !sourceReadError
+            ) {
                 Button(
                     onClick = {
                         scope.launch {
@@ -237,8 +405,12 @@ fun LiveTvSection(modifier: Modifier = Modifier) {
                             }
                             cleared.onSuccess {
                                 playerEngine.stop()
+                                releasePersistedDocumentReadPermission(context, playlistDocumentUri)
+                                releasePersistedDocumentReadPermission(context, xmltvDocumentUri)
                                 playlistUrl = ""
                                 xmltvUrl = ""
+                                playlistDocumentUri = null
+                                xmltvDocumentUri = null
                                 channels = emptyList()
                                 guide = null
                                 selectedChannel = null
@@ -459,6 +631,8 @@ private fun kotlinx.coroutines.CoroutineScope.persistSourceUrls(
     store: SecureSourceStore,
     playlistUrl: String,
     xmltvUrl: String,
+    playlistUri: String?,
+    xmltvUri: String?,
     canPersist: Boolean,
     onSaved: () -> Unit,
     onFailure: () -> Unit
@@ -471,7 +645,7 @@ private fun kotlinx.coroutines.CoroutineScope.persistSourceUrls(
 
         try {
             withContext(Dispatchers.IO) {
-                store.save(playlistUrl, xmltvUrl)
+                store.save(playlistUrl, xmltvUrl, playlistUri, xmltvUri)
             }
             onSaved()
         } catch (cancelled: CancellationException) {
@@ -482,6 +656,24 @@ private fun kotlinx.coroutines.CoroutineScope.persistSourceUrls(
     }
 }
 
+
+private fun takePersistableDocumentReadPermission(context: android.content.Context, uri: Uri): Boolean =
+    runCatching {
+        context.contentResolver.takePersistableUriPermission(
+            uri,
+            Intent.FLAG_GRANT_READ_URI_PERMISSION
+        )
+    }.isSuccess
+
+private fun releasePersistedDocumentReadPermission(context: android.content.Context, rawUri: String?) {
+    val value = rawUri?.takeIf(String::isNotBlank) ?: return
+    runCatching {
+        context.contentResolver.releasePersistableUriPermission(
+            Uri.parse(value),
+            Intent.FLAG_GRANT_READ_URI_PERMISSION
+        )
+    }
+}
 
 private const val EPG_SLOT_DURATION_MS = 30L * 60L * 1000L
 private const val EPG_SLOT_COUNT = 6
