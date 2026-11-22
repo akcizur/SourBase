@@ -500,3 +500,94 @@ func TestStateRejectsNullJSON(t *testing.T) {
 		t.Fatalf("expected 400 for null state, got %d: %s", rec.Code, rec.Body.String())
 	}
 }
+
+
+func TestCSFDServiceURLRequiresLoopback(t *testing.T) {
+	for _, raw := range []string{
+		"http://127.0.0.1:3000",
+		"http://localhost:3000",
+		"https://[::1]:3000",
+	} {
+		if _, err := validateCSFDServiceURL(raw); err != nil {
+			t.Errorf("expected local CSFD URL %q to be accepted: %v", raw, err)
+		}
+	}
+	for _, raw := range []string{
+		"https://csfd.cz",
+		"http://192.168.1.10:3000",
+		"http://127.0.0.1:3000/private",
+		"http://user:pass@127.0.0.1:3000",
+		"file:///tmp/csfd",
+	} {
+		if _, err := validateCSFDServiceURL(raw); err == nil {
+			t.Errorf("expected unsafe CSFD URL %q to be rejected", raw)
+		}
+	}
+}
+
+func TestCSFDSearchUsesLocalAPIAndProtectedCredentials(t *testing.T) {
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.URL.Path != "/search/Matrix" {
+			t.Errorf("unexpected CSFD endpoint: %s", r.URL.String())
+		}
+		if r.URL.Query().Get("language") != "cs" {
+			t.Errorf("expected Czech language, got %q", r.URL.Query().Get("language"))
+		}
+		if r.Header.Get("Authorization") != "Bearer test-api-key" {
+			t.Errorf("expected bearer API key, got %q", r.Header.Get("Authorization"))
+		}
+		if r.Header.Get("X-API-Key") != "test-api-key" {
+			t.Errorf("expected X-API-Key header, got %q", r.Header.Get("X-API-Key"))
+		}
+		w.Header().Set("Content-Type", "application/json")
+		io.WriteString(w, `{"movies":[{"id":535121,"title":"Na špatné straně","year":2018}],"tvSeries":[]}`)
+	}))
+	defer server.Close()
+
+	identity := func(b []byte) ([]byte, error) { return append([]byte(nil), b...), nil }
+	app := &appServer{
+		token:           "secret",
+		credentialsPath: filepath.Join(t.TempDir(), "credentials.dpapi"),
+		protectData:     identity,
+		unprotectData:   identity,
+	}
+	if err := app.writeCredentials(privateCredentials{CSFDBaseURL: server.URL, CSFDAPIKey: "test-api-key"}); err != nil {
+		t.Fatal(err)
+	}
+	req := httptest.NewRequest(http.MethodGet, "/api/csfd/search?q=Matrix&token=secret", nil)
+	rec := httptest.NewRecorder()
+	app.handleCSFDSearch(rec, req)
+	if rec.Code != http.StatusOK {
+		t.Fatalf("expected 200, got %d: %s", rec.Code, rec.Body.String())
+	}
+	if !strings.Contains(rec.Body.String(), "Na špatné straně") {
+		t.Fatalf("unexpected CSFD response: %s", rec.Body.String())
+	}
+}
+
+func TestCSFDSearchRejectsUnauthorizedAndShortQueries(t *testing.T) {
+	app := &appServer{token: "secret"}
+	unauthorized := httptest.NewRequest(http.MethodGet, "/api/csfd/search?q=Matrix&token=wrong", nil)
+	unauthorizedRec := httptest.NewRecorder()
+	app.handleCSFDSearch(unauthorizedRec, unauthorized)
+	if unauthorizedRec.Code != http.StatusUnauthorized {
+		t.Fatalf("expected 401, got %d", unauthorizedRec.Code)
+	}
+
+	short := httptest.NewRequest(http.MethodGet, "/api/csfd/search?q=x&token=secret", nil)
+	shortRec := httptest.NewRecorder()
+	app.handleCSFDSearch(shortRec, short)
+	if shortRec.Code != http.StatusBadRequest {
+		t.Fatalf("expected 400 for short query, got %d: %s", shortRec.Code, shortRec.Body.String())
+	}
+}
+
+func TestCSFDMovieRejectsInvalidID(t *testing.T) {
+	app := &appServer{token: "secret"}
+	req := httptest.NewRequest(http.MethodGet, "/api/csfd/movie/../../etc/passwd?token=secret", nil)
+	rec := httptest.NewRecorder()
+	app.handleCSFDMovie(rec, req)
+	if rec.Code != http.StatusBadRequest {
+		t.Fatalf("expected 400 for invalid ČSFD ID, got %d: %s", rec.Code, rec.Body.String())
+	}
+}
