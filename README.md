@@ -1,17 +1,21 @@
 # Sourbase · Media Center
 
-Sourbase is a local-first media center for Windows, with a new native Android TV client foundation. It combines IPTV, a personal media library, a shared player, EPG, Xtream VOD, local files, RSS catalogues and an optional local qBittorrent connection in one adaptive, TV-first product direction.
+Sourbase is a local-first media center for Windows, with a native Android TV client foundation in progress. It combines IPTV, a personal media library, a shared player, EPG, Xtream VOD, local files, RSS catalogues and an optional local qBittorrent connection in one adaptive, TV-first product direction.
 
 ## Platform direction
 
-- **Android TV first:** native Kotlin + Jetpack Compose interface designed for TV remotes and D-pad focus navigation. AndroidX Media3 provides the playback foundation for HLS and DASH.
-- **Web second:** responsive companion for source, catalogue and library management.
-- **Mobile third:** a future companion client based on the same platform-neutral domain contracts.
+- **Android TV first:** native Kotlin + Jetpack Compose for TV, designed for TV remotes and D-pad focus navigation. AndroidX Media3 provides the playback foundation for HLS and DASH.
+- **Web second:** a planned responsive companion for source, catalogue and library management. A standalone browser client and authenticated network API are not yet implemented.
+- **Mobile third:** planned Android and iOS companion clients based on shared domain contracts.
+- **Apple TV (tvOS):** a future native large-screen client with AVPlayer and Apple-style focus navigation.
 - **Windows preserved:** the existing `Sourbase.exe` remains supported, including its embedded web interface and local media host.
 
-The Android project currently contains the TV navigation shell, data contracts for media/channels/EPG and a Media3 playback host. The player now accepts validated HTTP(S) playback metadata, an optional MIME hint and per-source request headers. Playlist import, XMLTV parsing, provider login and persistent Android library storage are still future integration phases; the home screen remains a foundation preview. The previous Android CI run failed before Kotlin compilation because Maven Central returned HTTP 429. A mirror fallback and validation tests have now been added; an APK is not considered available until the new workflow passes and uploads it.
+The Android project currently contains the TV navigation shell, data contracts for media/channels/EPG and a Media3 playback host. The player accepts validated HTTP(S) playback metadata, an optional MIME hint and per-source request headers. Playlist import, XMLTV parsing, provider login and persistent Android library storage are not yet connected; the home screen remains a foundation preview. Android CI is being aligned with the Compose 1.12 / API 37 toolchain; an APK is available only after a successful workflow artifact upload.
 
-See [Platform UX and technical plan](docs/PRODUCT-UX-AND-PLATFORM-PLAN.md) and [Android TV architecture and delivery phases](docs/ANDROID-TV-ARCHITECTURE.md).
+See:
+- [Platform UX and technical plan](docs/PRODUCT-UX-AND-PLATFORM-PLAN.md)
+- [Android TV architecture and delivery phases](docs/ANDROID-TV-ARCHITECTURE.md)
+- [Implementation status and verification boundaries](IMPLEMENTATION-STATUS.md)
 
 ## Windows interface
 
@@ -70,6 +74,7 @@ Android uses a separate app-private storage boundary. The Android client must no
 - Torrent playback starts from completed files. Streaming partially downloaded pieces is not implemented.
 - Windows local media streams use an authenticated loopback endpoint with HTTP Range support for seeking.
 - Android playback is being built on AndroidX Media3; supported codecs remain device-dependent.
+- Apple playback is planned around AVPlayer; web playback is planned around Shaka Player or hls.js after a standalone browser client exists.
 
 ## Build from source
 
@@ -94,17 +99,17 @@ go build -trimpath -ldflags="-s -w -H=windowsgui" -o "Sourbase.exe" .
 
 ### Android TV
 
-Requires JDK 17, Android SDK platform 36 and Gradle 8.13.
+Requires JDK 17, Android SDK platform 37, Android Gradle Plugin 9.1.1 and Gradle 9.3.1.
 
 ```bash
 cd android-tv
 gradle :app:assembleDebug
 ```
 
-The debug APK is written to `android-tv/app/build/outputs/apk/debug/app-debug.apk`. GitHub Actions also builds and uploads the debug APK on Android TV project changes.
+The debug APK is written to `android-tv/app/build/outputs/apk/debug/app-debug.apk`. GitHub Actions uploads the debug APK only after build and unit tests succeed.
 
 ## Verification boundaries
 
 Windows CI runs Go unit tests, static analysis, embedded UI JavaScript syntax checks and the Windows x64 executable build. Physical Windows launch, DPAPI round-trip, real provider accounts and playback against a specific provider still require testing on Windows with the user's own accounts and permitted content.
 
-The Android CI workflow attempts dependency resolution, compilation, unit tests and debug APK assembly. The last observed run failed at dependency resolution with Maven Central HTTP 429; the mirror fallback is being verified by a new run. An APK is available only after a successful workflow artifact upload. D-pad navigation and playback still need device/emulator validation on Android TV hardware.
+Android CI has not yet produced a confirmed APK. Its current build toolchain is aligned to the official Compose 1.12 / API 37 requirements. D-pad navigation and playback still need device/emulator validation on Android TV hardware.

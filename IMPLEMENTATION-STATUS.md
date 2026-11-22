@@ -59,10 +59,11 @@ Not performed here:
 - Added HTTP(S) playback URL validation: empty/relative/non-HTTP URLs, missing hosts, embedded user-info credentials, malformed MIME values and CR/LF header injection are rejected.
 - Added JVM unit tests for accepted HTTP(S) sources and rejected invalid URLs/headers.
 - Added the platform UX/technical plan at docs/PRODUCT-UX-AND-PLATFORM-PLAN.md.
+- Updated the Android toolchain for Compose 1.12.1: AGP 9.1.1, Gradle 9.3.1, compileSdk 37 and AGP built-in Kotlin; targetSdk remains 35 to avoid opting into new runtime behavior in this tooling-only change.
 
 ### CI verification boundary
 
-The previously inspected Android workflow run (commit bb3b9e48) failed while resolving Gradle classpath dependencies: repo.maven.apache.org returned HTTP 429 responses. That run did not establish a Kotlin compilation failure and did not produce a confirmed APK. The new dependency mirror and validator changes trigger another Android build; update this status only after its final conclusion and artifact list are checked.
+The dependency mirror reduced the Maven Central HTTP 429 blockage. The next observed run reached :app:checkDebugAarMetadata and exposed a real version alignment issue: Compose 1.12.1 requires compileSdk 37 and AGP 9.1+. The project is now being migrated to AGP 9.1.1, Gradle 9.3.1 and AGP built-in Kotlin. No APK is confirmed until the updated CI build and artifact list are checked.
 
 The Windows workflow had succeeded on commit bb3b9e48, running Go tests, go vet, embedded JavaScript syntax validation and the Windows x64 build. This does not replace a physical Windows launch, DPAPI round-trip or provider-specific playback test.
 
