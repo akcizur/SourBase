@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -34,6 +35,7 @@ import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.tv.material3.Button
@@ -74,6 +76,7 @@ fun LiveTvSection(modifier: Modifier = Modifier) {
     var sourcesReady by remember { mutableStateOf(false) }
     var sourceStorageError by remember { mutableStateOf(false) }
     var sourceReadError by remember { mutableStateOf(false) }
+    var showEpgGrid by remember { mutableStateOf(false) }
     var loadingPlaylist by remember { mutableStateOf(false) }
     var loadingGuide by remember { mutableStateOf(false) }
     var playingError by remember { mutableStateOf<String?>(null) }
@@ -218,6 +221,12 @@ fun LiveTvSection(modifier: Modifier = Modifier) {
                 Text(if (loadingGuide) "Načítám EPG…" else "Načíst EPG")
             }
 
+            if (guide != null && channels.isNotEmpty()) {
+                Button(onClick = { showEpgGrid = !showEpgGrid }) {
+                    Text(if (showEpgGrid) "Zpět na kanály" else "TV program")
+                }
+            }
+
             Spacer(Modifier.weight(1f))
             Text(
                 text = "${channels.size} kanálů",
@@ -255,7 +264,43 @@ fun LiveTvSection(modifier: Modifier = Modifier) {
             }
         }
 
-        if (channels.isEmpty()) {
+        if (showEpgGrid && guide != null && channels.isNotEmpty()) {
+            EpgTimelineGrid(
+                channels = channels,
+                guide = guide,
+                onProgrammeSelected = { channel, programme ->
+                    selectedChannel = channel
+                    val now = System.currentTimeMillis()
+                    if (now >= programme.startEpochMs && now < programme.endEpochMs) {
+                        playingError = null
+                        runCatching { playerEngine.play(channel.stream) }
+                            .onSuccess {
+                                status = "Přehrávám živě: ${channel.name} · ${programme.title}"
+                                showEpgGrid = false
+                            }
+                            .onFailure { error ->
+                                playingError = error.message ?: "Přehrávání se nepodařilo spustit."
+                                status = playingError.orEmpty()
+                            }
+                    } else {
+                        val description = programme.description?.takeIf(String::isNotBlank)
+                        status = buildString {
+                            append(programme.title)
+                            append(" · ")
+                            append(formatTime(programme.startEpochMs))
+                            append("–")
+                            append(formatTime(programme.endEpochMs))
+                            description?.let {
+                                append(" · ")
+                                append(it)
+                            }
+                            append(" · Archivní přehrávání není dostupné; lze spustit živý kanál.")
+                        }
+                    }
+                },
+                modifier = Modifier.weight(1f)
+            )
+        } else if (channels.isEmpty()) {
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -405,6 +450,153 @@ private fun kotlinx.coroutines.CoroutineScope.persistSourceUrls(
         }
     }
 }
+
+
+private const val EPG_SLOT_DURATION_MS = 30L * 60L * 1000L
+private const val EPG_SLOT_COUNT = 6
+private val EPG_SLOT_WIDTH = 110.dp
+private val EPG_CHANNEL_COLUMN_WIDTH = 176.dp
+
+@Composable
+private fun EpgTimelineGrid(
+    channels: List<TvChannel>,
+    guide: XmltvGuide,
+    onProgrammeSelected: (TvChannel, EpgProgramme) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    val timelineStart = remember(guide) {
+        val now = System.currentTimeMillis()
+        now - (now % EPG_SLOT_DURATION_MS)
+    }
+    val timelineEnd = timelineStart + EPG_SLOT_COUNT * EPG_SLOT_DURATION_MS
+
+    Column(
+        modifier = modifier.fillMaxWidth(),
+        verticalArrangement = Arrangement.spacedBy(6.dp)
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(livePanel)
+                .padding(vertical = 8.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                text = "STANICE",
+                modifier = Modifier.width(EPG_CHANNEL_COLUMN_WIDTH).padding(start = 12.dp),
+                color = liveAccent,
+                fontSize = 10.sp,
+                fontWeight = FontWeight.Bold,
+                letterSpacing = 1.sp
+            )
+            repeat(EPG_SLOT_COUNT) { slot ->
+                Text(
+                    text = formatTime(timelineStart + slot * EPG_SLOT_DURATION_MS),
+                    modifier = Modifier.width(EPG_SLOT_WIDTH),
+                    color = liveMuted,
+                    fontSize = 12.sp,
+                    fontWeight = FontWeight.SemiBold
+                )
+            }
+        }
+
+        LazyColumn(
+            modifier = Modifier
+                .fillMaxWidth()
+                .weight(1f),
+            verticalArrangement = Arrangement.spacedBy(5.dp)
+        ) {
+            items(channels, key = TvChannel::id) { channel ->
+                val visibleProgrammes = guide.programmesFor(channel)
+                    .filter { it.endEpochMs > timelineStart && it.startEpochMs < timelineEnd }
+
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(72.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Column(
+                        modifier = Modifier
+                            .width(EPG_CHANNEL_COLUMN_WIDTH)
+                            .padding(end = 8.dp),
+                        verticalArrangement = Arrangement.spacedBy(3.dp)
+                    ) {
+                        Text(
+                            text = channel.name,
+                            color = Color.White,
+                            fontSize = 12.sp,
+                            fontWeight = FontWeight.SemiBold,
+                            maxLines = 1
+                        )
+                        Text(
+                            text = channel.group ?: "TV",
+                            color = liveMuted,
+                            fontSize = 10.sp,
+                            maxLines = 1
+                        )
+                    }
+
+                    Row(
+                        modifier = Modifier.height(68.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        var cursor = timelineStart
+                        visibleProgrammes.forEach { programme ->
+                            val visibleStart = maxOf(programme.startEpochMs, cursor, timelineStart)
+                            val visibleEnd = minOf(programme.endEpochMs, timelineEnd)
+                            if (visibleEnd > visibleStart) {
+                                if (visibleStart > cursor) {
+                                    Spacer(Modifier.width(epgWidthFor(visibleStart - cursor)))
+                                }
+                                val cardWidth = epgWidthFor(visibleEnd - visibleStart)
+                                Button(
+                                    onClick = { onProgrammeSelected(channel, programme) },
+                                    modifier = Modifier
+                                        .width(cardWidth)
+                                        .height(64.dp)
+                                        .padding(horizontal = 2.dp)
+                                ) {
+                                    Column(
+                                        modifier = Modifier.fillMaxWidth(),
+                                        verticalArrangement = Arrangement.spacedBy(3.dp)
+                                    ) {
+                                        Text(
+                                            text = programme.title,
+                                            color = Color.White,
+                                            fontSize = 11.sp,
+                                            fontWeight = FontWeight.SemiBold,
+                                            maxLines = 2
+                                        )
+                                        Text(
+                                            text = "${formatTime(programme.startEpochMs)}–${formatTime(programme.endEpochMs)}",
+                                            color = Color(0xFFD5DDE6),
+                                            fontSize = 9.sp,
+                                            maxLines = 1
+                                        )
+                                    }
+                                }
+                                cursor = visibleEnd
+                            }
+                        }
+                        if (cursor < timelineEnd) {
+                            Spacer(Modifier.width(epgWidthFor(timelineEnd - cursor)))
+                        }
+                    }
+                }
+            }
+        }
+
+        Text(
+            text = "OK na právě vysílaném pořadu spustí kanál. Výběr budoucího pořadu zobrazí detail; catch-up není zatím napojen.",
+            color = liveMuted,
+            fontSize = 10.sp
+        )
+    }
+}
+
+private fun epgWidthFor(durationMs: Long): Dp =
+    (EPG_SLOT_WIDTH.value * durationMs.toFloat() / EPG_SLOT_DURATION_MS.toFloat()).dp
 
 @Composable
 private fun SourceUrlField(
