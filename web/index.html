@@ -1965,7 +1965,7 @@
       item.category,
       linked?.year||item.year||item.releaseDate||item.info?.releasedate,
       item.rating?('★ '+item.rating):'',
-      linked&&Number.isFinite(Number(linked.rating))?('ČSFD '+linked.rating+' %'):'',
+      linked&&linked.rating!==null&&linked.rating!==undefined?('ČSFD '+linked.rating+' %'):'',
       item.info?.duration
     ].filter(Boolean).join('  ·  ');
     $('#contentModalKicker').textContent=kind==='movie'?'FILM Z VAŠÍ KNIHOVNY':'SERIÁL Z VAŠÍ KNIHOVNY';
@@ -1983,7 +1983,7 @@
       const count=linked.ratingCount?' ('+Number(linked.ratingCount).toLocaleString('cs-CZ')+' hodnocení)':'';
       $('#contentModalCsfdInfo').innerHTML=
         '<a href="'+attr(safeCSFDURL(linked.url,linked.csfdId))+'" target="_blank" rel="noopener noreferrer">ČSFD'+
-        (Number.isFinite(Number(linked.rating))?' · '+esc(String(linked.rating))+' %':'')+
+        (linked.rating!==null&&linked.rating!==undefined?' · '+esc(String(linked.rating))+' %':'')+
         esc(count)+'</a><span>'+esc(facts.join(' · '))+'</span>';
     } else {
       $('#contentModalCsfdInfo').innerHTML='';
