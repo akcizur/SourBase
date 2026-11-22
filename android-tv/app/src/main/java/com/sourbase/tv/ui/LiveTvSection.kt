@@ -687,9 +687,11 @@ private fun EpgTimelineGrid(
     onProgrammeSelected: (TvChannel, EpgProgramme) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val timelineStart = remember(guide) {
+    var windowOffsetSlots by remember(guide) { mutableStateOf(0) }
+    val timelineStart = remember(guide, windowOffsetSlots) {
         val now = System.currentTimeMillis()
-        now - (now % EPG_SLOT_DURATION_MS)
+        val currentSlotStart = now - (now % EPG_SLOT_DURATION_MS)
+        currentSlotStart + windowOffsetSlots.toLong() * EPG_SLOT_DURATION_MS
     }
     val timelineEnd = timelineStart + EPG_SLOT_COUNT.toLong() * EPG_SLOT_DURATION_MS
 
@@ -697,6 +699,27 @@ private fun EpgTimelineGrid(
         modifier = modifier.fillMaxWidth(),
         verticalArrangement = Arrangement.spacedBy(6.dp)
     ) {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Button(onClick = { windowOffsetSlots -= EPG_SLOT_COUNT }) {
+                Text("← 3 h")
+            }
+            Button(onClick = { windowOffsetSlots = 0 }) {
+                Text("Nyní")
+            }
+            Button(onClick = { windowOffsetSlots += EPG_SLOT_COUNT }) {
+                Text("3 h →")
+            }
+            Text(
+                text = "${formatTime(timelineStart)} – ${formatTime(timelineEnd)}",
+                color = liveMuted,
+                fontSize = 11.sp
+            )
+        }
+
         Row(
             modifier = Modifier
                 .fillMaxWidth()
