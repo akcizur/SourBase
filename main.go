@@ -39,6 +39,7 @@ const (
 	maxFetchBytes   = 300 << 20 // 300 MiB
 	maxStateBytes   = 120 << 20 // 120 MiB
 	maxTorrentBytes = 10 << 20  // 10 MiB
+	maxCSFDBytes    = 4 << 20   // 4 MiB
 )
 
 type appServer struct {
@@ -58,6 +59,8 @@ type appServer struct {
 	qbtVersion      string
 	mediaMu         sync.RWMutex
 	mediaFiles      map[string]string
+	csfdMu           sync.Mutex
+	csfdNextRequest  time.Time
 }
 
 func main() {
@@ -97,6 +100,8 @@ func run() error {
 	mux.HandleFunc("/api/fetch", app.handleFetch)
 	mux.HandleFunc("/api/state", app.handleState)
 	mux.HandleFunc("/api/credentials", app.handleCredentials)
+	mux.HandleFunc("/api/csfd/search", app.handleCSFDSearch)
+	mux.HandleFunc("/api/csfd/movie/", app.handleCSFDMovie)
 	mux.HandleFunc("/api/open-player", app.handleOpenPlayer)
 	mux.HandleFunc("/api/open-link", app.handleOpenLink)
 	mux.HandleFunc("/api/open-torrent", app.handleOpenTorrent)
@@ -382,6 +387,571 @@ func (a *appServer) handleState(w http.ResponseWriter, r *http.Request) {
 type privateCredentials struct {
 	XtreamPass       string `json:"xtreamPass"`
 	SKTorrentFeedURL string `json:"sktorrentFeedUrl"`
+	CSFDBaseURL      string `json:"csfdBaseUrl"`
+	CSFDAPIKey       string `json:"csfdApiKey"`
+}
+
+
+var csfdNumericID = regexp.MustCompile(`^[0-9]{1,12}package main
+
+import (
+	"bytes"
+	"context"
+	"crypto/rand"
+	"crypto/sha256"
+	"embed"
+	"encoding/hex"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"mime"
+	"mime/multipart"
+	"net"
+	"net/http"
+	"net/http/cookiejar"
+	"net/url"
+	"os"
+	"os/exec"
+	"path/filepath"
+	"regexp"
+	"runtime"
+	"slices"
+	"sort"
+	"strings"
+	"sync"
+	"sync/atomic"
+	"time"
+)
+
+//go:embed web/*
+var assets embed.FS
+
+const (
+	appName         = "WAVE IPTV"
+	defaultPort     = 38477
+	maxFetchBytes   = 300 << 20 // 300 MiB
+	maxStateBytes   = 120 << 20 // 120 MiB
+	maxTorrentBytes = 10 << 20  // 10 MiB
+	maxCSFDBytes    = 4 << 20   // 4 MiB
+)
+
+type appServer struct {
+	token           string
+	statePath       string
+	legacyStatePath string
+	credentialsPath string
+	protectData     func([]byte) ([]byte, error)
+	unprotectData   func([]byte) ([]byte, error)
+	server          *http.Server
+	lastSeen        atomic.Int64
+	shutting        atomic.Bool
+	logPath         string
+	qbtMu           sync.Mutex
+	qbtBase         string
+	qbtClient       *http.Client
+	qbtVersion      string
+	mediaMu         sync.RWMutex
+	mediaFiles      map[string]string
+	csfdMu           sync.Mutex
+	csfdNextRequest  time.Time
+}
+
+func main() {
+	if err := run(); err != nil {
+		writeLog("startup error: " + err.Error())
+		if runtime.GOOS != "windows" {
+			fmt.Fprintln(os.Stderr, err)
+		}
+	}
+}
+
+func run() error {
+	configDir, err := os.UserConfigDir()
+	if err != nil || configDir == "" {
+		configDir = os.TempDir()
+	}
+	appDir := filepath.Join(configDir, appName)
+	if err := os.MkdirAll(appDir, 0700); err != nil {
+		return fmt.Errorf("cannot create local data folder: %w", err)
+	}
+	app := &appServer{statePath: filepath.Join(appDir, "state.dpapi"), legacyStatePath: filepath.Join(appDir, "state.json"), credentialsPath: filepath.Join(appDir, "credentials.dpapi"), logPath: filepath.Join(appDir, "app.log"), mediaFiles: make(map[string]string)}
+	if err := app.migrateLegacyState(); err != nil {
+		app.log("legacy state migration deferred: " + err.Error())
+	}
+	if err := app.newToken(); err != nil {
+		return err
+	}
+	app.lastSeen.Store(time.Now().Unix())
+
+	listener, port, err := listenLocal()
+	if err != nil {
+		return err
+	}
+	baseURL := fmt.Sprintf("http://127.0.0.1:%d/", port)
+	mux := http.NewServeMux()
+	mux.HandleFunc("/", app.handleRoot)
+	mux.HandleFunc("/api/fetch", app.handleFetch)
+	mux.HandleFunc("/api/state", app.handleState)
+	mux.HandleFunc("/api/credentials", app.handleCredentials)
+	mux.HandleFunc("/api/csfd/search", app.handleCSFDSearch)
+	mux.HandleFunc("/api/csfd/movie/", app.handleCSFDMovie)
+	mux.HandleFunc("/api/open-player", app.handleOpenPlayer)
+	mux.HandleFunc("/api/open-link", app.handleOpenLink)
+	mux.HandleFunc("/api/open-torrent", app.handleOpenTorrent)
+	mux.HandleFunc("/api/qbt/connect", app.handleQBTConnect)
+	mux.HandleFunc("/api/qbt/disconnect", app.handleQBTDisconnect)
+	mux.HandleFunc("/api/qbt/status", app.handleQBTStatus)
+	mux.HandleFunc("/api/qbt/torrents", app.handleQBTTorrents)
+	mux.HandleFunc("/api/qbt/add", app.handleQBTAdd)
+	mux.HandleFunc("/api/qbt/action", app.handleQBTAction)
+	mux.HandleFunc("/api/qbt/play", app.handleQBTPlay)
+	mux.HandleFunc("/api/pick-local", app.handlePickLocal)
+	mux.HandleFunc("/api/media/register", app.handleMediaRegister)
+	mux.HandleFunc("/api/media/", app.handleMediaServe)
+	mux.HandleFunc("/api/ping", app.handlePing)
+	mux.HandleFunc("/api/quit", app.handleQuit)
+	mux.HandleFunc("/health", func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "text/plain; charset=utf-8")
+		io.WriteString(w, "wave-iptv-local")
+	})
+
+	app.server = &http.Server{
+		Handler:           securityHeaders(mux),
+		ReadHeaderTimeout: 10 * time.Second,
+		IdleTimeout:       90 * time.Second,
+		MaxHeaderBytes:    1 << 20,
+	}
+	go func() {
+		if err := app.server.Serve(listener); err != nil && !errors.Is(err, http.ErrServerClosed) {
+			app.log("server error: " + err.Error())
+		}
+	}()
+	go app.watchdog()
+
+	app.log("started at " + baseURL)
+	if os.Getenv("WAVE_NO_BROWSER") != "1" {
+		if err := openAppWindow(baseURL); err != nil {
+			app.log("browser launch failed: " + err.Error())
+			return fmt.Errorf("server started at %s, but the browser could not be opened: %w", baseURL, err)
+		}
+	}
+	// Keep the lightweight local host alive until the app window is closed or
+	// the user selects Exit in Settings.
+	select {}
+}
+
+func (a *appServer) newToken() error {
+	b := make([]byte, 32)
+	if _, err := rand.Read(b); err != nil {
+		return fmt.Errorf("cannot generate local session token: %w", err)
+	}
+	a.token = hex.EncodeToString(b)
+	return nil
+}
+
+func listenLocal() (net.Listener, int, error) {
+	for port := defaultPort; port < defaultPort+12; port++ {
+		ln, err := net.Listen("tcp4", fmt.Sprintf("127.0.0.1:%d", port))
+		if err == nil {
+			return ln, port, nil
+		}
+	}
+	ln, err := net.Listen("tcp4", "127.0.0.1:0")
+	if err != nil {
+		return nil, 0, fmt.Errorf("cannot start local web host: %w", err)
+	}
+	_, p, _ := net.SplitHostPort(ln.Addr().String())
+	var port int
+	fmt.Sscan(p, &port)
+	return ln, port, nil
+}
+
+func securityHeaders(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		// The server listens only on loopback. Also reject unexpected Host headers.
+		host, _, err := net.SplitHostPort(r.Host)
+		if err == nil && host != "127.0.0.1" && host != "localhost" {
+			http.Error(w, "invalid host", http.StatusForbidden)
+			return
+		}
+		w.Header().Set("X-Content-Type-Options", "nosniff")
+		w.Header().Set("Referrer-Policy", "no-referrer")
+		w.Header().Set("Permissions-Policy", "camera=(), microphone=(), geolocation=()")
+		w.Header().Set("Content-Security-Policy", "default-src 'self' data: blob: http: https:; img-src 'self' data: blob: http: https:; media-src * blob:; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline'; connect-src 'self' http: https:; font-src 'self' data:")
+		next.ServeHTTP(w, r)
+	})
+}
+
+func (a *appServer) authorized(r *http.Request) bool {
+	return r.URL.Query().Get("token") == a.token
+}
+
+func (a *appServer) handleRoot(w http.ResponseWriter, r *http.Request) {
+	if r.URL.Path != "/" && r.URL.Path != "/index.html" {
+		f, err := assets.Open("web/" + strings.TrimPrefix(r.URL.Path, "/"))
+		if err != nil {
+			http.NotFound(w, r)
+			return
+		}
+		defer f.Close()
+		if strings.HasSuffix(r.URL.Path, ".m3u") || strings.HasSuffix(r.URL.Path, ".m3u8") {
+			w.Header().Set("Content-Type", "audio/x-mpegurl; charset=utf-8")
+		} else if strings.HasSuffix(r.URL.Path, ".xml") || strings.HasSuffix(r.URL.Path, ".rss") {
+			w.Header().Set("Content-Type", "application/rss+xml; charset=utf-8")
+		}
+		io.Copy(w, f)
+		return
+	}
+	content, err := assets.ReadFile("web/index.html")
+	if err != nil {
+		http.Error(w, "application files are missing", http.StatusInternalServerError)
+		return
+	}
+	html := strings.ReplaceAll(string(content), "__WAVE_TOKEN__", a.token)
+	w.Header().Set("Content-Type", "text/html; charset=utf-8")
+	w.Header().Set("Cache-Control", "no-store")
+	io.WriteString(w, html)
+}
+
+func (a *appServer) handleFetch(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodGet || !a.authorized(r) {
+		http.Error(w, "unauthorized", http.StatusUnauthorized)
+		return
+	}
+	target, err := url.Parse(r.URL.Query().Get("url"))
+	if err != nil || target == nil || (target.Scheme != "http" && target.Scheme != "https") || target.Hostname() == "" {
+		http.Error(w, "URL must use HTTP or HTTPS", http.StatusBadRequest)
+		return
+	}
+	requestCtx, cancel := context.WithTimeout(r.Context(), 3*time.Minute)
+	defer cancel()
+	request, err := http.NewRequestWithContext(requestCtx, http.MethodGet, target.String(), nil)
+	if err != nil {
+		http.Error(w, "invalid request", http.StatusBadRequest)
+		return
+	}
+	request.Header.Set("User-Agent", "WAVE-IPTV/1.0")
+	request.Header.Set("Accept", "*/*")
+	client := &http.Client{
+		Timeout: 3 * time.Minute,
+		CheckRedirect: func(req *http.Request, via []*http.Request) error {
+			if len(via) >= 8 {
+				return fmt.Errorf("too many redirects")
+			}
+			if req.URL.Scheme != "http" && req.URL.Scheme != "https" {
+				return fmt.Errorf("redirect protocol not allowed")
+			}
+			return nil
+		},
+	}
+	resp, err := client.Do(request)
+	if err != nil {
+		http.Error(w, "upstream request failed: "+err.Error(), http.StatusBadGateway)
+		return
+	}
+	defer resp.Body.Close()
+	if resp.ContentLength > maxFetchBytes {
+		http.Error(w, "upstream file exceeds 300 MiB limit", http.StatusRequestEntityTooLarge)
+		return
+	}
+	if resp.StatusCode < 200 || resp.StatusCode >= 300 {
+		body, _ := io.ReadAll(io.LimitReader(resp.Body, 16<<10))
+		http.Error(w, fmt.Sprintf("Upstream HTTP %d: %s", resp.StatusCode, strings.TrimSpace(string(body))), resp.StatusCode)
+		return
+	}
+	w.Header().Set("Content-Type", "text/plain; charset=utf-8")
+	w.Header().Set("Cache-Control", "no-store")
+	limited := io.LimitReader(resp.Body, maxFetchBytes+1)
+	n, copyErr := io.Copy(w, limited)
+	if copyErr != nil {
+		a.log("proxy response write error: " + copyErr.Error())
+	}
+	if n > maxFetchBytes {
+		a.log("upstream response exceeded maximum size")
+	}
+}
+
+func (a *appServer) handleState(w http.ResponseWriter, r *http.Request) {
+	if !a.authorized(r) {
+		http.Error(w, "unauthorized", http.StatusUnauthorized)
+		return
+	}
+	switch r.Method {
+	case http.MethodGet:
+		b, err := a.readState()
+		if errors.Is(err, os.ErrNotExist) {
+			w.Header().Set("Content-Type", "application/json; charset=utf-8")
+			io.WriteString(w, "{}")
+			return
+		}
+		if err != nil {
+			writeJSONError(w, "Lokální databázi WAVE nelze dešifrovat. Spusťte aplikaci pod stejným účtem Windows, pod kterým byla vytvořena.", http.StatusServiceUnavailable)
+			return
+		}
+		// Older releases wrote secrets into the plaintext state snapshot. Never return those values
+		// to the UI once the new secure credential store is available.
+		var state map[string]any
+		if json.Unmarshal(b, &state) == nil && state != nil {
+			delete(state, "xtreamPass")
+			delete(state, "sktorrentFeedUrl")
+			state["waveSchemaVersion"] = 2
+			b, _ = json.Marshal(state)
+		}
+		w.Header().Set("Content-Type", "application/json; charset=utf-8")
+		w.Header().Set("Cache-Control", "no-store")
+		w.Write(b)
+	case http.MethodDelete:
+		if err := os.Remove(a.statePath); err != nil && !errors.Is(err, os.ErrNotExist) {
+			http.Error(w, "cannot delete local state", http.StatusInternalServerError)
+			return
+		}
+		if a.legacyStatePath != "" {
+			if err := os.Remove(a.legacyStatePath); err != nil && !errors.Is(err, os.ErrNotExist) {
+				http.Error(w, "cannot delete legacy local state", http.StatusInternalServerError)
+				return
+			}
+		}
+		if a.credentialsPath != "" {
+			if err := os.Remove(a.credentialsPath); err != nil && !errors.Is(err, os.ErrNotExist) {
+				http.Error(w, "cannot delete local credentials", http.StatusInternalServerError)
+				return
+			}
+		}
+		w.Header().Set("Content-Type", "application/json")
+		io.WriteString(w, `{"deleted":true}`)
+	case http.MethodPost:
+		defer r.Body.Close()
+		b, err := io.ReadAll(io.LimitReader(r.Body, maxStateBytes+1))
+		if err != nil || len(b) > maxStateBytes {
+			http.Error(w, "state file is too large or unreadable", http.StatusRequestEntityTooLarge)
+			return
+		}
+		var value map[string]any
+		if err := json.Unmarshal(b, &value); err != nil || value == nil {
+			http.Error(w, "invalid state JSON", http.StatusBadRequest)
+			return
+		}
+		// Compatibility migration for older clients that still include secrets
+		// in the state payload. New clients use /api/credentials directly.
+		creds, credsErr := a.readCredentials()
+		if credsErr != nil {
+			writeJSONError(w, "Uložené přihlašovací údaje nelze dešifrovat; stávající hodnoty nebyly změněny.", http.StatusServiceUnavailable)
+			return
+		}
+		secretChanged := false
+		if v, ok := value["xtreamPass"]; ok {
+			if text, ok := v.(string); ok {
+				creds.XtreamPass = text
+				secretChanged = true
+			}
+			delete(value, "xtreamPass")
+		}
+		if v, ok := value["sktorrentFeedUrl"]; ok {
+			if text, ok := v.(string); ok {
+				creds.SKTorrentFeedURL = text
+				secretChanged = true
+			}
+			delete(value, "sktorrentFeedUrl")
+		}
+		value["waveSchemaVersion"] = 2
+		if secretChanged {
+			if err := a.writeCredentials(creds); err != nil {
+				writeJSONError(w, "Nelze bezpečně uložit přihlašovací údaje. Na Windows je vyžadováno šifrování DPAPI.", http.StatusNotImplemented)
+				return
+			}
+		}
+		clean, err := json.Marshal(value)
+		if err != nil {
+			http.Error(w, "cannot encode local state", http.StatusInternalServerError)
+			return
+		}
+		if err := a.writeState(clean); err != nil {
+			writeJSONError(w, "Nelze bezpečně uložit lokální knihovnu. Ve Windows je vyžadováno šifrování DPAPI.", http.StatusNotImplemented)
+			return
+		}
+		w.Header().Set("Content-Type", "application/json")
+		io.WriteString(w, `{"saved":true,"schemaVersion":2}`)
+	default:
+		w.Header().Set("Allow", "GET, POST, DELETE")
+		http.Error(w, "method not allowed", http.StatusMethodNotAllowed)
+	}
+}
+
+type privateCredentials struct {
+	XtreamPass       string `json:"xtreamPass"`
+	SKTorrentFeedURL string `json:"sktorrentFeedUrl"`
+	CSFDBaseURL      string `json:"csfdBaseUrl"`
+	CSFDAPIKey       string `json:"csfdApiKey"`
+}
+
+)
+
+func validateCSFDServiceURL(raw string) (*url.URL, error) {
+	u, err := url.Parse(strings.TrimSpace(raw))
+	if err != nil || u == nil || (u.Scheme != "http" && u.Scheme != "https") || u.Hostname() == "" {
+		return nil, errors.New("ČSFD API adresa musí být platná HTTP(S) URL")
+	}
+	host := strings.ToLower(u.Hostname())
+	if host != "localhost" && host != "127.0.0.1" && host != "::1" {
+		return nil, errors.New("ČSFD API musí běžet lokálně na tomto zařízení")
+	}
+	if u.User != nil || (u.Path != "" && u.Path != "/") || u.RawQuery != "" || u.Fragment != "" {
+		return nil, errors.New("ČSFD API adresa nesmí obsahovat přihlašovací údaje, cestu ani parametry")
+	}
+	u.Path = ""
+	u.RawPath = ""
+	return u, nil
+}
+
+func (a *appServer) waitForCSFDSlot(ctx context.Context) error {
+	a.csfdMu.Lock()
+	now := time.Now()
+	wait := time.Until(a.csfdNextRequest)
+	a.csfdNextRequest = now.Add(1200 * time.Millisecond)
+	a.csfdMu.Unlock()
+	if wait <= 0 {
+		return nil
+	}
+	timer := time.NewTimer(wait)
+	defer timer.Stop()
+	select {
+	case <-ctx.Done():
+		return ctx.Err()
+	case <-timer.C:
+		return nil
+	}
+}
+
+func (a *appServer) fetchCSFDJSON(r *http.Request, creds privateCredentials, endpoint string) ([]byte, int, error) {
+	base, err := validateCSFDServiceURL(creds.CSFDBaseURL)
+	if err != nil {
+		return nil, http.StatusServiceUnavailable, errors.New("ČSFD konektor není nastaven. Spusťte lokální node-csfd-api a uložte jeho adresu v Nastavení.")
+	}
+	ctx, cancel := context.WithTimeout(r.Context(), 25*time.Second)
+	defer cancel()
+	if err := a.waitForCSFDSlot(ctx); err != nil {
+		return nil, http.StatusGatewayTimeout, errors.New("Požadavek na ČSFD byl zrušen nebo vypršel časový limit.")
+	}
+
+	target, err := url.Parse(strings.TrimRight(base.String(), "/") + endpoint)
+	if err != nil {
+		return nil, http.StatusBadRequest, errors.New("Neplatný požadavek na ČSFD.")
+	}
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, target.String(), nil)
+	if err != nil {
+		return nil, http.StatusBadRequest, errors.New("Neplatný požadavek na ČSFD.")
+	}
+	req.Header.Set("Accept", "application/json")
+	req.Header.Set("User-Agent", "Sourbase-Media-Center/1.0")
+	if creds.CSFDAPIKey != "" {
+		req.Header.Set("Authorization", "Bearer "+creds.CSFDAPIKey)
+		req.Header.Set("X-API-Key", creds.CSFDAPIKey)
+	}
+	client := &http.Client{
+		Timeout: 25 * time.Second,
+		CheckRedirect: func(next *http.Request, via []*http.Request) error {
+			if len(via) >= 3 || !strings.EqualFold(next.URL.Hostname(), base.Hostname()) {
+				return errors.New("ČSFD API přesměrovalo mimo lokální službu")
+			}
+			return nil
+		},
+	}
+	resp, err := client.Do(req)
+	if err != nil {
+		return nil, http.StatusBadGateway, errors.New("Lokální ČSFD API není dostupné. Zkontrolujte, že běží na uložené adrese.")
+	}
+	defer resp.Body.Close()
+	body, readErr := io.ReadAll(io.LimitReader(resp.Body, maxCSFDBytes+1))
+	if readErr != nil {
+		return nil, http.StatusBadGateway, errors.New("Odpověď ČSFD API se nepodařilo přečíst.")
+	}
+	if len(body) > maxCSFDBytes {
+		return nil, http.StatusBadGateway, errors.New("Odpověď ČSFD API je příliš velká.")
+	}
+	if resp.StatusCode < 200 || resp.StatusCode >= 300 {
+		switch resp.StatusCode {
+		case http.StatusUnauthorized:
+			return nil, http.StatusUnauthorized, errors.New("ČSFD API odmítlo API klíč. Zkontrolujte jej v Nastavení.")
+		case http.StatusTooManyRequests:
+			return nil, http.StatusTooManyRequests, errors.New("ČSFD nebo jeho API omezilo počet požadavků. Zkuste to později.")
+		case http.StatusNotFound:
+			return nil, http.StatusNotFound, errors.New("Na ČSFD nebyl nalezen odpovídající záznam.")
+		case http.StatusServiceUnavailable:
+			return nil, http.StatusServiceUnavailable, errors.New("ČSFD dočasně odmítlo požadavek.")
+		default:
+			return nil, http.StatusBadGateway, fmt.Errorf("Lokální ČSFD API vrátilo HTTP %d.", resp.StatusCode)
+		}
+	}
+	if !json.Valid(body) {
+		return nil, http.StatusBadGateway, errors.New("Lokální ČSFD API nevrátilo platný JSON.")
+	}
+	return body, http.StatusOK, nil
+}
+
+func (a *appServer) csfdCredentials(w http.ResponseWriter, r *http.Request) (privateCredentials, bool) {
+	if r.Method != http.MethodGet || !a.authorized(r) {
+		http.Error(w, "unauthorized", http.StatusUnauthorized)
+		return privateCredentials{}, false
+	}
+	creds, err := a.readCredentials()
+	if err != nil {
+		writeJSONError(w, "Uložená konfigurace ČSFD není dostupná.", http.StatusServiceUnavailable)
+		return privateCredentials{}, false
+	}
+	if _, err := validateCSFDServiceURL(creds.CSFDBaseURL); err != nil {
+		writeJSONError(w, "ČSFD konektor není nastaven. Spusťte lokální node-csfd-api.", http.StatusServiceUnavailable)
+		return privateCredentials{}, false
+	}
+	return creds, true
+}
+
+func (a *appServer) handleCSFDSearch(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodGet || !a.authorized(r) {
+		http.Error(w, "unauthorized", http.StatusUnauthorized)
+		return
+	}
+	query := strings.TrimSpace(r.URL.Query().Get("q"))
+	if len([]rune(query)) < 2 || len([]rune(query)) > 100 {
+		writeJSONError(w, "Zadejte název dlouhý 2 až 100 znaků.", http.StatusBadRequest)
+		return
+	}
+	creds, ok := a.csfdCredentials(w, r)
+	if !ok {
+		return
+	}
+	body, status, err := a.fetchCSFDJSON(r, creds, "/search/"+url.PathEscape(query)+"?language=cs")
+	if err != nil {
+		writeJSONError(w, err.Error(), status)
+		return
+	}
+	w.Header().Set("Content-Type", "application/json; charset=utf-8")
+	w.Header().Set("Cache-Control", "no-store")
+	_, _ = w.Write(body)
+}
+
+func (a *appServer) handleCSFDMovie(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodGet || !a.authorized(r) {
+		http.Error(w, "unauthorized", http.StatusUnauthorized)
+		return
+	}
+	id := strings.TrimPrefix(r.URL.Path, "/api/csfd/movie/")
+	if !csfdNumericID.MatchString(id) {
+		writeJSONError(w, "Neplatné ČSFD ID.", http.StatusBadRequest)
+		return
+	}
+	creds, ok := a.csfdCredentials(w, r)
+	if !ok {
+		return
+	}
+	body, status, err := a.fetchCSFDJSON(r, creds, "/movie/"+id+"?language=cs")
+	if err != nil {
+		writeJSONError(w, err.Error(), status)
+		return
+	}
+	w.Header().Set("Content-Type", "application/json; charset=utf-8")
+	w.Header().Set("Cache-Control", "no-store")
+	_, _ = w.Write(body)
 }
 
 func (a *appServer) handleCredentials(w http.ResponseWriter, r *http.Request) {
