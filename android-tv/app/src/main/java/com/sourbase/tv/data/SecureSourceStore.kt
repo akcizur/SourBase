@@ -36,7 +36,9 @@ class SecureSourceStore(context: Context) {
             val json = JSONObject(String(plaintext, StandardCharsets.UTF_8))
             StoredSourceUrls(
                 playlistUrl = json.optString(PLAYLIST_URL_FIELD).takeIf(String::isNotBlank),
-                xmltvUrl = json.optString(XMLTV_URL_FIELD).takeIf(String::isNotBlank)
+                xmltvUrl = json.optString(XMLTV_URL_FIELD).takeIf(String::isNotBlank),
+                playlistUri = json.optString(PLAYLIST_URI_FIELD).takeIf(String::isNotBlank),
+                xmltvUri = json.optString(XMLTV_URI_FIELD).takeIf(String::isNotBlank)
             )
         } catch (_: Exception) {
             // Do not silently discard or overwrite data that can no longer be decrypted.
@@ -48,11 +50,18 @@ class SecureSourceStore(context: Context) {
 
     @Synchronized
     @Throws(IOException::class)
-    fun save(playlistUrl: String?, xmltvUrl: String?) {
+    fun save(
+        playlistUrl: String?,
+        xmltvUrl: String?,
+        playlistUri: String? = null,
+        xmltvUri: String? = null
+    ) {
         val playlist = playlistUrl?.trim()?.takeIf(String::isNotEmpty)
         val guide = xmltvUrl?.trim()?.takeIf(String::isNotEmpty)
+        val playlistDocument = playlistUri?.trim()?.takeIf(String::isNotEmpty)
+        val guideDocument = xmltvUri?.trim()?.takeIf(String::isNotEmpty)
 
-        if (playlist == null && guide == null) {
+        if (playlist == null && guide == null && playlistDocument == null && guideDocument == null) {
             clear()
             return
         }
@@ -60,6 +69,8 @@ class SecureSourceStore(context: Context) {
         val plaintext = JSONObject()
             .put(PLAYLIST_URL_FIELD, playlist.orEmpty())
             .put(XMLTV_URL_FIELD, guide.orEmpty())
+            .put(PLAYLIST_URI_FIELD, playlistDocument.orEmpty())
+            .put(XMLTV_URI_FIELD, guideDocument.orEmpty())
             .toString()
             .toByteArray(StandardCharsets.UTF_8)
 
@@ -142,6 +153,8 @@ class SecureSourceStore(context: Context) {
         const val ENCRYPTED_SOURCES_KEY = "encrypted_source_urls"
         const val PLAYLIST_URL_FIELD = "playlistUrl"
         const val XMLTV_URL_FIELD = "xmltvUrl"
+        const val PLAYLIST_URI_FIELD = "playlistUri"
+        const val XMLTV_URI_FIELD = "xmltvUri"
         const val TRANSFORMATION = "AES/GCM/NoPadding"
         const val AES_KEY_SIZE_BITS = 256
         const val GCM_IV_LENGTH_BYTES = 12
@@ -152,5 +165,7 @@ class SecureSourceStore(context: Context) {
 
 data class StoredSourceUrls(
     val playlistUrl: String? = null,
-    val xmltvUrl: String? = null
+    val xmltvUrl: String? = null,
+    val playlistUri: String? = null,
+    val xmltvUri: String? = null
 )

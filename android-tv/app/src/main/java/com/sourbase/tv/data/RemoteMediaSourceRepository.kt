@@ -1,5 +1,7 @@
 package com.sourbase.tv.data
 
+import android.content.Context
+import android.net.Uri
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.io.ByteArrayOutputStream
@@ -24,6 +26,39 @@ class RemoteMediaSourceRepository(
 
     suspend fun loadXmltv(url: String): XmltvGuide = withContext(Dispatchers.IO) {
         XmltvGuideParser.parse(fetchText(url, MAX_XMLTV_BYTES))
+    }
+
+    suspend fun loadM3u(context: Context, uri: Uri): M3uParseResult = withContext(Dispatchers.IO) {
+        M3uPlaylistParser.parse(readDocumentText(context, uri, MAX_M3U_BYTES))
+    }
+
+    suspend fun loadXmltv(context: Context, uri: Uri): XmltvGuide = withContext(Dispatchers.IO) {
+        XmltvGuideParser.parse(readDocumentText(context, uri, MAX_XMLTV_BYTES))
+    }
+
+    private fun readDocumentText(context: Context, uri: Uri, maxBytes: Int): String {
+        require(uri.scheme == "content") {
+            "Selected document must be provided through Android's document picker."
+        }
+        val input = context.contentResolver.openInputStream(uri)
+            ?: throw IOException("The selected document could not be opened.")
+
+        val output = ByteArrayOutputStream(8 * 1024)
+        input.use { stream ->
+            val buffer = ByteArray(DEFAULT_BUFFER_SIZE)
+            var totalBytes = 0
+            while (true) {
+                val read = stream.read(buffer)
+                if (read < 0) break
+                totalBytes += read
+                if (totalBytes > maxBytes) {
+                    throw IOException("Selected document exceeded the allowed $maxBytes byte limit.")
+                }
+                output.write(buffer, 0, read)
+            }
+        }
+        return output.toByteArray().toString(StandardCharsets.UTF_8)
+            .removePrefix("\uFEFF")
     }
 
     private fun fetchText(rawUrl: String, maxBytes: Int): String {
