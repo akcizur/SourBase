@@ -1,3 +1,10 @@
 dist/wave-iptv-local
 *.log
 *.tmp
+
+# Android / Gradle
+.gradle/
+**/build/
+local.properties
+.idea/
+*.iml
