@@ -256,8 +256,7 @@ private fun NavigationRail(
 
         Spacer(modifier = Modifier.weight(1f))
         Text(
-            text = "Nastavení a zdroje
-budou dostupné v menu.",
+            text = "Nastavení a zdroje\nbudou dostupné v menu.",
             color = Color(0xFF718094),
             fontSize = 11.sp,
             lineHeight = 17.sp
@@ -292,8 +291,7 @@ private fun HeroPanel(
                 letterSpacing = 1.6.sp
             )
             Text(
-                text = if (selectedSection == "Domů") "Vaše televize.
-Po vašem." else selectedSection,
+                text = if (selectedSection == "Domů") "Vaše televize.\nPo vašem." else selectedSection,
                 color = Color.White,
                 fontSize = 31.sp,
                 lineHeight = 35.sp,
