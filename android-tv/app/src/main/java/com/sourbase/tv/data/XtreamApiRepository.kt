@@ -31,9 +31,10 @@ class XtreamApiRepository(
             val userInfo = response.optJSONObject("user_info")
                 ?: throw IOException("Poskytovatel nevrátil informace o účtu.")
 
-            val authenticated = userInfo.opt("auth")?.toString()?.let { it != "0" && !it.equals("false", true) }
+            val authenticated = userInfo.optNullableString("auth")
+                ?.let { it != "0" && !it.equals("false", true) }
                 ?: true
-            val status = userInfo.optString("status").ifBlank { "Unknown" }
+            val status = userInfo.optNullableString("status") ?: "Unknown"
             if (!authenticated || status.equals("Expired", true) ||
                 status.equals("Disabled", true) || status.equals("Banned", true)
             ) {
@@ -41,15 +42,16 @@ class XtreamApiRepository(
             }
 
             XtreamAccountInfo(
-                username = userInfo.optString("username").ifBlank { credentials.username },
+                username = userInfo.optNullableString("username") ?: credentials.username,
                 status = status,
-                expirationEpochSeconds = userInfo.optString("exp_date")
-                    .takeIf(String::isNotBlank)
+                expirationEpochSeconds = userInfo.optNullableString("exp_date")
                     ?.toLongOrNull()
                     ?.takeIf { it > 0L },
-                isTrial = userInfo.optString("is_trial").let { it == "1" || it.equals("true", true) },
-                activeConnections = userInfo.optString("active_cons").toIntOrNull(),
-                maximumConnections = userInfo.optString("max_connections").toIntOrNull()
+                isTrial = userInfo.optNullableString("is_trial")
+                    ?.let { it == "1" || it.equals("true", true) }
+                    ?: false,
+                activeConnections = userInfo.optNullableString("active_cons")?.toIntOrNull(),
+                maximumConnections = userInfo.optNullableString("max_connections")?.toIntOrNull()
             )
         }
 
@@ -186,7 +188,7 @@ class XtreamApiRepository(
             name = series.name,
             coverUrl = info?.optHttpUrl("cover_big") ?: series.coverUrl,
             plot = info?.optNullableString("plot") ?: series.plot,
-            seasons = seasons.sortedWith(compareBy(nullsFirst()) { it.number })
+            seasons = seasons.sortedBy { it.number ?: Int.MIN_VALUE }
         )
     }
 
@@ -273,6 +275,12 @@ internal fun buildXtreamApiUri(
     require(credentials.username.isNotBlank()) { "Xtream username must not be empty." }
     require(credentials.password.isNotBlank()) { "Xtream password must not be empty." }
     require(action == null || action.matches(Regex("[A-Za-z0-9_]+"))) { "Xtream action is invalid." }
+    val reservedParameters = setOf("username", "password", "action", "category_id")
+    require(extra.all { (key, _) ->
+        key.matches(Regex("[A-Za-z0-9_]+")) && key !in reservedParameters
+    }) {
+        "Xtream extra query parameters cannot override authentication or action parameters."
+    }
 
     val query = buildList {
         add("username" to credentials.username)
@@ -323,7 +331,13 @@ private fun validateXtreamBaseUrl(rawUrl: String): URI {
     require(uri.rawQuery == null && uri.rawFragment == null) {
         "Xtream base URL must not contain a query or fragment."
     }
-    return uri
+
+    // Providers and apps commonly show either the host root or the player_api.php endpoint.
+    val normalizedPath = uri.rawPath.orEmpty()
+        .removeSuffix("/")
+        .removeSuffix("/player_api.php")
+        .removeSuffix("/")
+    return URI("$scheme://${uri.rawAuthority}$normalizedPath")
 }
 
 private fun encodeQueryComponent(value: String): String =
@@ -333,7 +347,7 @@ private fun encodePathComponent(value: String): String =
     encodeQueryComponent(value).replace("+", "%20")
 
 private fun isNumericId(value: String): Boolean =
-    value.isNotBlank() && value.all(Char::isDigit)
+    value.isNotBlank() && value.all { it in '0'..'9' }
 
 private fun safeExtension(value: String, fallback: String): String {
     val normalized = value.trim().removePrefix(".").lowercase(Locale.ROOT)
@@ -348,8 +362,11 @@ private fun mimeTypeForExtension(extension: String): String? = when (extension.l
     else -> null
 }
 
-private fun JSONObject.optNullableString(key: String): String? =
-    optString(key).trim().takeIf(String::isNotEmpty)
+private fun JSONObject.optNullableString(key: String): String? {
+    val rawValue = opt(key) ?: return null
+    if (rawValue === JSONObject.NULL) return null
+    return rawValue.toString().trim().takeIf { it.isNotEmpty() && !it.equals("null", true) }
+}
 
 private fun JSONObject.optHttpUrl(key: String): String? {
     val value = optNullableString(key) ?: return null

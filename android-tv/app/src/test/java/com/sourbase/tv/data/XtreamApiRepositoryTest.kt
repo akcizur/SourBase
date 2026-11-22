@@ -53,6 +53,27 @@ class XtreamApiRepositoryTest {
     }
 
     @Test
+    fun acceptsBaseUrlThatAlreadyEndsWithPlayerApiPhp() {
+        val uri = buildXtreamApiUri(
+            credentials.copy(baseUrl = "https://provider.example.test/panel/player_api.php"),
+            action = "get_live_streams"
+        )
+
+        assertEquals("/panel/player_api.php", uri.path)
+    }
+
+    @Test
+    fun rejectsExtraParametersThatCouldOverrideCredentials() {
+        assertThrows(IllegalArgumentException::class.java) {
+            buildXtreamApiUri(
+                credentials,
+                action = "get_series_info",
+                extra = listOf("password" to "replacement")
+            )
+        }
+    }
+
+    @Test
     fun rejectsInvalidBaseUrlsAndActionValues() {
         listOf(
             "",
