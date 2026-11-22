@@ -62,7 +62,7 @@ Not performed here:
 - Added unit tests for URL restrictions, API key headers, service health, search/detail routes, authorization and invalid IDs.
 - Full design, data mapping, rate limits, setup and legal/security boundaries are recorded in [docs/CSFD-INTEGRATION.md](docs/CSFD-INTEGRATION.md).
 
-**Verification boundary:** mock-based Go tests and the Windows CI workflow must pass before release. No live scrape against ČSFD or physical Windows/Docker smoke test is claimed here. The upstream adapter is unofficial; users must respect current ČSFD terms. The feature is not available on static GitHub Pages or Android TV.
+**Verification:** [Windows CI run 44981380540](https://github.com/akcizur/SourBase/actions/runs/44981380540) completed successfully on commit `279b41cc4510d9e148985af1370104397d4193bb`: Go unit tests, `go vet`, embedded UI JavaScript syntax, PowerShell launcher syntax, Windows x64 EXE build and artifact upload all passed. No live scrape against ČSFD or physical Windows/Docker smoke test is claimed here. The final commits after this run changed documentation only. The upstream adapter is unofficial; users must respect current ČSFD terms. The feature is not available on static GitHub Pages or Android TV.
 
 ## Multi-platform research follow-up — 2026-11-22
 
