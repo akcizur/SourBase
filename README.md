@@ -1,6 +1,6 @@
 # Sourbase · Media Center
 
-Sourbase is a local-first media center for Windows, with a native Android TV client foundation in progress. It combines IPTV, a personal media library, a shared player, EPG, Xtream VOD, local files, RSS catalogues and an optional local qBittorrent connection in one adaptive, TV-first product direction.
+Sourbase is a local-first media center for Windows, with an actively developed native Android TV client. The existing Windows application remains supported. It combines IPTV, a personal media library, a shared player, EPG, Xtream VOD, local files, RSS catalogues and an optional local qBittorrent connection in one adaptive, TV-first product direction.
 
 ## Platform direction
 
@@ -10,7 +10,7 @@ Sourbase is a local-first media center for Windows, with a native Android TV cli
 - **Apple TV (tvOS):** a future native large-screen client with AVPlayer and Apple-style focus navigation.
 - **Windows preserved:** the existing `Sourbase.exe` remains supported, including its embedded web interface and local media host.
 
-The Android project currently contains the TV navigation shell, data contracts for media/channels/EPG and a Media3 playback host. The player accepts validated HTTP(S) playback metadata, an optional MIME hint and per-source request headers. Playlist import, XMLTV parsing, provider login and persistent Android library storage are not yet connected; the home screen remains a foundation preview. Android CI is being aligned with the Compose 1.12 / API 37 toolchain; an APK is available only after a successful workflow artifact upload.
+The Android TV client now imports remote M3U/M3U8 playlists and XMLTV guides, parses channel and programme metadata, matches EPG entries by `tvg-id`/XMLTV channel ID, shows a 2D six-slot (three-hour) programme timeline, and starts the selected currently airing channel through AndroidX Media3. Playlist and guide URLs are stored encrypted at rest with AES-GCM using an Android Keystore key; the encrypted record is held in app-private preferences and app backup is disabled. The TV home outside Live TV remains a navigation preview. Xtream login/VOD/series, a persistent full catalogue, favourites, watch history, a full player overlay, local playlist-file import and catch-up are not implemented yet.
 
 See:
 - [Platform UX and technical plan](docs/PRODUCT-UX-AND-PLATFORM-PLAN.md)
@@ -64,7 +64,7 @@ Sourbase reuses the previous WAVE IPTV profile and encrypted data. Your existing
 
 Language and theme preferences are stored separately in browser local storage under `sourbase-ui-preferences-v1`; they do not overwrite the media library or protected credentials. DPAPI-protected files are intended to be opened by the same Windows account on the same machine. qBittorrent credentials are session-only and remain in memory while the application is running. Keep qBittorrent Web UI on localhost; do not expose it to the public internet.
 
-Android uses a separate app-private storage boundary. The Android client must not attempt to read Windows files protected by DPAPI. Device-side secret storage will use Android Keystore when source persistence is implemented.
+Android uses a separate app-private storage boundary and does not read Windows files protected by DPAPI. The M3U and XMLTV source URLs are encrypted with AES-256-GCM using a non-exportable Android Keystore key. Only the encrypted IV/ciphertext record is stored in app-private preferences; Android backup is disabled. This currently covers source URLs only, not Xtream passwords, a full catalogue or watch history. HTTP source URLs are accepted for legacy providers, but HTTP transport is not encrypted; HTTPS is strongly preferred. If a stored record cannot be decrypted, the app preserves it and requires an explicit user action before clearing it.
 
 ## Playback notes
 
@@ -73,7 +73,7 @@ Android uses a separate app-private storage boundary. The Android client must no
 - MKV and uncommon codecs may require VLC/MPV on Windows.
 - Torrent playback starts from completed files. Streaming partially downloaded pieces is not implemented.
 - Windows local media streams use an authenticated loopback endpoint with HTTP Range support for seeking.
-- Android playback is being built on AndroidX Media3; supported codecs remain device-dependent.
+- Android playback uses AndroidX Media3 with HLS and DASH modules; codec/DRM availability remains device-dependent. The Android TV screen imports remote M3U/XMLTV URLs, and current programmes can start the live channel.
 - Apple playback is planned around AVPlayer; web playback is planned around Shaka Player or hls.js after a standalone browser client exists.
 
 ## Build from source
@@ -112,4 +112,4 @@ The debug APK is written to `android-tv/app/build/outputs/apk/debug/app-debug.ap
 
 Windows CI runs Go unit tests, static analysis, embedded UI JavaScript syntax checks and the Windows x64 executable build. Physical Windows launch, DPAPI round-trip, real provider accounts and playback against a specific provider still require testing on Windows with the user's own accounts and permitted content.
 
-Android CI has not yet produced a confirmed APK. Its current build toolchain is aligned to the official Compose 1.12 / API 37 requirements. D-pad navigation and playback still need device/emulator validation on Android TV hardware.
+Android CI passed on commit `4128ed981d5e3fa8de767945412c8751a13f8aed`: Kotlin compilation, `assembleDebug`, JVM unit tests and APK artifact upload succeeded. [Android TV workflow run 44975689815](https://github.com/akcizur/SourBase/actions/runs/44975689815) contains the `sourbase-android-tv-debug` artifact (about 15.1 MB). Windows CI also passed on the same commit, including Go tests, `go vet`, embedded JavaScript syntax validation, Windows x64 EXE build and artifact upload. [Windows workflow run 44975689835](https://github.com/akcizur/SourBase/actions/runs/44975689835) contains `sourbase-windows-x64`. These are CI build results, not physical-device acceptance: Android TV remote navigation and provider-specific playback still need a TV/box test; Windows DPAPI runtime and playback still need physical Windows testing.

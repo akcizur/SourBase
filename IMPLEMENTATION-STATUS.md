@@ -52,28 +52,37 @@ Not performed here:
 
 ## Multi-platform research follow-up — 2026-11-22
 
-### Android TV changes added
+### Android TV — implemented
 
-- Gradle repository configuration now tries a Google Cloud-hosted Maven Central mirror before Maven Central to reduce the observed HTTP 429 impact. The mirror is a fallback only; Maven Central remains configured.
-- Media3 player now uses the PlaybackSource MIME hint and request headers, with 15-second connect and 30-second read timeouts.
-- Added HTTP(S) playback URL validation: empty/relative/non-HTTP URLs, missing hosts, embedded user-info credentials, malformed MIME values and CR/LF header injection are rejected.
-- Added JVM unit tests for accepted HTTP(S) sources and rejected invalid URLs/headers.
-- Added the platform UX/technical plan at docs/PRODUCT-UX-AND-PLATFORM-PLAN.md.
-- Updated the Android toolchain for Compose 1.12.1: AGP 9.2.0, Gradle 9.4.1, compileSdk 37 (Android 17 preview package android-37.0 via SDK channel 3) and AGP built-in Kotlin; targetSdk remains 35 to avoid opting into new runtime behavior in this tooling-only change.
+- Native Kotlin / Compose for TV navigation shell with TV Material 3, D-pad focus states and initial focus on Domů.
+- Media3 / ExoPlayer playback host with HLS and DASH modules. `PlaybackSource` accepts validated HTTP(S) URL, optional MIME hint and request headers; the player uses 15-second connect and 30-second read timeouts.
+- Remote M3U/M3U8 loader and parser: channel ID, name, logo, group, tvg-id and stream URL, stable IDs and warnings for invalid entries.
+- Remote XMLTV loader and secure XMLTV parser: channel display names, programme title, description, categories, language and start/stop times with timezone offsets. Missing offsets are interpreted as UTC; invalid time ranges are skipped.
+- XMLTV matching uses `tvg-id` / XMLTV channel ID. The Live TV view displays the current programme and includes a six-slot EPG timeline with 30-minute slots (a three-hour window). Selecting the currently airing programme starts its live channel; future programme selection does not claim archive playback.
+- M3U and XMLTV URL settings are encrypted at rest using AES-256-GCM and a non-exportable Android Keystore key. App-private preferences contain only the IV/ciphertext record and Android backup is disabled. If the record cannot be decrypted, it is preserved until the user explicitly clears it.
+- Unit tests cover playback URL validation, M3U parsing, XMLTV time offsets, matching and malformed/unsafe XML handling.
 
-### CI verification boundary
+### CI verification — commit `4128ed981d5e3fa8de767945412c8751a13f8aed`
 
-The dependency mirror reduced the Maven Central HTTP 429 blockage. The next observed run reached :app:checkDebugAarMetadata and exposed a real version alignment issue: Compose 1.12.1 requires compileSdk 37 and AGP 9+. The subsequent CI run showed that Android 17's SDK package is a preview package, not the stable `platforms;android-37` path. The project now uses AGP 9.2.0, Gradle 9.4.1, AGP built-in Kotlin and installs `platforms;android-37.0` from SDK channel 3. No APK is confirmed until the updated CI build and artifact list are checked.
+- **Android TV:** [workflow run 44975689815](https://github.com/akcizur/SourBase/actions/runs/44975689815) completed successfully. SDK setup, Gradle setup, Kotlin compile, `:app:assembleDebug`, `:app:testDebugUnitTest` and APK upload all succeeded. Artifact: `sourbase-android-tv-debug`, 15,054,218 bytes, SHA-256 `1bbff2b6c50484b7bc29a766f0f52da19b3d2c9ab4f9ca1c2402161852345734`.
+- **Windows:** [workflow run 44975689835](https://github.com/akcizur/SourBase/actions/runs/44975689835) completed its Go unit tests, `go vet`, embedded UI JavaScript syntax check, Windows x64 EXE build and artifact upload successfully. Artifact: `sourbase-windows-x64`, 2,937,466 bytes, SHA-256 `e95ed1db966fd870f4034f1b0180e3a842a9df470b7ab3918c229f239642e4b2`.
+- These CI results prove compilation, unit tests and artifact creation. They do not prove manual operation on a physical Android TV device or Windows desktop.
 
-The Windows workflow had succeeded on commit bb3b9e48, running Go tests, go vet, embedded JavaScript syntax validation and the Windows x64 build. This does not replace a physical Windows launch, DPAPI round-trip or provider-specific playback test.
+### Still not implemented
 
-### Explicitly still missing
+- Xtream login and Live/VOD/Series catalog integration in Android TV.
+- Persistent full channel/VOD catalogue, favorites, watch history, resume sync and unified Live/VOD/EPG search.
+- Local M3U/XMLTV file picker/import; current Android source import is from remote HTTP(S) URLs.
+- EPG date navigation beyond the current three-hour window, station logos inside the EPG grid, recording, timeshift or catch-up.
+- Advanced player overlay for audio/subtitle track selection, quality, channel zapping and error recovery.
+- Android device/emulator UI tests for full D-pad focus traversal and physical TV playback smoke tests.
+- Standalone Web client, Android phone, iOS/iPadOS and tvOS clients.
+- Public authenticated backend, cloud sync, user accounts, subscriptions and real DRM licensing infrastructure.
 
-- M3U/M3U8 and Xtream import in Android TV.
-- XMLTV parser, reliable channel matching and TV EPG 2D grid in Android TV.
-- Persistent Android catalog, encrypted provider credential storage, watch history, favourites and unified Live/VOD/EPG search.
-- Production player overlay for available audio/subtitle tracks, quality and channel switching.
-- Standalone web client, Android phone app, iOS/iPadOS and tvOS clients.
-- Public authenticated backend, cloud sync, account/subscription and real DRM licensing infrastructure.
+### Security and compatibility boundaries
 
-Catch-up/timeshift must remain hidden unless the selected provider/channel reports a supported archive URL or API. DRM, JWT subscriptions and device limits remain architecture-only until real licensing and backend services exist. Windows DPAPI files remain Windows-only; they must not be shared with Android or Apple clients.
+- Android source URLs are encrypted at rest; the current store does not yet persist Xtream passwords or a general credentials vault.
+- HTTP is accepted for legacy IPTV providers, but HTTP traffic is not encrypted in transit; HTTPS is preferred. The current remote loader follows HTTP redirects using the platform connection behavior; redirect downgrade protection is a follow-up hardening item.
+- Windows DPAPI files remain Windows-only and are never shared with Android or Apple clients.
+- Catch-up/timeshift must remain unavailable unless the selected provider/channel reports a supported archive URL or API. DRM, JWT subscriptions and device limits remain architecture-only until real licensing and backend services exist.
+- Windows CI remains green, but physical Windows launch, DPAPI round-trip and provider-specific playback still require testing on a Windows machine.

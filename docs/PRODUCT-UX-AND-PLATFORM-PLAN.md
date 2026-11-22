@@ -7,7 +7,7 @@
 | Platforma | Cílová role | Doporučená technologie | Stav v repozitáři |
 |---|---|---|---|
 | Windows | Zachovat současný desktopový klient | Go host + vložené HTML UI + DPAPI | Existující aplikace; Windows workflow na commitu před aktuálními Android změnami prošel |
-| Android TV | Primární nová platforma | Kotlin, Compose for TV, AndroidX Media3 | UI a player scaffold; importy, EPG a katalog nejsou propojené |
+| Android TV | Primární nová platforma | Kotlin, Compose for TV, AndroidX Media3 | TV shell, remote M3U/XMLTV import, channel matching, six-slot EPG and Media3 live playback; source URLs encrypted with Keystore; CI APK passes |
 | Web / desktop browser | Druhá klientská plocha | Samostatný web + autentizované API + Shaka nebo hls.js | Samostatný browser klient a síťové API chybí; web/index.html patří Windows aplikaci |
 | Android phone | Mobilní klient | Nativní Android nebo později KMP | Chybí |
 | iPhone / iPad | Mobilní klient | SwiftUI + AVPlayer | Chybí |
@@ -23,9 +23,9 @@ Současná Windows větev zachovává Go host, lokální webové UI, DPAPI úlo�
 
 ### Android TV
 
-V android-tv je Kotlin/Compose navigační shell, klientské modely MediaEntry, TvChannel, EpgProgramme a PlaybackSource a základ Media3/ExoPlayer. Aktuální home obrazovka je preview. Nejsou připojené M3U/M3U8 importy, Xtream autentizace, XMLTV parser a matching, 2D EPG grid, trvalý katalog, watch history, favourites, unified search, profily ani produkční ovládací overlay přehrávače.
+V android-tv je Kotlin/Compose TV shell, datové modely, Media3 player, vzdálený M3U/M3U8 import, XMLTV parser a matching podle `tvg-id`/XMLTV ID. Obrazovka Live TV vypisuje kanály, aktuální pořad a 2D EPG timeline o šesti půlhodinových slotech (tři hodiny). Výběr právě vysílaného pořadu spouští živý stream. M3U/XMLTV URL se ukládají šifrovaně pomocí AES-GCM a Android Keystore. Home mimo Live TV zůstává preview; Xtream autentizace, VOD/series katalog, full-text search, favourites, watch history, local file import a pokročilý player overlay chybí.
 
-Přidání Maven Central mirroru překonalo opakované HTTP 429. Následující CI běh se dostal ke kontrole AAR metadat a odhalil nesoulad verzí: Compose 1.12.1 vyžaduje compileSdk 37 a AGP 9.1+. Toolchain je proto aktualizován na AGP 9.2.0, Gradle 9.4.1 a compileSdk 37; Android 17 Preview se instaluje jako `platforms;android-37.0` přes SDK channel 3. KGP Android plugin je nahrazen vestavěnou Kotlin podporou AGP. Dokud nový workflow neskončí úspěchem a nevytvoří APK artefakt, build není ověřený.
+Toolchain používá AGP 9.2.0, Gradle 9.4.1, compileSdk 37 (Android 17 preview balíček `android-37.0`, SDK channel 3), JDK 17 a AGP built-in Kotlin. Android workflow na commitu `4128ed981d5e3fa8de767945412c8751a13f8aed` úspěšně sestavil APK, spustil unit testy a nahrál artefakt. Fyzické ověření na Android TV zařízení však zatím neproběhlo.
 
 ### Chybějící platformy a služby
 
@@ -123,13 +123,13 @@ Budoucí návrh může zvažovat Widevine, FairPlay a PlayReady, ale reálné na
 
 ### P0 — stabilní Android TV základ
 
-1. **Build:** Gradle dependency resolution, Kotlin kompilace, unit testy, assembleDebug a upload APK. Akceptace: zelený CI run a artefakt sourbase-android-tv-debug skutečně existuje.
-2. **PlaybackSource:** validace HTTP(S), MIME hintu a hlaviček. Akceptace: unit testy pro validní a nevalidní URL, chybějící host, vložené credentials a CR/LF injection.
-3. **M3U:** parser s identitou, názvem, group-title, logem, tvg-id a stream URL. Akceptace: lokální fixtures včetně UTF-8 a chybějících atributů.
-4. **XMLTV:** parser, časové zóny a matching kanálů. Akceptace: fixtures pro offsety, DST, chybějící kanály a duplicitní pořady.
-5. **TV UX:** Home a EPG grid ovladatelné pouze ovladačem. Akceptace: Compose test D-pad focus path a manuální test na Android TV zařízení.
-6. **1–2 kroky:** vybrání aktuálního kanálu nebo VOD karty spustí přehrávání bez mezilehlého nastavení. Ověřit zvlášť Home, Live TV a VOD.
-7. **Windows regrese:** zachovat Go testy, go vet, kontrolu embedded JavaScriptu, Windows x64 build, DPAPI data path a současné UI.
+1. **Build — hotovo v CI:** Gradle dependency resolution, Kotlin compilation, unit tests, assembleDebug a APK upload. Akceptace CI splněna v run 44975689815; fyzické TV ověření stále čeká.
+2. **PlaybackSource — hotovo v CI:** HTTP(S), MIME hint, hlavičky, chybějící host, userinfo a CR/LF validace s JVM testy.
+3. **M3U — hotovo v CI pro remote URL:** parser channel ID, název, group-title, logo, tvg-id a stream URL; fixture tests. Lokální file picker zatím chybí.
+4. **XMLTV — hotovo v CI:** parser timezone offsetů, UTC fallback, validace intervalů a channel matching přes ID; fixture tests.
+5. **Basic Live TV/EPG — implementováno:** remote source form, list kanálů, current programme, šestipolohová timeline. Manuální D-pad/Player test na Android TV hardware čeká.
+6. **1–2 kroky:** aktuální pořad spouští live stream; budoucí pořad zobrazí informaci, ale catch-up není implementován. Home/VOD toky čekají na katalog.
+7. **Windows regrese — CI prošla:** Go tests, go vet, embedded JavaScript check a Windows x64 build na commitu 4128ed; DPAPI/device runtime stále vyžaduje fyzický test.
 
 ### P1 — katalog a další klienti
 

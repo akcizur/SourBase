@@ -15,17 +15,17 @@ Do not expose the loopback API to the network and do not attempt to read Windows
 
 ## Android TV client
 
-The new `android-tv/` project is a native Android TV application:
+The `android-tv/` project is a native Android TV application built with Kotlin (AGP built-in Kotlin), Jetpack Compose for TV, TV Material 3 and AndroidX Media3 / ExoPlayer with HLS and DASH modules. Its current implementation includes:
 
-- Kotlin with AGP built-in Kotlin and Jetpack Compose for TV.
-- TV-first navigation with visible D-pad focus states, initial focus on Domů and grouped focus traversal.
-- TV Material 3 components from `androidx.tv:tv-material`.
-- AndroidX Media3 / ExoPlayer with HLS and DASH modules.
-- Validated HTTP(S) playback sources with optional MIME hints and request headers.
-- App-private persistence and Android Keystore for any future secrets.
-- User-provided HTTP/HTTPS IPTV and VOD sources; cleartext HTTP is permitted for legacy provider compatibility.
+- TV-first navigation with visible D-pad focus states, initial focus on Domů, and grouped focus traversal.
+- Remote M3U/M3U8 URL import and parsing of channel ID, display name, logo, group and stream URL.
+- Remote XMLTV import and parsing of channel display names, programme title/description/category/language and start/stop timestamps with timezone offsets.
+- Channel matching through the playlist `tvg-id` / XMLTV channel ID rather than fuzzy display-name matching.
+- A six-slot, 30-minute-per-slot EPG timeline (three hours) with a fixed channel column. The current programme can launch its channel; selecting a future programme does not claim catch-up playback.
+- Validated HTTP(S) playback sources with optional MIME hints and per-source request headers.
+- AES-GCM encryption of M3U/XMLTV source URLs using a non-exportable Android Keystore key. Only IV/ciphertext are held in app-private preferences; Android backup is disabled. Unreadable encrypted data is preserved until explicit user reset.
 
-The first commit is a buildable UI and playback foundation. The home sections are navigation scaffolding, not yet connected to playlist or EPG data. No cloud account, subscription backend, DRM licensing service, or cross-device synchronization is claimed.
+The Android Home sections outside Live TV remain navigation scaffolding. Xtream login and catalog, VOD/series, persistent channel catalogue, favourites, watch history, unified search, local playlist file import, advanced player overlay and catch-up are not yet implemented. HTTP is accepted for legacy IPTV providers, but it is not encrypted in transit; HTTPS is preferred. No cloud account, subscription backend, DRM licensing service or cross-device synchronization is claimed.
 
 ## Shared domain boundary
 
@@ -36,14 +36,14 @@ Keep source and catalog concepts independent from platform UI:
 - `EpgProgramme`: channel ID, title, synopsis and start/end timestamps.
 - `PlaybackSource`: URL, optional MIME type and request headers.
 
-The Android models are an initial client-side contract. When the domain layer is extracted, preserve identifiers and field meaning across Windows, Web and Android instead of sharing platform-specific storage or UI code.
+The Android models are an initial client-side contract. M3U and XMLTV parser logic lives in the data layer, while remote downloads run on `Dispatchers.IO` with response-size limits and HTTP(S)-only URL validation. Source URLs are encrypted at rest; this does not currently encrypt transport for legacy `http://` URLs, nor store provider passwords. When the domain layer is extracted, preserve identifiers and field meaning across Windows, Web and Android instead of sharing platform-specific storage or UI code.
 
 ## Delivery phases
 
-1. **Android TV foundation:** app shell, D-pad navigation, Media3 playback host, CI APK build.
-2. **Source ingestion:** M3U/M3U8 import, source editing and app-private encrypted storage.
-3. **EPG and VOD:** XMLTV parsing, channel matching, Xtream-compatible catalog integration and metadata shelves.
-4. **Player UX:** live channel switching, audio/subtitle selection, catch-up only where the provider exposes a supported archive URL.
+1. **Android TV foundation — implemented and CI-verified:** app shell, D-pad navigation, Media3 playback host and debug APK artifact.
+2. **M3U/XMLTV source ingestion — implemented and CI-verified:** remote URL import, parser tests, XMLTV timezone parsing and channel ID matching; source URLs encrypted at rest with Android Keystore.
+3. **Basic Live TV/EPG — implemented and CI-verified:** channel list, current programme label and six-slot three-hour EPG timeline; current programme selection starts its live channel.
+4. **VOD/player UX — next:** Xtream-compatible catalog, movies/series/episodes, audio/subtitle/quality overlay and catch-up only where the provider exposes a supported archive URL.
 5. **Web companion:** responsive source/library management against an explicitly designed and authenticated API.
 6. **Mobile companion:** reuse domain contracts and account/sync APIs; do not copy Windows DPAPI behavior.
 
@@ -56,4 +56,4 @@ cd android-tv
 gradle :app:assembleDebug
 ```
 
-The debug APK is written to `android-tv/app/build/outputs/apk/debug/app-debug.apk`.
+The debug APK is written to `android-tv/app/build/outputs/apk/debug/app-debug.apk`. The latest verified artifact is `sourbase-android-tv-debug` from [workflow run 44975689815](https://github.com/akcizur/SourBase/actions/runs/44975689815), built from commit `4128ed981d5e3fa8de767945412c8751a13f8aed`. CI ran `assembleDebug`, `testDebugUnitTest` and uploaded the APK. Manual remote-control and real-stream checks on Android TV hardware are still required.
