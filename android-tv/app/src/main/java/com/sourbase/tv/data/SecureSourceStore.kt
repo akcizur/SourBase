@@ -39,7 +39,10 @@ class SecureSourceStore(context: Context) {
                 playlistUrl = json.optString(PLAYLIST_URL_FIELD).takeIf(String::isNotBlank),
                 xmltvUrl = json.optString(XMLTV_URL_FIELD).takeIf(String::isNotBlank),
                 playlistUri = json.optString(PLAYLIST_URI_FIELD).takeIf(String::isNotBlank),
-                xmltvUri = json.optString(XMLTV_URI_FIELD).takeIf(String::isNotBlank)
+                xmltvUri = json.optString(XMLTV_URI_FIELD).takeIf(String::isNotBlank),
+                xtreamBaseUrl = json.optString(XTREAM_BASE_URL_FIELD).takeIf(String::isNotBlank),
+                xtreamUsername = json.optString(XTREAM_USERNAME_FIELD).takeIf(String::isNotBlank),
+                xtreamPassword = json.optString(XTREAM_PASSWORD_FIELD).takeIf(String::isNotBlank)
             )
         } catch (_: Exception) {
             // Do not silently discard or overwrite data that can no longer be decrypted.
@@ -49,6 +52,10 @@ class SecureSourceStore(context: Context) {
         }
     }
 
+    /**
+     * Updates M3U/XMLTV sources while preserving any stored Xtream credentials.
+     * Older encrypted records without Xtream fields are read as empty values.
+     */
     @Synchronized
     @Throws(IOException::class)
     fun save(
@@ -57,21 +64,72 @@ class SecureSourceStore(context: Context) {
         playlistUri: String? = null,
         xmltvUri: String? = null
     ) {
-        val playlist = playlistUrl?.trim()?.takeIf(String::isNotEmpty)
-        val guide = xmltvUrl?.trim()?.takeIf(String::isNotEmpty)
-        val playlistDocument = playlistUri?.trim()?.takeIf(String::isNotEmpty)
-        val guideDocument = xmltvUri?.trim()?.takeIf(String::isNotEmpty)
+        val existing = load()
+        writeRecord(
+            existing.copy(
+                playlistUrl = playlistUrl?.trim()?.takeIf(String::isNotEmpty),
+                xmltvUrl = xmltvUrl?.trim()?.takeIf(String::isNotEmpty),
+                playlistUri = playlistUri?.trim()?.takeIf(String::isNotEmpty),
+                xmltvUri = xmltvUri?.trim()?.takeIf(String::isNotEmpty)
+            )
+        )
+    }
 
-        if (playlist == null && guide == null && playlistDocument == null && guideDocument == null) {
+    /** Updates Xtream settings without dropping saved playlists or document permissions. */
+    @Synchronized
+    @Throws(IOException::class)
+    fun saveXtreamCredentials(baseUrl: String, username: String, password: String) {
+        require(baseUrl.isNotBlank() && username.isNotBlank() && password.isNotBlank()) {
+            "Xtream base URL, username and password must all be provided."
+        }
+        val existing = load()
+        writeRecord(
+            existing.copy(
+                xtreamBaseUrl = baseUrl.trim(),
+                xtreamUsername = username.trim(),
+                xtreamPassword = password
+            )
+        )
+    }
+
+    /** Clears only Xtream credentials while preserving M3U/XMLTV source settings. */
+    @Synchronized
+    @Throws(IOException::class)
+    fun clearXtreamCredentials() {
+        val existing = load()
+        writeRecord(
+            existing.copy(
+                xtreamBaseUrl = null,
+                xtreamUsername = null,
+                xtreamPassword = null
+            )
+        )
+    }
+
+    private fun writeRecord(sources: StoredSourceUrls) {
+        val hasAnySource = listOf(
+            sources.playlistUrl,
+            sources.xmltvUrl,
+            sources.playlistUri,
+            sources.xmltvUri,
+            sources.xtreamBaseUrl,
+            sources.xtreamUsername,
+            sources.xtreamPassword
+        ).any { !it.isNullOrBlank() }
+
+        if (!hasAnySource) {
             clear()
             return
         }
 
         val plaintext = JSONObject()
-            .put(PLAYLIST_URL_FIELD, playlist.orEmpty())
-            .put(XMLTV_URL_FIELD, guide.orEmpty())
-            .put(PLAYLIST_URI_FIELD, playlistDocument.orEmpty())
-            .put(XMLTV_URI_FIELD, guideDocument.orEmpty())
+            .put(PLAYLIST_URL_FIELD, sources.playlistUrl.orEmpty())
+            .put(XMLTV_URL_FIELD, sources.xmltvUrl.orEmpty())
+            .put(PLAYLIST_URI_FIELD, sources.playlistUri.orEmpty())
+            .put(XMLTV_URI_FIELD, sources.xmltvUri.orEmpty())
+            .put(XTREAM_BASE_URL_FIELD, sources.xtreamBaseUrl.orEmpty())
+            .put(XTREAM_USERNAME_FIELD, sources.xtreamUsername.orEmpty())
+            .put(XTREAM_PASSWORD_FIELD, sources.xtreamPassword.orEmpty())
             .toString()
             .toByteArray(StandardCharsets.UTF_8)
 
@@ -170,6 +228,9 @@ class SecureSourceStore(context: Context) {
         const val XMLTV_URL_FIELD = "xmltvUrl"
         const val PLAYLIST_URI_FIELD = "playlistUri"
         const val XMLTV_URI_FIELD = "xmltvUri"
+        const val XTREAM_BASE_URL_FIELD = "xtreamBaseUrl"
+        const val XTREAM_USERNAME_FIELD = "xtreamUsername"
+        const val XTREAM_PASSWORD_FIELD = "xtreamPassword"
         const val TRANSFORMATION = "AES/GCM/NoPadding"
         const val AES_KEY_SIZE_BITS = 256
         const val GCM_IV_LENGTH_BYTES = 12
@@ -182,5 +243,8 @@ data class StoredSourceUrls(
     val playlistUrl: String? = null,
     val xmltvUrl: String? = null,
     val playlistUri: String? = null,
-    val xmltvUri: String? = null
+    val xmltvUri: String? = null,
+    val xtreamBaseUrl: String? = null,
+    val xtreamUsername: String? = null,
+    val xtreamPassword: String? = null
 )
