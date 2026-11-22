@@ -29,7 +29,7 @@ The upstream REST contract used by Sourbase is:
 | `GET /search/:query?language=cs` | Search | `movies[]`, `tvSeries[]`; `id`, `title`, `year`, `type`, `url`, `poster`, `colorRating` |
 | `GET /movie/:id?language=cs` | Full movie or series detail | `id`, `title`, `year`, `rating`, `ratingCount`, `poster`, `photo`, `genres[]`, `origins[]`, `descriptions[]`, `creators.directors[]`, `creators.actors[]` |
 
-Search results also contain users; Sourbase deliberately ignores them. Search results can contain a transparent placeholder poster; the confirmed detail response is preferred for the final artwork.
+Search results also contain users; Sourbase deliberately ignores them. Search results can contain a transparent placeholder poster; Sourbase rejects data-URI placeholders and uses the confirmed detail response or the existing provider artwork.
 
 Upstream reference: [node-csfd-api README and REST API reference](https://github.com/bartholomej/node-csfd-api#rest-api).
 
@@ -89,7 +89,7 @@ Each confirmed match is stored under `state.csfdMetadata["<kind>:<source-id>"]`,
 | `csfdId`, `url` | Confirmed ČSFD search/detail result |
 | `title`, `year` | ČSFD detail, with search result fallback |
 | `rating`, `ratingCount` | ČSFD aggregate rating and number of ratings |
-| `poster` | ČSFD detail poster; only HTTPS `image.pmgstatic.com` URLs or the tiny transparent GIF placeholder are accepted |
+| `poster` | ČSFD detail poster; only HTTPS `image.pmgstatic.com` URLs are accepted |
 | `genres`, `origins` | ČSFD detail |
 | `description` | First available detail description, capped at 5,000 characters |
 | `directors`, `actors` | Names from the detail's creator groups, capped to 5 and 8 respectively |
@@ -130,7 +130,7 @@ powershell -ExecutionPolicy Bypass -File .\Stop-Sourbase-CSFD.ps1
 
 The stop script removes the container but keeps the DPAPI-protected key for the next start. The adapter can also be inspected with `docker logs sourbase-csfd`.
 
-The launcher uses the Docker image's current `latest` tag. For a reproducible deployment, pin a verified immutable image digest or a published version tag after checking the registry; do not assume that the moving `latest` tag is immutable.
+The launcher is compatible with Windows PowerShell 5.1 and PowerShell 7. It uses the Docker image's current `latest` tag. For a reproducible deployment, pin a verified immutable image digest or a published version tag after checking the registry; do not assume that the moving `latest` tag is immutable.
 
 ## 7. Storage and privacy
 
