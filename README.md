@@ -58,9 +58,9 @@ The Windows client includes an optional, user-triggered ČSFD matcher. It uses t
 2. Run `powershell -ExecutionPolicy Bypass -File .\\Start-Sourbase-CSFD.ps1`.
 3. Copy the generated API key from the PowerShell output into **Nastavení → ČSFD · Filmová metadata**. Keep the URL at `http://127.0.0.1:3000`.
 4. Test the connection, open a movie or series, choose **Spárovat s ČSFD** and manually select the matching title.
-5. Stop the local connector with `powershell -ExecutionPolicy Bypass -File .\\Stop-Sourbase-CSFD.ps1`.
+5. Stop the local connector with `powershell -ExecutionPolicy Bypass -File .\\Stop-Sourbase-CSFD.ps1`. To also delete the launcher's separate DPAPI key, use `powershell -ExecutionPolicy Bypass -File .\\Stop-Sourbase-CSFD.ps1 -RemoveKey`.
 
-The launcher binds Docker only to `127.0.0.1` and stores the API key encrypted with DPAPI for the current Windows account. Sourbase stores confirmed match records in its DPAPI-protected local state. No automatic catalogue crawl or bulk mirror is performed. The integration is not available in the static GitHub Pages build or Android TV client. See [the complete ČSFD integration record](docs/CSFD-INTEGRATION.md) for the actual upstream schema, limits, legal caveats and verification checklist.
+The launcher binds Docker only to `127.0.0.1` and stores its API key encrypted with DPAPI for the current Windows account in `%LOCALAPPDATA%\\Sourbase\\csfd-api-key.dpapi`. Sourbase separately stores the app-side API key in `credentials.dpapi` and confirmed match records in its DPAPI-protected local state. Clearing app data removes the app-side key; `-RemoveKey` also deletes the launcher-side key file. No automatic catalogue crawl or bulk mirror is performed. The integration is not available in the static GitHub Pages build or Android TV client. See [the complete ČSFD integration record](docs/CSFD-INTEGRATION.md) for the actual upstream schema, limits, legal caveats and verification checklist.
 
 ## Storage and privacy
 
