@@ -128,7 +128,7 @@ Stop the service:
 powershell -ExecutionPolicy Bypass -File .\Stop-Sourbase-CSFD.ps1
 ```
 
-The stop script removes the container but keeps the DPAPI-protected key for the next start. The adapter can also be inspected with `docker logs sourbase-csfd`.
+The stop script removes the container but keeps the DPAPI-protected key for the next start. To stop the service and delete the launcher's separate key copy, run `powershell -ExecutionPolicy Bypass -File .\\Stop-Sourbase-CSFD.ps1 -RemoveKey`. Sourbase's **Vymazat data** action deletes the app-side key in `credentials.dpapi`; it does not delete the launcher's separate `%LOCALAPPDATA%\\Sourbase\\csfd-api-key.dpapi` file. Use `-RemoveKey` when you also want to reset that copy. The adapter can be inspected with `docker logs sourbase-csfd`.
 
 The launcher is compatible with Windows PowerShell 5.1 and PowerShell 7. It uses the Docker image's current `latest` tag. For a reproducible deployment, pin a verified immutable image digest or a published version tag after checking the registry; do not assume that the moving `latest` tag is immutable.
 
@@ -138,7 +138,7 @@ The launcher is compatible with Windows PowerShell 5.1 and PowerShell 7. It uses
 - Match records are part of the existing local state snapshot (`state.dpapi`), also protected with DPAPI on Windows.
 - The GitHub Pages/static browser build does not have the authenticated Go loopback service and therefore cannot use this local connector. A future standalone web client needs a separately designed authenticated backend; it must not embed the ČSFD API key in static JavaScript.
 - The connector is optional. If it is stopped, existing playback, playlists, IPTV, EPG, the local library and existing catalogue artwork continue to work.
-- Clearing Sourbase's local data clears the CSFD match records and connector credentials as part of the existing clear-data action.
+- Clearing Sourbase's local data clears the CSFD match records and the app-side connector credentials as part of the existing clear-data action. The launcher's separate DPAPI key file remains so Docker can be started again; pass `-RemoveKey` to the stop script to remove that second copy too.
 
 ## 8. Legal, licensing and operating limits
 
