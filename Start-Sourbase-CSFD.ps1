@@ -67,6 +67,25 @@ finally {
     }
 }
 
+$serviceReady = $false
+for ($attempt = 0; $attempt -lt 20; $attempt++) {
+    try {
+        $health = Invoke-RestMethod -Uri "http://127.0.0.1:3000/" -Method Get -Headers @{ Authorization = "Bearer $ApiKey" } -TimeoutSec 3
+        if ($health.version) {
+            $serviceReady = $true
+            break
+        }
+    }
+    catch {
+        Start-Sleep -Seconds 1
+    }
+}
+if (-not $serviceReady) {
+    Write-Host "Poslední log ČSFD kontejneru:" -ForegroundColor Yellow
+    docker logs --tail 40 sourbase-csfd
+    throw "Lokální ČSFD API neodpovědělo v časovém limitu. Zkontrolujte Docker log."
+}
+
 Write-Host ""
 Write-Host "ČSFD API běží na http://127.0.0.1:3000" -ForegroundColor Green
 Write-Host "API klíč pro Sourbase / Nastavení / ČSFD:" -ForegroundColor Yellow
