@@ -48,3 +48,31 @@ Not performed here:
 - executing the DPAPI round-trip on Windows
 - connecting a real IPTV/Xtream/SKTorrent account
 - validating stream playback against a specific provider
+
+
+## Multi-platform research follow-up — 2026-11-22
+
+### Android TV changes added
+
+- Gradle repository configuration now tries a Google Cloud-hosted Maven Central mirror before Maven Central to reduce the observed HTTP 429 impact. The mirror is a fallback only; Maven Central remains configured.
+- Media3 player now uses the PlaybackSource MIME hint and request headers, with 15-second connect and 30-second read timeouts.
+- Added HTTP(S) playback URL validation: empty/relative/non-HTTP URLs, missing hosts, embedded user-info credentials, malformed MIME values and CR/LF header injection are rejected.
+- Added JVM unit tests for accepted HTTP(S) sources and rejected invalid URLs/headers.
+- Added the platform UX/technical plan at docs/PRODUCT-UX-AND-PLATFORM-PLAN.md.
+
+### CI verification boundary
+
+The previously inspected Android workflow run (commit bb3b9e48) failed while resolving Gradle classpath dependencies: repo.maven.apache.org returned HTTP 429 responses. That run did not establish a Kotlin compilation failure and did not produce a confirmed APK. The new dependency mirror and validator changes trigger another Android build; update this status only after its final conclusion and artifact list are checked.
+
+The Windows workflow had succeeded on commit bb3b9e48, running Go tests, go vet, embedded JavaScript syntax validation and the Windows x64 build. This does not replace a physical Windows launch, DPAPI round-trip or provider-specific playback test.
+
+### Explicitly still missing
+
+- M3U/M3U8 and Xtream import in Android TV.
+- XMLTV parser, reliable channel matching and TV EPG 2D grid in Android TV.
+- Persistent Android catalog, encrypted provider credential storage, watch history, favourites and unified Live/VOD/EPG search.
+- Production player overlay for available audio/subtitle tracks, quality and channel switching.
+- Standalone web client, Android phone app, iOS/iPadOS and tvOS clients.
+- Public authenticated backend, cloud sync, account/subscription and real DRM licensing infrastructure.
+
+Catch-up/timeshift must remain hidden unless the selected provider/channel reports a supported archive URL or API. DRM, JWT subscriptions and device limits remain architecture-only until real licensing and backend services exist. Windows DPAPI files remain Windows-only; they must not be shared with Android or Apple clients.
