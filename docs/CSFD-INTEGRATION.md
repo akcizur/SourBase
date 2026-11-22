@@ -116,7 +116,7 @@ Poster files are not copied into Sourbase or mirrored to a new server; only thei
    powershell -ExecutionPolicy Bypass -File .\Start-Sourbase-CSFD.ps1
    ```
 
-3. The script pulls `bartholomej/node-csfd-api`, creates a random 256-bit API key when one does not exist, and starts the container with the host port bound to **127.0.0.1:3000 only**.
+3. The script pulls `bartholomej/node-csfd-api`, creates a random 256-bit API key when one does not exist, and starts the container with the host port bound to **127.0.0.1:3000 only**. It then polls the authenticated root health endpoint for up to 20 seconds before reporting that the service is ready.
 4. The key is stored encrypted for the current Windows account using PowerShell DPAPI at `%LOCALAPPDATA%\Sourbase\csfd-api-key.dpapi`. The script prints the key for copying into Sourbase.
 5. In Sourbase **Nastavení → ČSFD · Filmová metadata**, keep the API URL as `http://127.0.0.1:3000`, paste the key and select **Uložit**.
 6. Select **Ověřit spojení**. This checks the local adapter root, not a ČSFD title search.
@@ -128,7 +128,7 @@ Stop the service:
 powershell -ExecutionPolicy Bypass -File .\Stop-Sourbase-CSFD.ps1
 ```
 
-The stop script removes the container but keeps the DPAPI-protected key for the next start. To stop the service and delete the launcher's separate key copy, run `powershell -ExecutionPolicy Bypass -File .\\Stop-Sourbase-CSFD.ps1 -RemoveKey`. Sourbase's **Vymazat data** action deletes the app-side key in `credentials.dpapi`; it does not delete the launcher's separate `%LOCALAPPDATA%\\Sourbase\\csfd-api-key.dpapi` file. Use `-RemoveKey` when you also want to reset that copy. The adapter can be inspected with `docker logs sourbase-csfd`.
+The stop script removes the container but keeps the DPAPI-protected key for the next start. To stop the service and delete the launcher's separate key copy, run `powershell -ExecutionPolicy Bypass -File .\Stop-Sourbase-CSFD.ps1 -RemoveKey`. Sourbase's **Vymazat data** action deletes the app-side key in `credentials.dpapi`; it does not delete the launcher's separate `%LOCALAPPDATA%\Sourbase\csfd-api-key.dpapi` file. Use `-RemoveKey` when you also want to reset that copy. The adapter can be inspected with `docker logs sourbase-csfd`.
 
 The launcher is compatible with Windows PowerShell 5.1 and PowerShell 7. It uses the Docker image's current `latest` tag. For a reproducible deployment, pin a verified immutable image digest or a published version tag after checking the registry; do not assume that the moving `latest` tag is immutable.
 
