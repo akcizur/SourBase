@@ -321,14 +321,16 @@ private fun SourceUrlField(
                 .border(1.dp, Color(0xFF344252), RoundedCornerShape(10.dp))
                 .padding(horizontal = 12.dp, vertical = 11.dp),
             decorationBox = { innerTextField ->
-                if (value.isEmpty()) {
-                    Text(
-                        text = "https://…",
-                        color = Color(0xFF758396),
-                        fontSize = 13.sp
-                    )
+                androidx.compose.foundation.layout.Box {
+                    if (value.isEmpty()) {
+                        Text(
+                            text = "https://…",
+                            color = Color(0xFF758396),
+                            fontSize = 13.sp
+                        )
+                    }
+                    innerTextField()
                 }
-                innerTextField()
             }
         )
     }
