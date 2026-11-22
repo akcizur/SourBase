@@ -6,6 +6,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.io.ByteArrayOutputStream
 import java.io.IOException
+import java.io.InputStream
 import java.net.HttpURLConnection
 import java.net.URI
 import java.nio.charset.StandardCharsets
@@ -42,23 +43,7 @@ class RemoteMediaSourceRepository(
         }
         val input = context.contentResolver.openInputStream(uri)
             ?: throw IOException("The selected document could not be opened.")
-
-        val output = ByteArrayOutputStream(8 * 1024)
-        input.use { stream ->
-            val buffer = ByteArray(DEFAULT_BUFFER_SIZE)
-            var totalBytes = 0
-            while (true) {
-                val read = stream.read(buffer)
-                if (read < 0) break
-                totalBytes += read
-                if (totalBytes > maxBytes) {
-                    throw IOException("Selected document exceeded the allowed $maxBytes byte limit.")
-                }
-                output.write(buffer, 0, read)
-            }
-        }
-        return output.toByteArray().toString(StandardCharsets.UTF_8)
-            .removePrefix("\uFEFF")
+        return readBoundedSourceText(input, maxBytes)
     }
 
     private fun fetchText(rawUrl: String, maxBytes: Int): String {
@@ -135,6 +120,31 @@ class RemoteMediaSourceRepository(
         const val MAX_M3U_BYTES = 32 * 1024 * 1024
         const val MAX_XMLTV_BYTES = 64 * 1024 * 1024
     }
+}
+
+/**
+ * Reads a selected source with a strict byte limit, decodes UTF-8 and strips a BOM.
+ * The helper owns and closes the provided stream.
+ */
+internal fun readBoundedSourceText(input: InputStream, maxBytes: Int): String {
+    require(maxBytes > 0) { "Maximum source size must be positive." }
+
+    val output = ByteArrayOutputStream(8 * 1024)
+    input.use { stream ->
+        val buffer = ByteArray(DEFAULT_BUFFER_SIZE)
+        var totalBytes = 0
+        while (true) {
+            val read = stream.read(buffer)
+            if (read < 0) break
+            if (read == 0) continue
+            totalBytes += read
+            if (totalBytes > maxBytes) {
+                throw IOException("Selected document exceeded the allowed $maxBytes byte limit.")
+            }
+            output.write(buffer, 0, read)
+        }
+    }
+    return output.toByteArray().toString(StandardCharsets.UTF_8).removePrefix("\uFEFF")
 }
 
 /**

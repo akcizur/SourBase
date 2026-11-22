@@ -15,7 +15,7 @@ import android.security.keystore.KeyGenParameterSpec
 import android.security.keystore.KeyProperties
 
 /**
- * Stores provider playlist/EPG URLs encrypted with an AES-GCM key held by Android Keystore.
+ * Stores remote source URLs and selected document URIs encrypted with an AES-GCM key held by Android Keystore.
  *
  * SharedPreferences contains only Base64-encoded IV and ciphertext. The AES key is
  * non-exportable from Android Keystore, and the encrypted values are kept in the
