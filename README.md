@@ -9,9 +9,9 @@ Sourbase is a local-first media center for Windows, with a new native Android TV
 - **Mobile third:** a future companion client based on the same platform-neutral domain contracts.
 - **Windows preserved:** the existing `Sourbase.exe` remains supported, including its embedded web interface and local media host.
 
-The Android project currently contains the TV navigation shell, data contracts for media/channels/EPG and a Media3 playback host. Playlist import, XMLTV parsing, provider login and persistent Android library storage are the next integration phases; the current Android home screen is explicitly a foundation preview, not a claim that those modules are already connected.
+The Android project currently contains the TV navigation shell, data contracts for media/channels/EPG and a Media3 playback host. The player now accepts validated HTTP(S) playback metadata, an optional MIME hint and per-source request headers. Playlist import, XMLTV parsing, provider login and persistent Android library storage are still future integration phases; the home screen remains a foundation preview. The previous Android CI run failed before Kotlin compilation because Maven Central returned HTTP 429. A mirror fallback and validation tests have now been added; an APK is not considered available until the new workflow passes and uploads it.
 
-See [Android TV architecture and delivery phases](docs/ANDROID-TV-ARCHITECTURE.md).
+See [Platform UX and technical plan](docs/PRODUCT-UX-AND-PLATFORM-PLAN.md) and [Android TV architecture and delivery phases](docs/ANDROID-TV-ARCHITECTURE.md).
 
 ## Windows interface
 
@@ -107,4 +107,4 @@ The debug APK is written to `android-tv/app/build/outputs/apk/debug/app-debug.ap
 
 Windows CI runs Go unit tests, static analysis, embedded UI JavaScript syntax checks and the Windows x64 executable build. Physical Windows launch, DPAPI round-trip, real provider accounts and playback against a specific provider still require testing on Windows with the user's own accounts and permitted content.
 
-Android CI validates the Gradle project and assembles a debug APK. D-pad navigation and playback still need device/emulator validation on Android TV hardware.
+The Android CI workflow attempts dependency resolution, compilation, unit tests and debug APK assembly. The last observed run failed at dependency resolution with Maven Central HTTP 429; the mirror fallback is being verified by a new run. An APK is available only after a successful workflow artifact upload. D-pad navigation and playback still need device/emulator validation on Android TV hardware.
