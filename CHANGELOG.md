@@ -1,5 +1,14 @@
 # Changelog
 
+## Sourbase · ČSFD metadata connector
+
+- Add an optional local ČSFD REST adapter for service status, Czech search and movie/series details.
+- Add manual and reversible title matching with ČSFD posters, aggregate ratings, rating counts, genres, origins, descriptions, directors and cast.
+- Keep source stream URLs and provider IDs unchanged; persist confirmed matches in local protected state.
+- Protect the adapter API key using the existing DPAPI credentials store.
+- Restrict the adapter to loopback, add request throttling/body limits/timeouts and add PowerShell Docker start/stop scripts.
+- Record the upstream API contract, mapping, legal caveats, operational limits and verification checklist in `docs/CSFD-INTEGRATION.md`.
+
 ## 1.6.0 · Research implementation
 
 - Encrypt the complete local desktop state with Windows DPAPI current-user scope.
