@@ -88,6 +88,12 @@ class SecureSourceStore(context: Context) {
         if (!preferences.edit().remove(ENCRYPTED_SOURCES_KEY).commit()) {
             throw IOException("Šifrované zdroje se nepodařilo vymazat.")
         }
+
+        // Also remove a possibly invalidated key so a fresh source setup can recover.
+        val keyStore = KeyStore.getInstance(ANDROID_KEY_STORE).apply { load(null) }
+        if (keyStore.containsAlias(KEY_ALIAS)) {
+            keyStore.deleteEntry(KEY_ALIAS)
+        }
     }
 
     private fun decrypt(record: String): ByteArray {

@@ -72,6 +72,7 @@ fun LiveTvSection(modifier: Modifier = Modifier) {
     var status by remember { mutableStateOf("Načítám uložené zdroje…") }
     var sourcesReady by remember { mutableStateOf(false) }
     var sourceStorageError by remember { mutableStateOf(false) }
+    var sourceReadError by remember { mutableStateOf(false) }
     var loadingPlaylist by remember { mutableStateOf(false) }
     var loadingGuide by remember { mutableStateOf(false) }
     var playingError by remember { mutableStateOf<String?>(null) }
@@ -92,6 +93,7 @@ fun LiveTvSection(modifier: Modifier = Modifier) {
             }
         } catch (_: Exception) {
             sourceStorageError = true
+            sourceReadError = true
             status = "Uložená URL nelze dešifrovat. Nebyla smazána ani přepsána."
         } finally {
             sourcesReady = true
@@ -143,9 +145,14 @@ fun LiveTvSection(modifier: Modifier = Modifier) {
                                     store = sourceStore,
                                     playlistUrl = playlistUrl,
                                     xmltvUrl = xmltvUrl,
+                                    canPersist = !sourceReadError,
                                     onFailure = {
                                         sourceStorageError = true
-                                        status = "Playlist načten, ale jeho URL se nepodařilo bezpečně uložit."
+                                        status = if (sourceReadError) {
+                                            "Playlist načten. Starý šifrovaný záznam nebyl přepsán; nejdříve jej ručně vymažte."
+                                        } else {
+                                            "Playlist načten, ale jeho URL se nepodařilo bezpečně uložit."
+                                        }
                                     }
                                 )
                                 status = buildString {
@@ -185,9 +192,14 @@ fun LiveTvSection(modifier: Modifier = Modifier) {
                                     store = sourceStore,
                                     playlistUrl = playlistUrl,
                                     xmltvUrl = xmltvUrl,
+                                    canPersist = !sourceReadError,
                                     onFailure = {
                                         sourceStorageError = true
-                                        status = "EPG načteno, ale URL zdrojů se nepodařilo bezpečně uložit."
+                                        status = if (sourceReadError) {
+                                            "EPG načteno. Starý šifrovaný záznam nebyl přepsán; nejdříve jej ručně vymažte."
+                                        } else {
+                                            "EPG načteno, ale URL zdrojů se nepodařilo bezpečně uložit."
+                                        }
                                     }
                                 )
                                 status = "EPG načteno: ${parsed.channels.size} stanic, ${parsed.programmes.size} pořadů."
@@ -217,6 +229,28 @@ fun LiveTvSection(modifier: Modifier = Modifier) {
             fontSize = 12.sp,
             maxLines = 2
         )
+
+        if (sourceReadError) {
+            Button(
+                onClick = {
+                    scope.launch {
+                        val cleared = runCatching {
+                            withContext(Dispatchers.IO) { sourceStore.clear() }
+                        }
+                        cleared.onSuccess {
+                            sourceReadError = false
+                            sourceStorageError = false
+                            status = "Nedostupný uložený záznam byl vymazán. Zadejte zdroje znovu."
+                        }.onFailure {
+                            status = "Uložený záznam se nepodařilo bezpečně vymazat."
+                        }
+                    }
+                },
+                enabled = sourcesReady && !loadingPlaylist && !loadingGuide
+            ) {
+                Text("Vymazat nedostupné uložené URL")
+            }
+        }
 
         if (channels.isEmpty()) {
             Column(
@@ -346,9 +380,15 @@ private fun kotlinx.coroutines.CoroutineScope.persistSourceUrls(
     store: SecureSourceStore,
     playlistUrl: String,
     xmltvUrl: String,
+    canPersist: Boolean,
     onFailure: () -> Unit
 ) {
     launch {
+        if (!canPersist) {
+            onFailure()
+            return@launch
+        }
+
         val result = runCatching {
             withContext(Dispatchers.IO) {
                 store.save(playlistUrl, xmltvUrl)
