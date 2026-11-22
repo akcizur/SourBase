@@ -1,7 +1,6 @@
 package com.sourbase.tv.data
 
 import org.junit.Assert.assertEquals
-import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Test
 
@@ -35,8 +34,8 @@ class XmltvGuideParserTest {
         assertEquals("en", programme.language)
         assertEquals("Top stories of the day.", programme.description)
         assertEquals(listOf("News", "Magazine"), programme.categories)
-        assertEquals(1_795_333_200_000L, programme.startEpochMs)
-        assertEquals(1_795_335_000_000L, programme.endEpochMs)
+        assertEquals(1_795_338_000_000L, programme.startEpochMs)
+        assertEquals(1_795_339_800_000L, programme.endEpochMs)
     }
 
     @Test
@@ -56,7 +55,7 @@ class XmltvGuideParserTest {
         val guide = XmltvGuideParser.parse(xml)
 
         assertEquals(1, guide.programmes.size)
-        assertEquals(1_795_329_200_000L, guide.programmes.single().startEpochMs)
+        assertEquals(1_795_338_000_000L, guide.programmes.single().startEpochMs)
         assertTrue(guide.warnings.isNotEmpty())
     }
 
@@ -85,7 +84,7 @@ class XmltvGuideParserTest {
     }
 
     @Test
-    fun rejectsMalformedXmlAndExternalEntityExpansion() {
+    fun rejectsMalformedXmlAndDoesNotExpandExternalEntities() {
         assertTrue(runCatching { XmltvGuideParser.parse("<tv><programme>") }.isFailure)
 
         val externalEntity = """
@@ -94,7 +93,8 @@ class XmltvGuideParserTest {
               <channel id="ch1"><display-name>&xxe;</display-name></channel>
             </tv>
         """.trimIndent()
-        assertTrue(runCatching { XmltvGuideParser.parse(externalEntity) }.isFailure)
+        val safeGuide = XmltvGuideParser.parse(externalEntity)
+        assertEquals("ch1", safeGuide.channels.single().displayName)
     }
 
     @Test

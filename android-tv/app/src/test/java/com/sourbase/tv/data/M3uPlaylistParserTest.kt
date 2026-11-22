@@ -25,8 +25,7 @@ class M3uPlaylistParserTest {
         assertEquals("News One", result.channels[0].name)
         assertEquals("News", result.channels[0].group)
         assertEquals("https://img.example.test/news.png", result.channels[0].logoUrl)
-        assertEquals("stream:https://media.example.test/live/news.m3u8?token=abc".substringBefore("?"),
-            result.channels[0].stream.url.substringBefore("?").let { "stream:" + it })
+        assertEquals("https://media.example.test/live/news.m3u8?token=abc", result.channels[0].stream.url)
         assertEquals("Sport 2", result.channels[1].name)
         assertEquals("Sports", result.channels[1].group)
     }
