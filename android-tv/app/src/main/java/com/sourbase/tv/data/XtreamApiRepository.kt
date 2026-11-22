@@ -65,6 +65,7 @@ class XtreamApiRepository(
         categoryId: String? = null
     ): List<XtreamLiveChannel> = withContext(Dispatchers.IO) {
         requestArray(buildXtreamApiUri(credentials, "get_live_streams", categoryId))
+            .mapObjects()
             .mapNotNull { item ->
                 val streamId = item.optString("stream_id").takeIf(::isNumericId) ?: return@mapNotNull null
                 val name = item.optString("name").trim().takeIf(String::isNotEmpty) ?: return@mapNotNull null
@@ -94,6 +95,7 @@ class XtreamApiRepository(
         categoryId: String? = null
     ): List<XtreamVodItem> = withContext(Dispatchers.IO) {
         requestArray(buildXtreamApiUri(credentials, "get_vod_streams", categoryId))
+            .mapObjects()
             .mapNotNull { item ->
                 val streamId = item.optString("stream_id").takeIf(::isNumericId) ?: return@mapNotNull null
                 val name = item.optString("name").trim().takeIf(String::isNotEmpty) ?: return@mapNotNull null
@@ -125,6 +127,7 @@ class XtreamApiRepository(
         categoryId: String? = null
     ): List<XtreamSeriesItem> = withContext(Dispatchers.IO) {
         requestArray(buildXtreamApiUri(credentials, "get_series", categoryId))
+            .mapObjects()
             .mapNotNull { item ->
                 val seriesId = item.optString("series_id").takeIf(::isNumericId)
                     ?: item.optString("id").takeIf(::isNumericId)
