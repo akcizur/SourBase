@@ -48,6 +48,7 @@ import com.sourbase.tv.playback.SourbasePlayerView
 import java.time.Instant
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -146,6 +147,7 @@ fun LiveTvSection(modifier: Modifier = Modifier) {
                                     playlistUrl = playlistUrl,
                                     xmltvUrl = xmltvUrl,
                                     canPersist = !sourceReadError,
+                                    onSaved = { sourceStorageError = false },
                                     onFailure = {
                                         sourceStorageError = true
                                         status = if (sourceReadError) {
@@ -193,6 +195,7 @@ fun LiveTvSection(modifier: Modifier = Modifier) {
                                     playlistUrl = playlistUrl,
                                     xmltvUrl = xmltvUrl,
                                     canPersist = !sourceReadError,
+                                    onSaved = { sourceStorageError = false },
                                     onFailure = {
                                         sourceStorageError = true
                                         status = if (sourceReadError) {
@@ -381,6 +384,7 @@ private fun kotlinx.coroutines.CoroutineScope.persistSourceUrls(
     playlistUrl: String,
     xmltvUrl: String,
     canPersist: Boolean,
+    onSaved: () -> Unit,
     onFailure: () -> Unit
 ) {
     launch {
@@ -389,12 +393,16 @@ private fun kotlinx.coroutines.CoroutineScope.persistSourceUrls(
             return@launch
         }
 
-        val result = runCatching {
+        try {
             withContext(Dispatchers.IO) {
                 store.save(playlistUrl, xmltvUrl)
             }
+            onSaved()
+        } catch (cancelled: CancellationException) {
+            throw cancelled
+        } catch (_: Exception) {
+            onFailure()
         }
-        if (result.isFailure) onFailure()
     }
 }
 
