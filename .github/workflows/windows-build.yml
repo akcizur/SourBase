@@ -34,6 +34,20 @@ jobs:
           $script | Set-Content -NoNewline -Encoding utf8 app-check.js
           node --check app-check.js
           Remove-Item app-check.js
+      - name: PowerShell connector scripts syntax
+        shell: pwsh
+        run: |
+          $files = @('Start-Sourbase-CSFD.ps1', 'Stop-Sourbase-CSFD.ps1')
+          foreach ($file in $files) {
+            $parseTokens = $null
+            $parseErrors = $null
+            $path = (Resolve-Path $file).Path
+            [System.Management.Automation.Language.Parser]::ParseFile($path, [ref]$parseTokens, [ref]$parseErrors) | Out-Null
+            if ($parseErrors.Count -gt 0) {
+              $parseErrors | ForEach-Object { Write-Error $_.Message }
+              throw "PowerShell parser errors in $file"
+            }
+          }
       - name: Build Windows x64 EXE
         shell: pwsh
         run: |
