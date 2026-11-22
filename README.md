@@ -16,6 +16,7 @@ See:
 - [Platform UX and technical plan](docs/PRODUCT-UX-AND-PLATFORM-PLAN.md)
 - [Android TV architecture and delivery phases](docs/ANDROID-TV-ARCHITECTURE.md)
 - [Implementation status and verification boundaries](IMPLEMENTATION-STATUS.md)
+- [ČSFD metadata integration — architecture, mapping, safeguards and setup](docs/CSFD-INTEGRATION.md)
 
 ## Windows interface
 
@@ -23,7 +24,7 @@ See:
 - **Responsive UI:** adapted layouts for desktop TVs, laptops, tablets and phones.
 - **Language:** Czech and English. Switch with the language control in the top bar; UI text, notifications and date/time formatting follow the selected language.
 - **Appearance:** light and dark themes, switchable from the top bar.
-- **Source hub:** add M3U/M3U8 URLs or files, Xtream Codes, XMLTV EPG, local media, RSS catalogues or configure qBittorrent from one menu.
+- **Source hub:** add M3U/M3U8 URLs or files, Xtream Codes, XMLTV EPG, local media, RSS catalogues, ČSFD metadata or configure qBittorrent from one menu.
 
 ## Included Windows modules
 
@@ -37,6 +38,7 @@ See:
 | RSS catalogue | User-supplied RSS feed, local import and item details |
 | qBittorrent | Local Web UI connection, download queue and completed-file handoff |
 | Local Media | File picker and authenticated loopback byte-range streaming |
+| ČSFD Metadata | Manual local matching of movies/series to ČSFD IDs, posters, ratings and creators |
 
 ## Windows local operation
 
@@ -47,6 +49,18 @@ See:
 5. To manage permitted downloads, run qBittorrent and enable its Web UI on localhost. Sourbase passes completed files to its player or an installed VLC/MPV fallback.
 
 The interface, local media, saved library and cached catalogues work offline. Remote streams, remote EPG, provider catalogues and RSS synchronization require network access to their respective servers.
+
+### ČSFD metadata connector (optional)
+
+The Windows client includes an optional, user-triggered ČSFD matcher. It uses the unofficial `node-csfd-api` scraper as a local REST service; it is not an official ČSFD API or partnership.
+
+1. Install and start Docker Desktop.
+2. Run `powershell -ExecutionPolicy Bypass -File .\\Start-Sourbase-CSFD.ps1`.
+3. Copy the generated API key from the PowerShell output into **Nastavení → ČSFD · Filmová metadata**. Keep the URL at `http://127.0.0.1:3000`.
+4. Test the connection, open a movie or series, choose **Spárovat s ČSFD** and manually select the matching title.
+5. Stop the local connector with `powershell -ExecutionPolicy Bypass -File .\\Stop-Sourbase-CSFD.ps1`.
+
+The launcher binds Docker only to `127.0.0.1` and stores the API key encrypted with DPAPI for the current Windows account. Sourbase stores confirmed match records in its DPAPI-protected local state. No automatic catalogue crawl or bulk mirror is performed. The integration is not available in the static GitHub Pages build or Android TV client. See [the complete ČSFD integration record](docs/CSFD-INTEGRATION.md) for the actual upstream schema, limits, legal caveats and verification checklist.
 
 ## Storage and privacy
 
