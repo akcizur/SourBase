@@ -26,7 +26,7 @@
 
 - **SQLite:** current persistence is a DPAPI-encrypted JSON snapshot. There are no normalized SQL tables or indexed catalog queries yet. This is the next storage migration.
 - **General plugin SDK:** SKTorrent and source adapters remain built-in modules; there is not yet a third-party plugin loader or signed plugin manifest.
-- **Metadata enrichment service:** TMDB matching, poster caching and scheduled metadata refresh are not yet implemented as a complete provider service.
+- **Metadata enrichment:** a manual, local ČSFD metadata connector is now implemented for the Windows desktop client. TMDB, automatic catalogue matching, scheduled refresh and poster-file caching remain unimplemented.
 - **Embedded native playback engine:** WAVE currently uses the browser video element plus VLC/MPV fallback; libmpv/libVLC is not embedded.
 - **Installer / signed releases:** the EXE is portable and unsigned. SmartScreen may warn until a trusted code-signing certificate is used.
 - **Windows runtime validation:** the source includes a Windows-only DPAPI round-trip test, but this environment can only cross-compile it. A real Windows runner must execute it.
@@ -49,6 +49,20 @@ Not performed here:
 - connecting a real IPTV/Xtream/SKTorrent account
 - validating stream playback against a specific provider
 
+
+## ČSFD metadata connector — 2026-11-22
+
+- Added a local-only Go adapter for the unofficial `node-csfd-api` REST service.
+- Added service health, Czech search and movie/series detail routes. All routes require the app session token.
+- Restricted the configured service URL to loopback only and pinned redirects to the exact local origin. Responses are JSON-only, capped at 4 MiB and limited to 25 seconds.
+- Serialized upstream requests to one request slot every 1.2 seconds. The UI performs lookups only after explicit user action and shows up to 20 numeric-ID search results.
+- Added a manual title-match dialog and reversible mapping. Sourbase playback URLs and provider IDs are never overwritten.
+- Added a protected credentials extension for the local API key and a local-state field for confirmed metadata.
+- Added a PowerShell Docker launcher and stop script. Docker is published on 127.0.0.1 only; the API key is DPAPI-encrypted for the current Windows account.
+- Added unit tests for URL restrictions, API key headers, service health, search/detail routes, authorization and invalid IDs.
+- Full design, data mapping, rate limits, setup and legal/security boundaries are recorded in [docs/CSFD-INTEGRATION.md](docs/CSFD-INTEGRATION.md).
+
+**Verification boundary:** mock-based Go tests and the Windows CI workflow must pass before release. No live scrape against ČSFD or physical Windows/Docker smoke test is claimed here. The upstream adapter is unofficial; users must respect current ČSFD terms. The feature is not available on static GitHub Pages or Android TV.
 
 ## Multi-platform research follow-up — 2026-11-22
 
