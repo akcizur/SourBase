@@ -77,6 +77,28 @@ class M3uPlaylistParserTest {
     }
 
     @Test
+    fun duplicateTvgIdsAndRepeatedStreamsReceiveDeterministicUniqueIds() {
+        val source = """
+            #EXTM3U
+            #EXTINF:-1 tvg-id="news.one",News One
+            https://media.example.test/live/news.m3u8
+            #EXTINF:-1 tvg-id="news.one",News One (backup)
+            https://media.example.test/live/news.m3u8
+            #EXTINF:-1 tvg-id="news.one",News One (alternate)
+            https://backup.example.test/live/news.m3u8
+        """.trimIndent()
+
+        val firstParse = M3uPlaylistParser.parse(source).channels
+        val secondParse = M3uPlaylistParser.parse(source).channels
+
+        assertEquals(3, firstParse.size)
+        assertEquals(3, firstParse.map(TvChannel::id).toSet().size)
+        assertEquals(firstParse.map(TvChannel::id), secondParse.map(TvChannel::id))
+        assertEquals("tvg:news.one", firstParse.first().id)
+        assertTrue(firstParse.drop(1).all { it.id.startsWith("tvg:news.one:") })
+    }
+
+    @Test
     fun ignoresHlsMediaSegmentsWithoutChannelMetadata() {
         val mediaPlaylist = """
             #EXTM3U

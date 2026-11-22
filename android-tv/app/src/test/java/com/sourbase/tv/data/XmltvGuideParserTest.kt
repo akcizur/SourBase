@@ -84,6 +84,48 @@ class XmltvGuideParserTest {
     }
 
     @Test
+    fun programmesForUsesSortedPerChannelIndex() {
+        val channel = TvChannel(
+            id = "stream:one",
+            name = "News",
+            stream = PlaybackSource("https://media.example.test/news.m3u8"),
+            xmltvId = "news.one"
+        )
+        val guide = XmltvGuide(
+            channels = listOf(XmltvChannel("news.one", listOf("News"))),
+            programmes = listOf(
+                EpgProgramme(
+                    id = "later",
+                    channelId = "news.one",
+                    title = "Later",
+                    startEpochMs = 20L,
+                    endEpochMs = 30L
+                ),
+                EpgProgramme(
+                    id = "other-channel",
+                    channelId = "sports.one",
+                    title = "Sports",
+                    startEpochMs = 5L,
+                    endEpochMs = 15L
+                ),
+                EpgProgramme(
+                    id = "earlier",
+                    channelId = "news.one",
+                    title = "Earlier",
+                    startEpochMs = 10L,
+                    endEpochMs = 20L
+                )
+            ),
+            warnings = emptyList()
+        )
+
+        val programmes = guide.programmesFor(channel)
+
+        assertEquals(listOf("earlier", "later"), programmes.map(EpgProgramme::id))
+        assertTrue(guide.programmesFor(channel.copy(xmltvId = "missing")).isEmpty())
+    }
+
+    @Test
     fun rejectsMalformedXmlAndDoesNotExpandExternalEntities() {
         assertTrue(runCatching { XmltvGuideParser.parse("<tv><programme>") }.isFailure)
 

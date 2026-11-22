@@ -68,13 +68,21 @@ data class XmltvGuide(
     val programmes: List<EpgProgramme>,
     val warnings: List<String>
 ) {
+    /**
+     * Build the channel index once. TV row rendering asks for programmes per channel;
+     * filtering the entire XMLTV feed on every row made the EPG O(channels × programmes).
+     */
+    private val programmesByChannelId: Map<String, List<EpgProgramme>> by lazy(LazyThreadSafetyMode.PUBLICATION) {
+        programmes
+            .groupBy(EpgProgramme::channelId)
+            .mapValues { (_, channelProgrammes) ->
+                channelProgrammes.sortedBy(EpgProgramme::startEpochMs)
+            }
+    }
+
     /** XMLTV ids are matched through the playlist's tvg-id first, then its stable channel id. */
     fun programmesFor(channel: TvChannel): List<EpgProgramme> {
         val xmltvChannelId = channel.xmltvId?.takeIf(String::isNotBlank) ?: channel.id
-        return programmes
-            .asSequence()
-            .filter { it.channelId == xmltvChannelId }
-            .sortedBy(EpgProgramme::startEpochMs)
-            .toList()
+        return programmesByChannelId[xmltvChannelId].orEmpty()
     }
 }

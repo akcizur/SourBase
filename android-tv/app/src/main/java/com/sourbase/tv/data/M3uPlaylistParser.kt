@@ -28,6 +28,7 @@ object M3uPlaylistParser {
         }
 
         val channels = mutableListOf<TvChannel>()
+        val usedChannelIds = mutableSetOf<String>()
         val warnings = mutableListOf<String>()
         var pending: PendingChannel? = null
 
@@ -61,10 +62,15 @@ object M3uPlaylistParser {
                             .ifBlank { tvgId.orEmpty() }
                             .ifBlank { "Channel ${channels.size + 1}" }
                         val stableId = tvgId?.let { "tvg:$it" } ?: stableStreamId(streamUri.toString())
-                        val uniqueId = if (channels.any { it.id == stableId }) {
-                            "$stableId:${stableStreamId(streamUri.toString()).removePrefix("stream:")}"
-                        } else {
-                            stableId
+                        val streamSuffix = stableStreamId(streamUri.toString()).removePrefix("stream:")
+                        var uniqueId = stableId
+                        if (!usedChannelIds.add(uniqueId)) {
+                            uniqueId = "$stableId:$streamSuffix"
+                            var duplicateOrdinal = 2
+                            while (!usedChannelIds.add(uniqueId)) {
+                                uniqueId = "$stableId:$streamSuffix:$duplicateOrdinal"
+                                duplicateOrdinal++
+                            }
                         }
 
                         channels += TvChannel(
