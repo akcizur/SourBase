@@ -80,6 +80,7 @@ fun LiveTvSection(modifier: Modifier = Modifier) {
     var loadingPlaylist by remember { mutableStateOf(false) }
     var loadingGuide by remember { mutableStateOf(false) }
     var playingError by remember { mutableStateOf<String?>(null) }
+    val currentGuide = guide
 
     DisposableEffect(playerEngine) {
         onDispose { playerEngine.release() }
@@ -264,10 +265,10 @@ fun LiveTvSection(modifier: Modifier = Modifier) {
             }
         }
 
-        if (showEpgGrid && guide != null && channels.isNotEmpty()) {
+        if (showEpgGrid && currentGuide != null && channels.isNotEmpty()) {
             EpgTimelineGrid(
                 channels = channels,
-                guide = guide,
+                guide = currentGuide,
                 onProgrammeSelected = { channel, programme ->
                     selectedChannel = channel
                     val now = System.currentTimeMillis()
@@ -454,8 +455,8 @@ private fun kotlinx.coroutines.CoroutineScope.persistSourceUrls(
 
 private const val EPG_SLOT_DURATION_MS = 30L * 60L * 1000L
 private const val EPG_SLOT_COUNT = 6
-private val EPG_SLOT_WIDTH = 110.dp
-private val EPG_CHANNEL_COLUMN_WIDTH = 176.dp
+private val EPG_SLOT_WIDTH = 92.dp
+private val EPG_CHANNEL_COLUMN_WIDTH = 164.dp
 
 @Composable
 private fun EpgTimelineGrid(
@@ -468,7 +469,7 @@ private fun EpgTimelineGrid(
         val now = System.currentTimeMillis()
         now - (now % EPG_SLOT_DURATION_MS)
     }
-    val timelineEnd = timelineStart + EPG_SLOT_COUNT * EPG_SLOT_DURATION_MS
+    val timelineEnd = timelineStart + EPG_SLOT_COUNT.toLong() * EPG_SLOT_DURATION_MS
 
     Column(
         modifier = modifier.fillMaxWidth(),
@@ -491,7 +492,7 @@ private fun EpgTimelineGrid(
             )
             repeat(EPG_SLOT_COUNT) { slot ->
                 Text(
-                    text = formatTime(timelineStart + slot * EPG_SLOT_DURATION_MS),
+                    text = formatTime(timelineStart + slot.toLong() * EPG_SLOT_DURATION_MS),
                     modifier = Modifier.width(EPG_SLOT_WIDTH),
                     color = liveMuted,
                     fontSize = 12.sp,
