@@ -807,51 +807,159 @@
     html[data-theme="light"] .guide-foot,html[data-theme="light"] .legend{color:#707b8e}
 
   
-    /* Sourbase WALL — minimal media-first layout */
-    .home-hero {
-      min-height:clamp(220px,25vw,295px);
-      margin:12px 0 18px;
-      border-radius:12px;
-      box-shadow:none;
+    /* Sourbase — Simple Poster Wall */
+    .app { display:block !important; min-height:100vh; }
+    .rail { display:none !important; }
+    .main {
+      display:block;
+      width:100%;
+      max-width:none;
+      margin:0;
+      padding:0 clamp(14px,2.5vw,38px) 48px;
     }
-    .hero-copy { padding:34px 0 30px 38px; }
-    .hero-kicker { margin-bottom:14px; }
-    .hero-copy p { margin:12px 0; }
-    .home-hero:not(.has-feature) .hero-art { display:none; }
-    .home-hero:not(.has-feature) { background:linear-gradient(112deg,#20212b 0%,#181922 100%); }
-    .home-welcome-row { display:none; }
-    .home-shelf { margin:20px 0 25px; }
-    .home-shelf-head { margin:0 1px 10px; }
-    .home-shelf-head h3 { font-size:17px; letter-spacing:-.35px; }
-    .home-shelf-head p { display:none; }
-    .home-shelf-link { font-size:10px; color:#a49aff; }
-    .home-row-track {
+    .topbar {
+      position:sticky;
+      top:0;
+      z-index:35;
+      display:flex;
+      align-items:center;
+      flex-wrap:nowrap;
+      gap:20px;
+      width:100%;
+      height:64px;
+      margin:0;
+      padding:0;
+      background:rgba(16,17,22,.96);
+      border-bottom:1px solid rgba(255,255,255,.06);
+      backdrop-filter:blur(16px);
+    }
+    .wordmark { flex:none; font-size:13px; letter-spacing:2px; }
+    .topnav {
+      display:flex !important;
+      flex:1 1 auto;
+      align-items:center;
+      gap:3px;
+      min-width:0;
+      margin:0;
+      overflow:visible;
+    }
+    .nav-link {
+      height:36px;
+      padding:0 12px;
+      color:#92939e;
+      font-size:12px;
+      white-space:nowrap;
+    }
+    .nav-link.active,.nav-link:hover { color:#fff; background:rgba(255,255,255,.07); }
+    .nav-more { position:relative; flex:none; }
+    .nav-more summary {
+      display:flex;
+      align-items:center;
+      height:36px;
+      padding:0 12px;
+      border-radius:9px;
+      color:#92939e;
+      font-size:12px;
+      font-weight:600;
+      list-style:none;
+      cursor:pointer;
+      white-space:nowrap;
+    }
+    .nav-more summary::-webkit-details-marker { display:none; }
+    .nav-more summary:after {
+      content:"";
+      width:6px;
+      height:6px;
+      margin:0 0 3px 9px;
+      border-right:1.5px solid currentColor;
+      border-bottom:1.5px solid currentColor;
+      transform:rotate(45deg);
+    }
+    .nav-more[open] summary,.nav-more summary:hover { color:#fff; background:rgba(255,255,255,.07); }
+    .nav-more-menu {
+      position:absolute;
+      top:calc(100% + 7px);
+      left:0;
+      z-index:60;
+      display:grid;
+      min-width:166px;
+      padding:5px;
+      gap:2px;
+      border:1px solid rgba(255,255,255,.09);
+      border-radius:9px;
+      background:#1b1c24;
+      box-shadow:0 14px 34px rgba(0,0,0,.3);
+    }
+    .nav-more-menu button {
+      width:100%;
+      padding:9px 10px;
+      border:0;
+      border-radius:6px;
+      background:transparent;
+      color:#c7c7d0;
+      text-align:left;
+      font-size:12px;
+      cursor:pointer;
+    }
+    .nav-more-menu button:hover,.nav-more-menu button.active { background:rgba(255,255,255,.07); color:#fff; }
+    .top-actions { flex:none; gap:7px; margin-left:auto; }
+    .search {
+      width:min(250px,22vw);
+      height:36px;
+      border-radius:8px;
+      background:#1a1b23;
+    }
+    .icon-btn,.btn { height:36px; border-radius:8px; }
+    .btn.primary { box-shadow:none; }
+    .page-view { min-height:calc(100vh - 64px); }
+    .page-head { padding:22px 0 15px; }
+    .page-head h1 { font-size:24px; }
+    .subhead { font-size:11px; }
+    .home-hero,.home-welcome-row { display:none !important; }
+    #view-home { padding-top:3px; }
+    #homeSections { margin:0; }
+    .home-shelf { margin:21px 0 28px; }
+    .home-shelf-head {
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
       gap:12px;
-      padding:2px 1px 7px;
+      margin:0 1px 10px;
+    }
+    .home-shelf-head h2 {
+      margin:0;
+      color:#f0f0f3;
+      font-size:17px;
+      font-weight:650;
+      letter-spacing:-.25px;
+    }
+    .home-shelf-head p { display:none; }
+    .home-shelf-link {
+      flex:none;
+      padding:5px 0 5px 10px;
+      border:0;
+      background:transparent;
+      color:#9c9da9;
+      font-size:10px;
+      cursor:pointer;
+    }
+    .home-shelf-link:hover { color:#fff; }
+    .home-row-track,.resume-row-track {
+      display:flex;
+      align-items:flex-start;
+      gap:13px;
+      width:100%;
+      overflow-x:auto;
+      overflow-y:hidden;
+      padding:1px 1px 6px;
       scrollbar-width:none;
       scroll-snap-type:x proximity;
+      overscroll-behavior-inline:contain;
     }
     .home-row-track::-webkit-scrollbar,.resume-row-track::-webkit-scrollbar { display:none; }
-    .poster-card {
-      flex:0 0 clamp(126px,11.8vw,166px);
-      width:clamp(126px,11.8vw,166px);
-      scroll-snap-align:start;
-    }
-    .poster-cover { border-radius:7px; box-shadow:none; }
-    .poster-card:hover .poster-cover { transform:translateY(-2px); box-shadow:none; }
-    .poster-title { margin-top:8px; font-size:11px; }
-    .poster-meta { font-size:9px; }
-    .resume-row-track {
-      display:flex;
-      gap:12px;
-      overflow-x:auto;
-      padding:1px 1px 7px;
-      scrollbar-width:none;
-      scroll-snap-type:x proximity;
-    }
-    .resume-card {
-      flex:0 0 clamp(205px,18vw,260px);
-      width:clamp(205px,18vw,260px);
+    .poster-card,.resume-card {
+      flex:0 0 clamp(126px,12vw,176px);
+      width:clamp(126px,12vw,176px);
       min-width:0;
       padding:0;
       border:0;
@@ -861,248 +969,186 @@
       cursor:pointer;
       scroll-snap-align:start;
     }
-    .resume-cover {
+    .poster-cover,.resume-cover {
       position:relative;
       display:block;
-      aspect-ratio:16/9;
+      width:100%;
+      aspect-ratio:2/3;
       overflow:hidden;
-      border-radius:7px;
-      background:#242530;
+      border-radius:5px;
+      background:#252630;
+      box-shadow:none;
     }
-    .resume-cover img { display:block; width:100%; height:100%; object-fit:cover; transition:transform .25s; }
-    .resume-cover:after {
-      content:"";
-      position:absolute;
-      inset:35% 0 0;
-      background:linear-gradient(transparent,rgba(0,0,0,.42));
-      pointer-events:none;
+    .poster-cover img,.resume-cover img {
+      display:block;
+      width:100%;
+      height:100%;
+      object-fit:cover;
+      transition:transform .2s ease;
     }
-    .resume-fallback {
+    .poster-placeholder,.resume-fallback {
       display:grid;
       width:100%;
       height:100%;
       place-items:center;
-      background:linear-gradient(135deg,#39364e,#202532);
-      color:#e9e6ff;
-      font-size:25px;
+      padding:12px;
+      background:linear-gradient(145deg,#39364e,#202532);
+      color:#eeeaff;
+      font-size:23px;
       font-weight:800;
     }
+    .poster-cover:after,.resume-cover:after {
+      content:"";
+      position:absolute;
+      inset:45% 0 0;
+      background:linear-gradient(transparent,rgba(0,0,0,.25));
+      pointer-events:none;
+    }
+    .poster-card:hover .poster-cover img,.resume-card:hover .resume-cover img { transform:scale(1.025); }
+    .poster-card:focus-visible .poster-cover,.resume-card:focus-visible .resume-cover { outline:2px solid #9c8cff; outline-offset:3px; }
+    .poster-title,.resume-copy strong {
+      display:block;
+      margin-top:7px;
+      overflow:hidden;
+      color:#e9e9ed;
+      font-size:11px;
+      font-weight:600;
+      line-height:1.35;
+      text-overflow:ellipsis;
+      white-space:nowrap;
+    }
+    .poster-meta,.resume-copy > span { display:none; }
+    .resume-copy { display:block; min-width:0; }
     .resume-progress {
       position:absolute;
-      z-index:2;
-      left:8px;
-      right:8px;
-      bottom:8px;
+      z-index:3;
+      left:0;
+      right:0;
+      bottom:0;
       height:3px;
       overflow:hidden;
-      border-radius:5px;
-      background:rgba(255,255,255,.42);
+      background:rgba(255,255,255,.45);
     }
-    .resume-progress i { display:block; height:100%; border-radius:inherit; background:#8b7aff; }
+    .resume-progress i { display:block; height:100%; background:#8e7cff; }
     .resume-play {
       position:absolute;
-      z-index:2;
+      z-index:4;
       inset:0;
       display:grid;
       place-items:center;
-      color:white;
-      font-size:18px;
+      color:#fff;
+      font-size:20px;
       opacity:0;
-      transition:opacity .18s;
-      text-shadow:0 2px 10px rgba(0,0,0,.6);
+      text-shadow:0 2px 10px rgba(0,0,0,.65);
+      transition:opacity .16s;
     }
     .resume-card:hover .resume-play,.resume-card:focus-visible .resume-play { opacity:1; }
-    .resume-card:hover .resume-cover img { transform:scale(1.025); }
-    .resume-copy { display:block; min-width:0; margin-top:7px; }
-    .resume-copy strong {
-      display:block;
+    .home-channel-row { display:flex; gap:9px; overflow-x:auto; }
+    .home-channel-card { flex:0 0 185px; border-radius:7px; box-shadow:none; }
+    .home-empty-state {
+      display:flex;
+      align-items:center;
+      gap:14px;
+      min-height:90px;
+      margin:25px 0;
+      padding:18px 0;
+      border-top:1px solid rgba(255,255,255,.07);
+      color:#9495a1;
+      font-size:12px;
+    }
+    .home-empty-state p { margin:0; }
+    .home-empty-state .btn { flex:none; }
+    .catalog-toolbar { margin:4px 0 14px; }
+    .catalog-grid {
+      display:grid;
+      grid-template-columns:repeat(auto-fill,minmax(138px,1fr));
+      align-items:start;
+      gap:21px 13px;
+    }
+    .catalog-card { min-width:0; border:0; background:transparent; overflow:visible; }
+    .catalog-card:hover { transform:none; box-shadow:none; border:0; }
+    .catalog-cover {
+      position:relative;
+      aspect-ratio:2/3;
       overflow:hidden;
-      color:#e8e8ee;
+      border-radius:5px;
+      background:#252630;
+      box-shadow:none;
+    }
+    .catalog-cover img { display:block; width:100%; height:100%; object-fit:cover; transition:transform .2s ease; }
+    .catalog-card:hover .catalog-cover img { transform:scale(1.025); }
+    .catalog-info { padding:7px 0 0; }
+    .catalog-title {
+      overflow:hidden;
+      color:#e9e9ed;
       font-size:11px;
-      font-weight:650;
+      font-weight:600;
       text-overflow:ellipsis;
       white-space:nowrap;
     }
-    .resume-copy > span {
-      display:block;
-      overflow:hidden;
-      margin-top:3px;
-      color:#858794;
-      font-size:9px;
-      text-overflow:ellipsis;
-      white-space:nowrap;
-    }
-    .home-channel-row { gap:8px; }
-    .home-channel-card { border-radius:8px; box-shadow:none; }
-    .catalog-grid { gap:19px 13px; }
-    .catalog-cover { border-radius:7px; box-shadow:none; }
-    .catalog-card:hover .catalog-cover { transform:translateY(-2px); box-shadow:none; }
+    .catalog-meta { display:none; }
+    .catalog-badge { display:none; }
     button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible {
-      outline:2px solid #9b8fff;
+      outline:2px solid #9c8cff;
       outline-offset:3px;
     }
-    html[data-theme="light"] .home-hero:not(.has-feature) {
-      background:linear-gradient(112deg,#f1f0fa 0%,#e8e9f2 100%);
-    }
-    html[data-theme="light"] .resume-cover { background:#e6e8ef; }
-    html[data-theme="light"] .resume-fallback {
-      background:linear-gradient(135deg,#e8e5f8,#dfe4ef);
-      color:#49426f;
-    }
-    html[data-theme="light"] .resume-copy strong { color:#252a39; }
-    html[data-theme="light"] .resume-copy > span { color:#707b8e; }
-    @media(max-width:1050px) {
-      .poster-card { flex-basis:clamp(124px,14vw,158px); width:clamp(124px,14vw,158px); }
-    }
-    @media(max-width:760px) {
-      .home-hero { min-height:260px; margin:10px 0 17px; }
-      .hero-copy { width:100%; padding:28px 22px 24px; }
-      .hero-copy h1 { font-size:clamp(29px,7vw,36px); }
-      .home-shelf { margin:18px 0 22px; }
-      .poster-card { flex-basis:118px; width:118px; }
-      .resume-card { flex-basis:210px; width:210px; }
-    }
-    @media(max-width:430px) {
-      .home-hero { min-height:235px; }
-      .hero-copy { padding:24px 18px 22px; }
-      .hero-copy h1 { font-size:29px; }
-    }
-
-  
-    @media(min-width:761px) {
-      .app { grid-template-columns:68px minmax(0,1fr); }
-      .rail { width:68px; padding:16px 5px 12px; }
-      .rail-section-label,.rail-separator,
-      .rail-btn[data-page="home"],.rail-btn[data-page="movies"],
-      .rail-btn[data-page="series"],.rail-btn[data-page="favorites"],
-      .rail-btn[data-page="guide"] { display:none; }
-      .rail-menu { gap:9px; }
-      .rail-btn { width:48px; height:48px; min-height:48px; gap:0; border-radius:13px; }
-      .rail-btn span { display:none; }
-      .main { padding-left:30px; padding-right:30px; }
-    }
-
-  
-    /* One navigation only — the media wall uses a single top menu on every screen. */
-    .app { display:block !important; min-height:100vh; }
-    .main { display:block; width:100%; max-width:none; margin:0; padding:0 30px 58px; }
-    .rail { display:none !important; }
-    .topbar {
-      position:sticky;
-      top:0;
-      z-index:35;
-      width:100%;
-      margin:0;
-      padding:0;
-      gap:20px;
-      display:flex;
-      flex-wrap:nowrap;
-    }
-    .topnav {
-      display:flex !important;
-      flex:1 1 auto;
-      min-width:0;
-      align-items:center;
-      gap:3px;
-      margin:0;
-      overflow:visible;
-    }
-    .nav-link { white-space:nowrap; }
-    .nav-more { position:relative; flex:none; }
-    .nav-more summary {
-      list-style:none;
-      display:flex;
-      align-items:center;
-      height:36px;
-      padding:0 13px;
-      border-radius:9px;
-      color:#878995;
-      font-size:12px;
-      font-weight:600;
-      cursor:pointer;
-      white-space:nowrap;
-    }
-    .nav-more summary::-webkit-details-marker { display:none; }
-    .nav-more summary:after { content:""; width:6px; height:6px; margin:0 0 3px 9px; border-right:1.5px solid currentColor; border-bottom:1.5px solid currentColor; transform:rotate(45deg); }
-    .nav-more[open] summary,.nav-more summary:hover { background:rgba(255,255,255,.055); color:#f4f2ff; }
-    .nav-more-menu {
-      position:absolute;
-      top:calc(100% + 9px);
-      left:0;
-      z-index:60;
-      display:grid;
-      min-width:174px;
-      padding:6px;
-      gap:2px;
-      border:1px solid rgba(255,255,255,.09);
-      border-radius:10px;
-      background:#1b1c24;
-      box-shadow:0 16px 40px rgba(0,0,0,.3);
-    }
-    .nav-more-menu button {
-      width:100%;
-      padding:10px 11px;
-      border:0;
-      border-radius:7px;
-      background:transparent;
-      color:#c7c7d0;
-      text-align:left;
-      font-size:12px;
-      cursor:pointer;
-    }
-    .nav-more-menu button:hover,.nav-more-menu button.active { background:rgba(255,255,255,.07); color:#fff; }
+    html[data-theme="light"] .topbar { background:rgba(242,244,248,.96); border-bottom-color:rgba(25,31,48,.09); }
+    html[data-theme="light"] .nav-link.active,html[data-theme="light"] .nav-link:hover { color:#202334; background:rgba(35,39,58,.07); }
     html[data-theme="light"] .nav-more summary { color:#697184; }
-    html[data-theme="light"] .nav-more summary:hover,html[data-theme="light"] .nav-more[open] summary { color:#202334; background:rgba(35,39,58,.07); }
-    html[data-theme="light"] .nav-more-menu { background:#fff; border-color:rgba(25,31,48,.13); box-shadow:0 16px 40px rgba(20,28,48,.15); }
+    html[data-theme="light"] .nav-more[open] summary,html[data-theme="light"] .nav-more summary:hover { color:#202334; background:rgba(35,39,58,.07); }
+    html[data-theme="light"] .nav-more-menu { background:#fff; border-color:rgba(25,31,48,.13); box-shadow:0 14px 34px rgba(20,28,48,.15); }
     html[data-theme="light"] .nav-more-menu button { color:#424b5d; }
     html[data-theme="light"] .nav-more-menu button:hover,html[data-theme="light"] .nav-more-menu button.active { background:#edf0f7; color:#202334; }
+    html[data-theme="light"] .home-shelf-head h2,html[data-theme="light"] .poster-title,html[data-theme="light"] .resume-copy strong,html[data-theme="light"] .catalog-title { color:#252a39; }
+    html[data-theme="light"] .poster-cover,html[data-theme="light"] .resume-cover,html[data-theme="light"] .catalog-cover { background:#e5e7ee; }
+    html[data-theme="light"] .poster-placeholder,html[data-theme="light"] .resume-fallback { background:linear-gradient(145deg,#e8e5f8,#dfe4ef); color:#49426f; }
+    html[data-theme="light"] .home-empty-state { border-top-color:rgba(25,31,48,.1); color:#687184; }
     @media(max-width:1050px) {
-      .main { padding-left:24px; padding-right:24px; }
-      .topbar { gap:12px; }
-      .nav-link,.nav-more summary { padding-left:9px; padding-right:9px; }
+      .main { padding-inline:24px; }
+      .topbar { gap:10px; }
+      .nav-link,.nav-more summary { padding-inline:9px; }
+      .search { width:min(205px,19vw); }
     }
     @media(max-width:760px) {
-      .main { padding:0 14px 88px; }
+      .main { padding:0 14px 44px; }
       .topbar {
         display:grid;
         grid-template-columns:auto minmax(0,1fr);
-        grid-template-rows:46px 38px;
+        grid-template-rows:44px 37px;
+        min-height:81px;
         height:auto;
-        min-height:84px;
-        gap:0 8px;
+        gap:0 7px;
       }
-      .wordmark { grid-column:1; grid-row:1; font-size:10px; letter-spacing:1.3px; }
-      .top-actions { grid-column:2; grid-row:1; justify-self:end; gap:5px; min-width:0; }
+      .wordmark { grid-column:1; grid-row:1; font-size:10px; letter-spacing:1.2px; }
+      .top-actions { grid-column:2; grid-row:1; justify-self:end; gap:5px; }
       .topnav {
-        grid-column:1 / -1;
+        grid-column:1/-1;
         grid-row:2;
-        display:flex !important;
-        width:100%;
         min-width:0;
+        width:100%;
         gap:1px;
         overflow-x:auto;
         overflow-y:visible;
         scrollbar-width:none;
-        white-space:nowrap;
       }
       .topnav::-webkit-scrollbar { display:none; }
-      .nav-link,.nav-more summary { height:35px; padding:0 8px; font-size:10px; }
-      .nav-more-menu { position:fixed; top:auto; left:auto; right:14px; margin-top:0; }
-      .search { width:min(175px,30vw); height:35px; }
+      .nav-link,.nav-more summary { height:34px; padding-inline:8px; font-size:10px; }
+      .search { width:min(150px,29vw); height:34px; }
       #refreshBtn { display:none; }
-      #addPlaylistBtn { width:35px; min-width:35px; padding:0; font-size:0; }
-      #addPlaylistBtn svg { width:16px; height:16px; }
+      #addPlaylistBtn { width:34px; min-width:34px; padding:0; font-size:0; }
+      #addPlaylistBtn svg { width:15px; height:15px; }
     }
     @media(max-width:480px) {
       .wordmark { display:none; }
       .topbar { grid-template-columns:minmax(0,1fr); }
       .top-actions { grid-column:1; grid-row:1; justify-self:end; }
       .topnav { grid-column:1; grid-row:2; }
-      .nav-link,.nav-more summary { padding:0 7px; font-size:9px; }
+      .nav-link,.nav-more summary { padding-inline:7px; font-size:9px; }
       .search { width:clamp(88px,25vw,120px); }
+      .home-empty-state { align-items:flex-start; flex-direction:column; }
     }
 
-  </style>
+  </style></style>
 </head>
 <body>
 <div class="app">
@@ -1820,11 +1866,25 @@
   function mediaDescription(item) { return item?.plot || item?.description || item?.info?.plot || item?.info?.description || 'Informace o titulu poskytuje váš IPTV katalog.'; }
   function safeMediaTitle(item) { return item?.title || item?.name || 'Bez názvu'; }
   function homePoster(item,kind) {
-    const title=safeMediaTitle(item);const cover=mediaCover(item);const id=String(item.id||item.stream_id||item.series_id||'');
-    return `<button class="poster-card" data-catalog-kind="${kind}" data-id="${attr(id)}"><span class="poster-cover">${cover?`<img loading="lazy" referrerpolicy="no-referrer" src="${attr(cover)}" alt="" onerror="this.remove()">`:`<span class="poster-placeholder"><span>${esc(initials(title))}</span></span>`}</span><span class="poster-title">${esc(title)}</span><span class="poster-meta">${esc(item.category|| (kind==='movie'?'Film':'Seriál'))}</span></button>`;
+    const title=safeMediaTitle(item),cover=mediaCover(item);
+    const id=String(item.id||item.stream_id||item.series_id||'');
+    const image=cover
+      ? `<img loading="lazy" decoding="async" referrerpolicy="no-referrer" src="${attr(cover)}" alt="" onerror="this.remove()">`
+      : `<span class="poster-placeholder"><span>${esc(initials(title))}</span></span>`;
+    return `<button class="poster-card" data-catalog-kind="${kind}" data-id="${attr(id)}" aria-label="${attr(title)}">
+      <span class="poster-cover">${image}</span>
+      <span class="poster-title">${esc(title)}</span>
+      <span class="poster-meta">${esc(item.category||(kind==='movie'?'Film':'Seriál'))}</span>
+    </button>`;
   }
   function homeShelf(title,subtitle,content,action='',items=false) {
-    return `<section class="home-shelf"><div class="home-shelf-head"><div><h3>${esc(title)}</h3>${subtitle?`<p>${esc(subtitle)}</p>`:''}</div>${action?`<button class="home-shelf-link" data-home-page="${attr(action)}">Zobrazit vše</button>`:''}</div>${items?`<div class="home-row-track">${content}</div>`:content}</section>`;
+    return `<section class="home-shelf" aria-label="${attr(title)}">
+      <div class="home-shelf-head">
+        <h2>${esc(title)}</h2>
+        ${action?`<button class="home-shelf-link" data-home-page="${attr(action)}">Zobrazit vše</button>`:''}
+      </div>
+      ${items?`<div class="home-row-track">${content}</div>`:content}
+    </section>`;
   }
   function openContentDetails(kind,id) {
     const item=(kind==='movie'?state.vod:state.series).find(x=>String(x.id)===String(id))||(state.savedCatalog||[]).find(x=>x.kind===kind&&String(x.id)===String(id))?.item;if(!item)return;
@@ -1848,69 +1908,129 @@
     playMedia(url,item.title,item.caption,{kind:item.kind||'history',cover:item.cover||'',localPath:item.localPath||'',resumeTime:item.currentTime||0});
   }
   function renderHome() {
-    const hero=$('#homeHero');if(!hero)return;
+    const hero=$('#homeHero');
+    if(!hero)return;
+
     const query=$('#globalSearch').value.trim().toLowerCase();
-    const matchText=x=>`${safeMediaTitle(x)} ${x.category||''} ${x.year||''}`.toLowerCase().includes(query);
-    const visibleVod=query?state.vod.filter(matchText):state.vod;const visibleSeries=query?state.series.filter(matchText):state.series;
-    const visibleChannels=query?state.channels.filter(x=>`${x.name} ${x.group||''}`.toLowerCase().includes(query)):state.channels;
-    const featured=(query?(visibleVod[0]||visibleSeries[0]):(state.vod[0]||state.series[0]))||null;const type=(query&&visibleVod.length)||(state.vod.length&&!query)?'movie':'series';
-    const title=featured?safeMediaTitle(featured):'Váš svět zábavy. Bez hranic.';
-    const desc=featured?mediaDescription(featured):'Filmy, seriály a živé vysílání z vašich vlastních zdrojů. Jedna knihovna, jeden přehled.';
-    $('#homeHeroOverline').textContent=featured?(type==='movie'?'VÝBĚR Z FILMOVÉ KNIHOVNY':'VÝBĚR ZE SERIÁLŮ'):'VŠE NA JEDNOM MÍSTĚ';
-    $('#homeHeroTitle').textContent=title;$('#homeHeroDesc').textContent=desc;
-    const heroMeta=featured?[featured.category,featured.year||featured.releaseDate,featured.rating?`★ ${featured.rating}`:''].filter(Boolean):['LOKÁLNÍ KNIHOVNA','M3U · M3U8 · XMLTV'];
-    $('#homeHeroMeta').innerHTML=heroMeta.map((x,i)=>`${i?'<i></i>':''}<span>${esc(String(x))}</span>`).join('');
-    $('#homePrimary').querySelector('span').textContent=featured?'Zobrazit podrobnosti':'Přidat zdroj';
-    $('#homePrimary').dataset.kind=featured?type:'';$('#homePrimary').dataset.id=featured?String(featured.id):'';
-    const cover=featured?mediaCover(featured):'';
-    hero.classList.toggle('has-feature',!!cover);
-    $('#homeHeroArt').innerHTML=cover?`<img src="${attr(cover)}" alt="" referrerpolicy="no-referrer" onerror="this.remove()">`:'<div class="hero-art-orbit orbit-one"></div><div class="hero-art-orbit orbit-two"></div><div class="hero-art-core"><span>S</span></div>';
-    $('#homeChannelCount').textContent=state.channels.filter(c=>c.url).length||state.channels.length;
-    $('#homeMovieCount').textContent=state.vod.length+(state.sktorrentItems||[]).filter(x=>x.kind==='movie').length;$('#homeSeriesCount').textContent=state.series.length+(state.sktorrentItems||[]).filter(x=>x.kind==='series').length;
+    const matchText=item=>`${safeMediaTitle(item)} ${item.category||''} ${item.year||''}`.toLowerCase().includes(query);
+    const visibleVod=query?state.vod.filter(matchText):state.vod;
+    const visibleSeries=query?state.series.filter(matchText):state.series;
+    const visibleChannels=query
+      ?state.channels.filter(channel=>`${channel.name} ${channel.group||''}`.toLowerCase().includes(query))
+      :[];
+    const visibleSktorrent=(state.sktorrentItems||[]).filter(item=>
+      !query||`${item.title} ${item.category} ${item.description||''}`.toLowerCase().includes(query)
+    );
+
+    // Keep legacy hero nodes in the DOM for compatibility, but the media wall does not render them.
+    const featured=visibleVod[0]||visibleSeries[0]||null;
+    const featuredKind=visibleVod.length?'movie':'series';
+    $('#homeHeroOverline').textContent=featured?'VAŠE KNIHOVNA':'';
+    $('#homeHeroTitle').textContent=featured?safeMediaTitle(featured):'';
+    $('#homeHeroDesc').textContent='';
+    $('#homeHeroMeta').textContent='';
+    $('#homePrimary').dataset.kind=featured?featuredKind:'';
+    $('#homePrimary').dataset.id=featured?String(featured.id):'';
+    $('#homeHeroArt').innerHTML='';
+    hero.classList.toggle('has-feature',!!(featured&&mediaCover(featured)));
+    $('#homeChannelCount').textContent=state.channels.filter(channel=>channel.url).length||state.channels.length;
+    $('#homeMovieCount').textContent=state.vod.length;
+    $('#homeSeriesCount').textContent=state.series.length;
+
     const sections=[];
     const resumeEntries=(state.watchHistory||[])
-      .filter(item=>item&&(item.url||item.localPath)&&Number(item.currentTime||0)>15&&(!Number(item.duration)||Number(item.currentTime||0)<Number(item.duration)-15))
+      .filter(item=>item&&(item.url||item.localPath)&&Number(item.currentTime||0)>15&&
+        (!Number(item.duration)||Number(item.currentTime||0)<Number(item.duration)-15))
       .slice().sort((a,b)=>Number(b.updatedAt||0)-Number(a.updatedAt||0)).slice(0,12);
-    if(resumeEntries.length){
-      const resumeCards=resumeEntries.map(item=>{
+
+    if(resumeEntries.length) {
+      const cards=resumeEntries.map(item=>{
         const title=item.title||'Přehrávané médium';
-        const pct=item.duration>0?Math.max(0,Math.min(100,(Number(item.currentTime||0)/Number(item.duration))*100)):0;
-        const cover=item.cover?'<img loading="lazy" referrerpolicy="no-referrer" src="'+attr(item.cover)+'" alt="" onerror="this.remove()">':'<span class="resume-fallback">'+esc(initials(title))+'</span>';
-        return '<button class="resume-card" data-home-history="'+attr(item.key||'')+'" aria-label="Pokračovat ve sledování: '+attr(title)+'"><span class="resume-cover">'+cover+'<span class="resume-progress"><i style="width:'+pct+'%"></i></span><span class="resume-play" aria-hidden="true">▶</span></span><span class="resume-copy"><strong>'+esc(title)+'</strong><span>'+esc(item.caption||'Naposledy přehráno')+'</span></span></button>';
+        const progress=item.duration>0
+          ?Math.max(0,Math.min(100,Number(item.currentTime||0)/Number(item.duration)*100)):0;
+        const cover=item.cover
+          ?`<img loading="lazy" decoding="async" referrerpolicy="no-referrer" src="${attr(item.cover)}" alt="" onerror="this.remove()">`
+          :`<span class="resume-fallback">${esc(initials(title))}</span>`;
+        return `<button class="resume-card" data-home-history="${attr(item.key||'')}" aria-label="Pokračovat ve sledování: ${attr(title)}">
+          <span class="resume-cover">${cover}
+            <span class="resume-progress"><i style="width:${progress}%"></i></span>
+            <span class="resume-play" aria-hidden="true">▶</span>
+          </span>
+          <span class="resume-copy"><strong>${esc(title)}</strong><span>${esc(item.caption||'')}</span></span>
+        </button>`;
       }).join('');
-      sections.push(homeShelf('Pokračovat ve sledování','', '<div class="resume-row-track">'+resumeCards+'</div>', 'player'));
+      sections.push(homeShelf('Pokračovat ve sledování','',`<div class="resume-row-track">${cards}</div>`,'player'));
     }
-    const channels=visibleChannels.slice(0,12);
-    if(channels.length) {
-      const channelTiles=channels.map(ch=>`<button class="home-channel-card" data-home-channel="${attr(ch.id)}">${logoHTML(ch)}<span style="min-width:0"><span class="home-channel-name">${esc(ch.name)}</span><span class="home-channel-group">${esc(ch.group||'TV kanál')}</span></span></button>`).join('');
-      sections.push(homeShelf('Vaše TV kanály','Rychlý přístup k oblíbeným stanicím',`<div class="home-channel-row">${channelTiles}</div>`,'channels'));
+
+    if(visibleVod.length) {
+      sections.push(homeShelf('Filmy','',visibleVod.slice(0,24).map(item=>homePoster(item,'movie')).join(''),'movies',true));
     }
-    if(visibleVod.length) sections.push(homeShelf('Filmy',query?'Výsledky vyhledávání':'Filmový katalog z aktivního zdroje',visibleVod.slice(0,16).map(x=>homePoster(x,'movie')).join(''),'movies',true));
-    else sections.push(homeShelf('Filmy','Váš katalog se zobrazí zde',`<div class="home-empty-tile"><strong>Filmová knihovna čeká na zdroj</strong><p>Přidejte Xtream Codes účet a načtěte svůj VOD katalog.</p><button class="btn" data-home-add>+ Přidat vstup</button></div>`,'',true));
-    if(visibleSeries.length) sections.push(homeShelf('Seriály',query?'Výsledky vyhledávání':'Sezóny a epizody z vašeho katalogu',visibleSeries.slice(0,16).map(x=>homePoster(x,'series')).join(''),'series',true));
-    else sections.push(homeShelf('Seriály','Všechny sezóny na jednom místě',`<div class="home-empty-tile"><strong>Seriálová knihovna je připravena</strong><p>Po připojení Xtream zdroje se zde zobrazí vaše seriály.</p><button class="btn" data-home-add>+ Přidat vstup</button></div>`,'',true));
-    const visibleSktorrent=(state.sktorrentItems||[]).filter(x=>!query||`${x.title} ${x.category} ${x.description||''}`.toLowerCase().includes(query));
+    if(visibleSeries.length) {
+      sections.push(homeShelf('Seriály','',visibleSeries.slice(0,24).map(item=>homePoster(item,'series')).join(''),'series',true));
+    }
     if(visibleSktorrent.length) {
-      const tiles=visibleSktorrent.slice(0,16).map(item=>`<button class="poster-card" data-home-skitem="${attr(item.id)}"><span class="poster-cover">${item.cover?`<img loading="lazy" referrerpolicy="no-referrer" src="${attr(item.cover)}" alt="" onerror="this.remove()">`:`<span class="poster-placeholder"><span>${esc(initials(item.title))}</span></span>`}</span><span class="poster-title">${esc(item.title)}</span><span class="poster-meta">SKTorrent · ${item.kind==='series'?'TV / Seriál':'Film'}</span></button>`).join('');
-      sections.push(homeShelf('SKTorrent','Položky z vašeho osobního RSS katalogu',`<div class="home-row-track">${tiles}</div>`,'sktorrent',true));
+      const cards=visibleSktorrent.slice(0,24).map(item=>{
+        const title=item.title||'Bez názvu';
+        const cover=item.cover
+          ?`<img loading="lazy" decoding="async" referrerpolicy="no-referrer" src="${attr(item.cover)}" alt="" onerror="this.remove()">`
+          :`<span class="poster-placeholder"><span>${esc(initials(title))}</span></span>`;
+        return `<button class="poster-card" data-home-skitem="${attr(item.id)}" aria-label="${attr(title)}">
+          <span class="poster-cover">${cover}</span>
+          <span class="poster-title">${esc(title)}</span>
+          <span class="poster-meta">SKTorrent · ${item.kind==='series'?'Seriál':'Film'}</span>
+        </button>`;
+      }).join('');
+      sections.push(homeShelf('SKTorrent','',cards,'sktorrent',true));
     }
-    const nowItems=state.channels.map(ch=>({ch,p:getCurrentProgram(ch)})).filter(x=>x.p).slice(0,10);
-    if(nowItems.length) {
-      const cards=nowItems.map(({ch,p})=>`<button class="home-channel-card" data-home-program-channel="${attr(ch.id)}" data-home-program="${attr(p.id)}">${logoHTML(ch)}<span style="min-width:0"><span class="home-channel-name">${esc(p.title)}</span><span class="home-channel-group">${esc(ch.name)} · ${timeLabel(p.start)}–${timeLabel(p.stop)}</span></span></button>`).join('');
-      sections.push(homeShelf('Právě v TV','Co právě běží na vašich kanálech',`<div class="home-channel-row">${cards}</div>`,'guide'));
+
+    // Channel results appear only when the user searches for a channel.
+    if(query&&visibleChannels.length) {
+      const cards=visibleChannels.slice(0,16).map(channel=>
+        `<button class="home-channel-card" data-home-channel="${attr(channel.id)}">
+          ${logoHTML(channel)}
+          <span style="min-width:0">
+            <span class="home-channel-name">${esc(channel.name)}</span>
+            <span class="home-channel-group">${esc(channel.group||'TV kanál')}</span>
+          </span>
+        </button>`
+      ).join('');
+      sections.push(homeShelf('Kanály','',`<div class="home-channel-row">${cards}</div>`,'channels'));
     }
-    if(!channels.length&&!visibleVod.length&&!visibleSeries.length) sections.push(homeShelf(query?'Žádné výsledky':'Začněte tady',query?'Zkuste upravit hledaný výraz':'Přidejte vlastní obsah',`<div class="home-empty-tile"><strong>${query?'Nic jsme nenašli':'Zatím nemáte žádný obsah'}</strong><p>${query?'Pro tento výraz neodpovídají žádné kanály, filmy ani seriály.':'Importujte lokální M3U, URL playlist nebo Xtream Codes.'}</p><button class="btn primary" data-home-add>+ Přidat vstup</button></div>`,'',true));
+
+    if(!sections.length) {
+      const empty=query
+        ?'<p>Pro tento výraz jsme nic nenašli.</p>'
+        :'<p>Připojte vlastní zdroj a vaše filmy a seriály se zobrazí tady.</p>';
+      sections.push(`<section class="home-empty-state">${empty}<button class="btn primary" data-home-add>Přidat zdroj</button></section>`);
+    }
+
     $('#homeSections').innerHTML=sections.join('');
-    $$('#homeSections [data-home-history]').forEach(btn=>btn.addEventListener('click',()=>{
-      const item=(state.watchHistory||[]).find(x=>String(x.key||'')===btn.dataset.homeHistory);
+    $$('#homeSections [data-home-history]').forEach(button=>button.addEventListener('click',()=>{
+      const item=(state.watchHistory||[]).find(entry=>String(entry.key||'')===button.dataset.homeHistory);
       resumeHistoryEntry(item);
     }));
-    $$('#homeSections [data-home-channel]').forEach(btn=>btn.addEventListener('click',()=>{const ch=state.channels.find(x=>x.id===btn.dataset.homeChannel);if(!ch)return;state.selectedChannel=ch.id;const p=getCurrentProgram(ch);if(p){state.selectedProgram=p;renderDetails(ch,p);}if(ch.url)playChannel(ch);else toast('Tento ukázkový kanál nemá stream. Importujte vlastní playlist.');}));
-    $$('#homeSections [data-home-program-channel]').forEach(btn=>btn.addEventListener('click',()=>{selectProgram(btn.dataset.homeProgramChannel,btn.dataset.homeProgram);const ch=state.channels.find(x=>x.id===btn.dataset.homeProgramChannel);if(!state.autoplay||!ch?.url)navigate('guide');}));
-    $$('#homeSections [data-catalog-kind]').forEach(btn=>btn.addEventListener('click',()=>openContentDetails(btn.dataset.catalogKind,btn.dataset.id)));
-    $$('#homeSections [data-home-skitem]').forEach(btn=>btn.addEventListener('click',()=>{const item=(state.sktorrentItems||[]).find(x=>String(x.id)===btn.dataset.homeSkitem);if(item)openSktorrentDetails(item);}));
-    $$('#homeSections [data-home-page]').forEach(btn=>btn.addEventListener('click',()=>navigate(btn.dataset.homePage)));
-    $('#homeSections [data-home-add]').forEach(btn=>btn.addEventListener('click',()=>openModal('sourceHubModal')));
+    $$('#homeSections [data-home-channel]').forEach(button=>button.addEventListener('click',()=>{
+      const channel=state.channels.find(entry=>entry.id===button.dataset.homeChannel);
+      if(!channel)return;
+      state.selectedChannel=channel.id;
+      const programme=getCurrentProgram(channel);
+      if(programme){state.selectedProgram=programme;renderDetails(channel,programme);}
+      if(channel.url)playChannel(channel);
+      else toast('Tento ukázkový kanál nemá stream. Importujte vlastní playlist.');
+    }));
+    $$('#homeSections [data-catalog-kind]').forEach(button=>
+      button.addEventListener('click',()=>openContentDetails(button.dataset.catalogKind,button.dataset.id))
+    );
+    $$('#homeSections [data-home-skitem]').forEach(button=>button.addEventListener('click',()=>{
+      const item=(state.sktorrentItems||[]).find(entry=>String(entry.id)===button.dataset.homeSkitem);
+      if(item)openSktorrentDetails(item);
+    }));
+    $$('#homeSections [data-home-page]').forEach(button=>
+      button.addEventListener('click',()=>navigate(button.dataset.homePage))
+    );
+    $('#homeSections [data-home-add]').forEach(button=>
+      button.addEventListener('click',()=>openModal('sourceHubModal'))
+    );
   }
   function catalogCard(item,kind) {
     const cover=mediaCover(item);const title=safeMediaTitle(item);
@@ -2249,7 +2369,7 @@
 
 
   const SOURBASE_PREFS_KEY='sourbase-ui-preferences-v1';
-  const SOURBASE_TRANSLATIONS={"Hlavní navigace":"Main navigation","Obsah":"Content","Domů":"Home","Přehrávač":"Player","Objevit":"Discover","Knihovna":"Library","TV program":"TV guide","Kanály":"Channels","Seriály":"Series","Nastavení":"Settings","MENU":"MENU","TELEVIZE":"TV","Hledat filmy, seriály, kanály…":"Search movies, series, channels…","Obnovit knihovnu":"Refresh library","Přidat vstup":"Add source","VŠE NA JEDNOM MÍSTĚ":"ALL IN ONE PLACE","Váš svět zábavy.":"Your entertainment world.","Bez hranic.":"Without limits.","Filmy, seriály a živé vysílání z vašich vlastních zdrojů. Jedna knihovna, jeden přehled.":"Movies, series and live TV from your own sources. One library, one place.","LOKÁLNÍ KNIHOVNA":"LOCAL LIBRARY","Procházet TV program":"Browse TV guide","VAŠE STREAMOVACÍ MÍSTO":"YOUR MEDIA SPACE","Objevte svůj obsah":"Discover your content","Všechny zdroje zůstávají uložené lokálně v tomto zařízení.":"All sources remain stored locally on this device.","kanálů":"channels","filmů":"movies","seriálů":"series","titulů":"titles","položek":"items","pořadů":"programmes","LIVE TELEVISION":"LIVE TELEVISION","Live TV":"Live TV","Živé vysílání a televizní program v reálném čase.":"Live channels and the TV schedule in real time.","Právě běží":"Now","Následuje":"Upcoming","Všechny kategorie":"All categories","Přejít na aktuální čas":"Jump to current time","Právě vysílá":"On air","Program":"Programme","Aktuální čas":"Current time","Jedno místo pro živé vysílání, filmy, epizody i lokální soubory.":"One place for live TV, movies, episodes and local files.","Připraveno k přehrávání":"Ready to play","Vyberte film, epizodu, TV kanál nebo lokální video":"Select a movie, episode, TV channel or local video","Vyberte film, seriál nebo kanál":"Select a movie, series or channel","Váš obsah se přehraje zde":"Your content plays here","Přehrát vybraný kanál":"Play selected channel","Zastavit":"Stop","Otevřít ve VLC / MPV":"Open in VLC / MPV","Otevřít lokální video":"Open local video","LOKÁLNÍ PŘEHRÁVAČ":"LOCAL PLAYER","NOW PLAYING":"NOW PLAYING","Vyberte pořad":"Select a programme","Informace o vysílání se zobrazí zde":"Broadcast details will appear here","Informace o titulu.":"Title information.","Kliknutím na pořad nebo titul zobrazíte jeho dostupné informace.":"Select a programme or title to see its details.","Přidat do knihovny":"Add to library","Otevřít knihovnu":"Open library","Pokračovat ve sledování":"Continue watching","Celá knihovna":"Full library","Historie sledování se zobrazí po prvním přehrání.":"Your watch history will appear after the first playback.","YOUR LINEUP":"YOUR LINEUP","Procházejte svůj playlist a spusťte živé vysílání.":"Browse your playlist and start live TV.","KATEGORIE":"CATEGORIES","Kategorie":"Category","Všechny kanály":"All channels","YOUR LIBRARY":"YOUR LIBRARY","Uložené filmy a seriály spolu s oblíbenými TV kanály.":"Saved movies and series alongside your favourite TV channels.","Vše":"All","Filmy":"Movies","Lokální soubory":"Local files","+ Přidat video":"+ Add video","MOJE MÉDIA":"MY MEDIA","Knihovna je zatím prázdná":"Your library is empty","Přidejte filmy, seriály nebo lokální videa.":"Add movies, series or local videos.","Objevit obsah":"Discover content","NEDÁVNO PŘEHRÁVANÉ":"RECENTLY PLAYED","Historie sledování je zatím prázdná.":"Your watch history is empty.","OBLÍBENÉ TV KANÁLY":"FAVOURITE TV CHANNELS","YOUR VIDEO LIBRARY":"YOUR VIDEO LIBRARY","Filmová knihovna z M3U nebo Xtream Codes účtu.":"Movie library from an M3U playlist or Xtream Codes account.","Lokálně uložený katalog":"Locally stored catalogue","Přidejte Xtream Codes účet pro načtení filmů.":"Connect an Xtream Codes account to load movies.","YOUR SERIES LIBRARY":"YOUR SERIES LIBRARY","Seriály, sezóny a epizody z vašeho IPTV účtu.":"Series, seasons and episodes from your IPTV account.","Vyberte seriál pro zobrazení epizod":"Select a series to view episodes","Přidejte Xtream Codes účet pro načtení seriálů.":"Connect an Xtream Codes account to load series.","Epizody seriálu":"Series episodes","Vyberte seriál.":"Select a series.","Název titulu":"Title","CONTENT SOURCE PLUGIN":"CONTENT SOURCE","Osobní filmový a seriálový katalog synchronizovaný z vašeho RSS feedu.":"Personal movie and series catalogue synced from your RSS feed.","LOKÁLNÍ KATALOG":"LOCAL CATALOGUE","Vlastní SKTorrent RSS URL":"Your SKTorrent RSS URL","Vložte vygenerovaný RSS odkaz ze svého účtu":"Paste the RSS link generated by your account","Načíst / obnovit":"Load / refresh","Importovat RSS soubor":"Import RSS file","Vyzkoušet ukázku":"Try demo","Nastavit RSS ↗":"Set up RSS ↗","DOWNLOAD MANAGER":"DOWNLOAD MANAGER","Napojte místní torrent klient a spravujte stahování přímo v Sourbase.":"Connect your local torrent client and manage downloads directly in Sourbase.","Odpojeno":"Disconnected","Připojeno":"Connected","Web UI adresa":"Web UI address","Uživatelské jméno":"Username","Heslo":"Password","Heslo Web UI":"Web UI password","Připojit":"Connect","Odpojit":"Disconnect","Fronta stahování":"Download queue","Obnovit":"Refresh","Řadit":"Sort","Nejnovější":"Newest","Název A–Z":"Title A–Z","Seriály / TV":"Series / TV","Moje knihovna":"My library","RSS není připojeno · lze importovat lokální RSS":"RSS is not connected · you can import a local RSS file","SKTorrent katalog čeká na připojení":"SKTorrent catalogue is waiting for a connection","Vložte vlastní RSS URL nebo importujte RSS XML soubor. Položky se uloží do lokální knihovny Sourbase.":"Paste your own RSS URL or import an RSS XML file. Items are saved to your local Sourbase library.","Otevřít nastavení RSS trackeru":"Open tracker RSS settings","PREFERENCES":"PREFERENCES","Playlisty, programový průvodce a lokální data.":"Playlists, TV guide and local data.","Datové zdroje":"Data sources","Playlisty, EPG a katalogy se ukládají lokálně do tohoto zařízení. Vzdálené zdroje se načítají přímo od vašeho poskytovatele.":"Playlists, EPG and catalogues are stored locally on this device. Remote sources are loaded directly from your provider.","Aktuální playlist":"Current playlist","Ukázkový playlist":"Sample playlist","Přidat zdroj":"Add source","Uložené M3U playlisty":"Saved M3U playlists","Přepínejte mezi dříve importovanými seznamy.":"Switch between previously imported playlists.","Žádné uložené playlisty":"No saved playlists","Otevřít":"Open","Odebrat":"Remove","Programový průvodce (EPG)":"TV guide (EPG)","Ukázková data · XMLTV lze importovat":"Sample data · XMLTV can be imported","Přidat EPG":"Add EPG","Přehrávání a soukromí":"Playback and privacy","Ve Windows jsou knihovna, stream adresy i uložené přihlašovací údaje chráněny šifrováním DPAPI pro aktuální účet Windows. Qbittorrent přihlašovací údaje zůstávají pouze v paměti po dobu běhu aplikace.":"On Windows, the library, stream addresses and saved credentials are protected with DPAPI encryption for the current Windows account. qBittorrent credentials stay in memory only while the app is running.","Automaticky spustit stream po výběru kanálu":"Automatically play a stream when a channel is selected","Po kliknutí na kanál zahájí přehrávání.":"Playback starts when you select a channel.","Vymazat lokální data":"Clear local data","Odstraní uložené playlisty, EPG, katalogy a přihlašovací údaje.":"Deletes saved playlists, EPG, catalogues and credentials.","Vymazat data":"Clear data","Ukončit aplikaci":"Exit application","Ukončit Sourbase":"Exit Sourbase","Zavře lokální server aplikace.":"Closes the local application server.","O aplikaci Sourbase":"About Sourbase","Lokální IPTV přehrávač pro M3U/M3U8, Xtream Codes a XMLTV EPG. Aplikace neodesílá playlisty do žádného vlastního cloudu. HLS přehrávání závisí na podpoře prohlížeče; pro spolehlivé HLS lze použít VLC / MPV.":"A local IPTV player for M3U/M3U8, Xtream Codes and XMLTV EPG. The app does not upload playlists to a cloud service. HLS playback depends on browser support; VLC / MPV can be used for more reliable HLS playback.","Přidat nový vstup":"Add a new source","Vyberte zdroj médií. Všechny vstupy jsou dostupné z tohoto menu a jejich nastavení zůstává přehledně oddělené.":"Choose a media source. All source types are available from this menu, with their settings kept separate.","IPTV playlist URL":"IPTV playlist URL","M3U / M3U8 · internetový odkaz":"M3U / M3U8 · internet URL","Playlist soubor":"Playlist file","Import M3U / M3U8 z disku":"Import M3U / M3U8 from disk","Server, uživatel a heslo · Live / VOD":"Server, username and password · Live / VOD","TV program · XMLTV":"TV guide · XMLTV","EPG průvodce z URL nebo souboru":"EPG guide from URL or file","Lokální média":"Local media","Video soubory z tohoto zařízení":"Video files from this device","RSS katalog":"RSS catalogue","Vlastní RSS feed nebo XML import":"Custom RSS feed or XML import","Lokální klient a fronta stahování":"Local client and download queue","Lokální knihovna · bez vlastního cloudu":"Local library · no proprietary cloud","Přidání do klienta předá magnet nebo torrent odkaz systému Windows. Stažené MP4/WebM soubory lze přehrávat přímo v Sourbase. MKV a další formáty lze předat do VLC / MPV. Samotné stahování zajišťuje váš torrent klient.":"Adding an item passes the magnet or torrent link to Windows. Downloaded MP4/WebM files can play directly in Sourbase. MKV and other formats can be opened in VLC / MPV. Downloads are handled by your torrent client.","Přidat TV program (EPG)":"Add TV guide (EPG)","M3U URL":"M3U URL","Soubor M3U":"M3U file","Xtream Codes":"Xtream Codes","Název playlistu":"Playlist name","Např. Moje IPTV":"e.g. My IPTV","URL playlistu (.m3u / .m3u8)":"Playlist URL (.m3u / .m3u8)","URL se načítá přes lokální aplikaci. Přístupové údaje ve stream URL zůstávají pouze v lokálních datech.":"The URL is loaded through the local app. Credentials in stream URLs remain in local data only.","Vyberte soubor .m3u nebo .m3u8":"Select an .m3u or .m3u8 file","Importovaný playlist":"Imported playlist","Soubor bude načten přímo v zařízení. Obsah playlistu se uloží lokálně pro příští návštěvu.":"The file is loaded directly on this device. The playlist is stored locally for your next visit.","Server / Portal URL":"Server / Portal URL","Připojení probíhá přímo k serveru poskytovatele. Načtou se Live TV, filmy, seriály a dostupné EPG. Ve Windows Sourbase ukládá knihovnu i tajné údaje do DPAPI chráněného lokálního úložiště, svázaného s vaším účtem Windows. Přístupové údaje se neodesílají do cloudu.":"The connection goes directly to your provider. Live TV, movies, series and available EPG are loaded. On Windows, Sourbase stores the library and secrets in DPAPI-protected local storage tied to your Windows account. Credentials are not sent to the cloud.","Vložte vlastní RSS URL ze SKTorrent":"Enter your own RSS URL from SKTorrent","password":"password","Na SKTorrent otevřete Custom RSS XML Feed, vyberte kategorie Movies a TV a jako Feed Type zvolte Download link, chcete-li do torrent klienta předávat přímo torrent. Pokud tracker nabízí Alternative (no cookies), lze tuto variantu použít pro externí čtečku. Sourbase ukládá vygenerovanou RSS adresu do DPAPI chráněného lokálního úložiště, ne vaše heslo ani cookies. Feed standardně obsahuje posledních 50 položek.":"On SKTorrent, open Custom RSS XML Feed, select Movies and TV categories, and choose Download link as the Feed Type to pass torrent files directly to your client. If the tracker offers Alternative (no cookies), you can use it with an external reader. Sourbase stores the generated RSS address in DPAPI-protected local storage, not your password or cookies. The feed usually contains the latest 50 items.","Načíst playlist":"Load playlist","Načíst EPG":"Load EPG","Zavřít":"Close","Zrušit":"Cancel","URL adresa":"URL","XMLTV soubor":"XMLTV file","URL XMLTV (.xml / .xml.gz)":"XMLTV URL (.xml / .xml.gz)","Podporovaný formát je XMLTV. Komprimované XMLTV .gz soubory se rozbalí při importu.":"XMLTV is the supported format. Compressed XMLTV .gz files are decompressed during import.","Vyberte XMLTV soubor":"Select an XMLTV file","Přehrát":"Play","Přehrát stažené video":"Play downloaded video","Zobrazit vše":"Show all","Zobrazit stránku":"View page","Žádné kanály":"No channels","Upravte filtr nebo přidejte M3U playlist.":"Adjust the filter or add an M3U playlist.","Nic tu zatím není":"Nothing here yet","Importujte M3U playlist nebo upravte vyhledávání.":"Import an M3U playlist or adjust your search.","Žádné oblíbené kanály":"No favourite channels","Označte kanál hvězdičkou v seznamu kanálů.":"Mark a channel as a favourite in the channel list.","Vaše knihovna je zatím prázdná":"Your library is empty","Tato kategorie je prázdná":"This category is empty","Otevřete detail filmu nebo epizody a zvolte Přidat do knihovny.":"Open a movie or episode and choose Add to library.","Změňte filtr Filmy / Seriály.":"Change the Movies / Series filter.","Zkuste jiný hledaný výraz.":"Try another search term.","Žádné výsledky":"No results","Nebyly nalezeny žádné seriály":"No series found","Načítám…":"Loading…","Nová epizoda":"New episode","Výběr týdne":"Pick of the week","Ostatní":"Other","Film":"Movie","Seriál":"Series","Ukázková data":"Sample data","Popis není v RSS feedu dostupný.":"Description is not available in the RSS feed.","Popis není dostupný":"Description unavailable","Připojte qBittorrent pro zobrazení stahování.":"Connect qBittorrent to view downloads.","Fronta je prázdná. Přidejte titul z katalogu nebo otevřete torrent ve SKTorrent detailu.":"The queue is empty. Add a title from the catalogue or open a torrent from its SKTorrent details.","Průběh":"Progress","Aktivních / uložených torrentů":"Active / saved torrents","Rychlost stahování":"Download speed","Rychlost odesílání":"Upload speed","Přidat do torrent klienta":"Add to torrent client","Přidat do qBittorrent":"Add to qBittorrent","Pokračovat":"Resume","Pozastavit":"Pause","SERIÁL":"SERIES","PŘEHRÁT":"PLAY","LOKÁLNÍ VIDEO":"LOCAL VIDEO","SKTORRENT":"SKTORRENT","Tento zdroj nelze uložit jako katalogový titul.":"This source cannot be saved as a catalogue title.","Tento záznam neobsahuje platný odkaz.":"This item does not contain a valid link.","Tento záznam neobsahuje platný torrent odkaz.":"This item does not contain a valid torrent link.","Odkaz předán výchozímu torrent klientu.":"Link passed to the default torrent client.","Odkaz otevřen ve výchozí aplikaci.":"Link opened in the default application.","Magnet odkaz byl předán torrent klientu.":"Magnet link passed to the torrent client.","Odkaz se nepodařilo otevřít.":"Could not open the link.","Torrent se nepodařilo předat klientu.":"Could not pass the torrent to the client.","Nejprve vyberte kanál.":"Select a channel first.","TV průvodce byl obnoven.":"TV guide refreshed.","Lokální data byla vymazána.":"Local data has been cleared.","Opravdu odstranit všechny lokálně uložené playlisty, EPG a oblíbené kanály?":"Delete all locally stored playlists, EPG and favourite channels?","Lokální katalog obnoven z profilu aplikace.":"Local catalogue restored from the application profile.","Lokální import":"Local import","Položky se uloží lokálně.":"Items are saved locally.","Ukázkový RSS katalog není dostupný.":"Sample RSS catalogue is unavailable.","Načtena offline ukázka. Položky neobsahují skutečné torrent odkazy.":"Offline demo loaded. Items do not contain real torrent links.","Vložte vlastní RSS URL vygenerovanou na trackeru, nebo importujte RSS XML soubor. Položky se uloží lokálně.":"Enter an RSS URL generated by your tracker, or import an RSS XML file. Items are saved locally.","Přihlášení bylo odmítnuto. Zkontrolujte server, jméno a heslo.":"Login was rejected. Check the server, username and password.","Server nevrátil platnou odpověď Xtream API.":"The server did not return a valid Xtream API response.","Rozbalení XMLTV .gz není v tomto prohlížeči podporováno. Rozbalte soubor do .xml.":"XMLTV .gz decompression is not supported in this browser. Extract the file to .xml.","Přepnout jazyk na English":"Switch language to English","Přepnout jazyk na češtinu":"Switch language to Czech","Přepnout na světlý motiv":"Switch to light theme","Přepnout na tmavý motiv":"Switch to dark theme","Světlý motiv":"Light theme","Tmavý motiv":"Dark theme","Jazyk":"Language","Motiv":"Theme","Vaše streamovací místo":"Your media space","Přehrávání":"Playback","Sledování":"Watching","Ready":"Ready","LOADING":"LOADING","PLAYING":"PLAYING","BUFFERING":"BUFFERING","ERROR":"ERROR","STOPPED":"STOPPED","Žádné výsledky pro tento filtr.":"No results for this filter.","Filmový katalog zatím není načten. Připojte Xtream Codes účet.":"The movie catalogue has not loaded yet. Connect an Xtream Codes account.","Katalog seriálů zatím není načten. Připojte Xtream Codes účet.":"The series catalogue has not loaded yet. Connect an Xtream Codes account.","Pro tento seriál nebyly vráceny žádné epizody.":"No episodes were returned for this series.","Přidejte vlastní obsah":"Add your own content","Zatím nemáte žádný obsah":"You do not have any content yet","Importujte lokální M3U, URL playlist nebo Xtream Codes.":"Import a local M3U file, playlist URL or Xtream Codes account.","Dnes":"Today","Název položky":"Item title","Otevřít stránku":"Open page","Otevřít přehrávač":"Open player","LOKÁLNÍ PŘEHRÁVAČ · OFFLINE KNIHOVNA":"LOCAL PLAYER · OFFLINE LIBRARY","Připojení je pouze k qBittorrent na tomto počítači. Web UI musí být zapnuté v Nastavení → Web UI. Přihlašovací údaje zůstávají jen v paměti po dobu běhu aplikace.":"The connection is only to qBittorrent on this computer. Web UI must be enabled in Settings → Web UI. Credentials remain in memory only while the app is running.","Sourbase MEDIA":"SOURBASE MEDIA","Sourbase LIBRARY":"SOURBASE LIBRARY","Sourbase INPUT CENTER":"SOURBASE INPUT CENTER","Sourbase MEDIA CENTER":"SOURBASE MEDIA CENTER","Oblíbené":"Favourite","Server vrátil HTTP ":"Server returned HTTP ","qBittorrent připojen":"qBittorrent connected","Titul byl uložen do knihovny.":"Title added to library.","Titul byl odebrán z knihovny.":"Title removed from the library.","RSS zatím nebylo načteno":"RSS has not been loaded yet","Přidat vybranou epizodu do qBittorrent":"Add selected episode to qBittorrent","Přidat vybranou epizodu":"Add selected episode","Torrent odkaz není ve feedu":"No torrent link in the feed","Uložit epizodu":"Save episode","Vyberte epizodu ze seznamu a přidejte ji do torrent klienta.":"Select an episode from the list and add it to your torrent client.","Ukázkový katalog":"Sample catalogue","Torrent soubor byl předán klientu:":"Torrent file passed to the client:","Můj playlist":"My playlist","Stahování":"Downloading","Sdílení":"Seeding","Čeká na stahování":"Waiting to download","Čeká na sdílení":"Waiting to seed","Pozastaveno":"Paused","Ve frontě":"Queued","Kontrola":"Checking","Kontrola dat":"Checking data","Přesun souborů":"Moving files","Chyba":"Error","Chybí soubory":"Missing files","Vynucené stahování":"Force downloading","Vynucené sdílení":"Force seeding","Příprava":"Allocating","Neznámý stav":"Unknown status","Aktivní":"Active","Otevřít vybranou položku":"Open selected item","Stream otevřen v ":"Stream opened in ","Načteno ":"Loaded "," kanálů":" channels"," filmů":" movies"," seriálů":" series"," z playlistu.":" from the playlist.","Xtream načteno: ":"Xtream loaded: "," EPG se načítá na pozadí.":" EPG is loading in the background.","Xtream EPG načteno: ":"Xtream EPG loaded: ","EPG načteno: ":"EPG loaded: "," pořadů.":" programmes.","Aktivní playlist: ":"Active playlist: ","Xtream XMLTV · načítám…":"Xtream XMLTV · loading…","Xtream · EPG bez shody":"Xtream · EPG has no channel matches","Xtream · EPG není dostupné":"Xtream · EPG unavailable","Vaše TV kanály":"Your TV channels","Rychlý přístup k oblíbeným stanicím":"Quick access to favourite stations","Filmový katalog z aktivního zdroje":"Movie catalogue from the active source","Váš katalog se zobrazí zde":"Your catalogue will appear here","Filmová knihovna čeká na zdroj":"Movie library is waiting for a source","Přidejte Xtream Codes účet a načtěte svůj VOD katalog.":"Connect an Xtream Codes account to load your VOD catalogue.","Sezóny a epizody z vašeho katalogu":"Seasons and episodes from your catalogue","Všechny sezóny na jednom místě":"All seasons in one place","Seriálová knihovna je připravena":"Series library is ready","Po připojení Xtream zdroje se zde zobrazí vaše seriály.":"Your series will appear here after connecting an Xtream source.","Položky z vašeho osobního RSS katalogu":"Items from your personal RSS catalogue","Právě v TV":"On TV now","Co právě běží na vašich kanálech":"What's on your channels now","Začněte tady":"Get started here","Pro tento výraz neodpovídají žádné kanály, filmy ani seriály.":"No channels, movies or series match this search.","Zobrazit podrobnosti":"View details","VÝBĚR Z FILMOVÉ KNIHOVNY":"PICK FROM YOUR MOVIE LIBRARY","VÝBĚR ZE SERIÁLŮ":"PICK FROM YOUR SERIES","FILM Z VAŠÍ KNIHOVNY":"MOVIE FROM YOUR LIBRARY","SERIÁL Z VAŠÍ KNIHOVNY":"SERIES FROM YOUR LIBRARY","Zobrazit epizody":"View episodes","Výsledky vyhledávání":"Search results","Žádné filmy pro tento filtr.":"No movies for this filter.","Žádné seriály pro tento filtr.":"No series for this filter.","Pro načtení epizod je potřeba znovu zadat Xtream přihlašovací údaje.":"Re-enter your Xtream credentials to load episodes.","Načítám epizody…":"Loading episodes…","Načítám Xtream katalog…":"Loading Xtream catalogue…","Živý kanál":"Live channel","TV kanál":"TV channel","Přehrávané médium":"Media currently playing","Naposledy přehráno":"Last played","Tato položka nemá dostupnou stream adresu.":"This item does not have an available stream URL.","Tento záznam už nemá dostupnou stream adresu.":"This item no longer has an available stream URL.","Výběr lokálních videí je dostupný v desktopové aplikaci.":"Local video selection is available in the desktop app.","Místní úložiště je plné. Playlist se nemusí uložit.":"Local storage is full. The playlist may not be saved.","Ukázkový kanál nemá připojený stream. Přidejte vlastní playlist.":"The sample channel has no stream. Add your own playlist.","Tento ukázkový kanál nemá stream. Importujte vlastní playlist.":"This sample channel has no stream. Import your own playlist.","Nejprve vyberte kanál, film nebo epizodu.":"Select a channel, movie or episode first.","HLS není v tomto přehrávači dostupné. Zkuste VLC / MPV.":"HLS is not available in this player. Try VLC / MPV.","Stream se nepodařilo přehrát. Zkontrolujte formát a adresu.":"Could not play the stream. Check the format and URL.","Playlist byl odebrán z lokální knihovny.":"Playlist removed from the local library.","Playlist se nepodařilo načíst.":"Could not load the playlist.","EPG se nepodařilo stáhnout. Server může blokovat CORS.":"Could not download EPG. The server may be blocking CORS.","qBittorrent katalog":"qBittorrent catalogue","Připojuji…":"Connecting…","Obnovit spojení":"Reconnect","Torrent předán qBittorrent.":"Torrent sent to qBittorrent.","SKTorrent RSS načteno: ":"SKTorrent RSS loaded: ","Lokální RSS importováno: ":"Local RSS imported: "," položek.":" items.","nikdy":"never","Odebrat z knihovny":"Remove from library","Správce stahování":"Download manager","Přidáno do knihovny.":"Added to the library.","Odebráno z knihovny.":"Removed from the library.","Ukázkový kanál. Přidejte vlastní playlist pro přehrávání.":"Sample channel. Add your own playlist to play it.","Lokální knihovnu nebo přihlašovací údaje se nepodařilo bezpečně uložit.":"Could not securely save the local library or credentials.","Sezóna ":"Season "," řada · ":" season · ","Epizody":"Episodes","Přehrát film":"Play movie","Informace o pořadu nejsou v EPG dostupné.":"Programme information is not available in the EPG.","Informace z TV průvodce":"TV guide information","Výběr stand-upu a komediálních pořadů.":"A selection of stand-up and comedy programmes.","Šest přátel, jejich každodenní příběhy, vztahy a nezapomenutelné chvíle v New Yorku.":"Six friends, their everyday stories, relationships and unforgettable moments in New York.","Birminghamský gang vedený ambiciózní rodinou Shelbyových rozšiřuje svůj vliv.":"A Birmingham gang led by the ambitious Shelby family expands its influence.","Animovaný seriál o rodině Simpsonových a jejich životě ve Springfieldu.":"An animated series about the Simpson family and their life in Springfield.","Aktuální dění, satira a komentáře k tématům, která hýbou světem.":"Current affairs, satire and commentary on the topics shaping the world.","Nekonvenční diagnostik a jeho tým řeší komplikované medicínské případy.":"An unconventional diagnostician and his team solve complex medical cases.","Dva agenti FBI vyšetřují nevysvětlitelné jevy a záhadné případy.":"Two FBI agents investigate unexplained phenomena and mysterious cases.","Dokumentární cesta do fascinujících ekosystémů a divoké přírody.":"A documentary journey into fascinating ecosystems and the wild.","Večerní talk show, rozhovory, hudba a humor.":"An evening talk show with interviews, music and humour.","Filmový večer s výběrem oblíbených příběhů.":"A movie night featuring a selection of favourite stories.","Mladý chirurg s výjimečnými schopnostmi čelí náročným případům.":"A young surgeon with exceptional abilities faces challenging cases.","Dramatický seriál o dospívání, přátelství a hledání vlastní identity.":"A drama series about growing up, friendship and finding one's identity.","Pro zvolený filtr nejsou v tomto časovém okně žádné pořady.":"There are no programmes for the selected filter in this time window.","Vyberte kanál.":"Select a channel.","Žádné programy":"No programmes"};
+  const SOURBASE_TRANSLATIONS={"Hlavní navigace":"Main navigation","Obsah":"Content","Domů":"Home","Přehrávač":"Player","Objevit":"Discover","Knihovna":"Library","TV program":"TV guide","Kanály":"Channels","Seriály":"Series","Nastavení":"Settings","MENU":"MENU","TELEVIZE":"TV","Hledat filmy, seriály, kanály…":"Search movies, series, channels…","Obnovit knihovnu":"Refresh library","Přidat vstup":"Add source","VŠE NA JEDNOM MÍSTĚ":"ALL IN ONE PLACE","Váš svět zábavy.":"Your entertainment world.","Bez hranic.":"Without limits.","Filmy, seriály a živé vysílání z vašich vlastních zdrojů. Jedna knihovna, jeden přehled.":"Movies, series and live TV from your own sources. One library, one place.","LOKÁLNÍ KNIHOVNA":"LOCAL LIBRARY","Procházet TV program":"Browse TV guide","VAŠE STREAMOVACÍ MÍSTO":"YOUR MEDIA SPACE","Objevte svůj obsah":"Discover your content","Všechny zdroje zůstávají uložené lokálně v tomto zařízení.":"All sources remain stored locally on this device.","kanálů":"channels","filmů":"movies","seriálů":"series","titulů":"titles","položek":"items","pořadů":"programmes","LIVE TELEVISION":"LIVE TELEVISION","Live TV":"Live TV","Živé vysílání a televizní program v reálném čase.":"Live channels and the TV schedule in real time.","Právě běží":"Now","Následuje":"Upcoming","Všechny kategorie":"All categories","Přejít na aktuální čas":"Jump to current time","Právě vysílá":"On air","Program":"Programme","Aktuální čas":"Current time","Jedno místo pro živé vysílání, filmy, epizody i lokální soubory.":"One place for live TV, movies, episodes and local files.","Připraveno k přehrávání":"Ready to play","Vyberte film, epizodu, TV kanál nebo lokální video":"Select a movie, episode, TV channel or local video","Vyberte film, seriál nebo kanál":"Select a movie, series or channel","Váš obsah se přehraje zde":"Your content plays here","Přehrát vybraný kanál":"Play selected channel","Zastavit":"Stop","Otevřít ve VLC / MPV":"Open in VLC / MPV","Otevřít lokální video":"Open local video","LOKÁLNÍ PŘEHRÁVAČ":"LOCAL PLAYER","NOW PLAYING":"NOW PLAYING","Vyberte pořad":"Select a programme","Informace o vysílání se zobrazí zde":"Broadcast details will appear here","Informace o titulu.":"Title information.","Kliknutím na pořad nebo titul zobrazíte jeho dostupné informace.":"Select a programme or title to see its details.","Přidat do knihovny":"Add to library","Otevřít knihovnu":"Open library","Pokračovat ve sledování":"Continue watching","Celá knihovna":"Full library","Historie sledování se zobrazí po prvním přehrání.":"Your watch history will appear after the first playback.","YOUR LINEUP":"YOUR LINEUP","Procházejte svůj playlist a spusťte živé vysílání.":"Browse your playlist and start live TV.","KATEGORIE":"CATEGORIES","Kategorie":"Category","Všechny kanály":"All channels","YOUR LIBRARY":"YOUR LIBRARY","Uložené filmy a seriály spolu s oblíbenými TV kanály.":"Saved movies and series alongside your favourite TV channels.","Vše":"All","Filmy":"Movies","Lokální soubory":"Local files","+ Přidat video":"+ Add video","MOJE MÉDIA":"MY MEDIA","Knihovna je zatím prázdná":"Your library is empty","Přidejte filmy, seriály nebo lokální videa.":"Add movies, series or local videos.","Objevit obsah":"Discover content","NEDÁVNO PŘEHRÁVANÉ":"RECENTLY PLAYED","Historie sledování je zatím prázdná.":"Your watch history is empty.","OBLÍBENÉ TV KANÁLY":"FAVOURITE TV CHANNELS","YOUR VIDEO LIBRARY":"YOUR VIDEO LIBRARY","Filmová knihovna z M3U nebo Xtream Codes účtu.":"Movie library from an M3U playlist or Xtream Codes account.","Lokálně uložený katalog":"Locally stored catalogue","Přidejte Xtream Codes účet pro načtení filmů.":"Connect an Xtream Codes account to load movies.","YOUR SERIES LIBRARY":"YOUR SERIES LIBRARY","Seriály, sezóny a epizody z vašeho IPTV účtu.":"Series, seasons and episodes from your IPTV account.","Vyberte seriál pro zobrazení epizod":"Select a series to view episodes","Přidejte Xtream Codes účet pro načtení seriálů.":"Connect an Xtream Codes account to load series.","Epizody seriálu":"Series episodes","Vyberte seriál.":"Select a series.","Název titulu":"Title","CONTENT SOURCE PLUGIN":"CONTENT SOURCE","Osobní filmový a seriálový katalog synchronizovaný z vašeho RSS feedu.":"Personal movie and series catalogue synced from your RSS feed.","LOKÁLNÍ KATALOG":"LOCAL CATALOGUE","Vlastní SKTorrent RSS URL":"Your SKTorrent RSS URL","Vložte vygenerovaný RSS odkaz ze svého účtu":"Paste the RSS link generated by your account","Načíst / obnovit":"Load / refresh","Importovat RSS soubor":"Import RSS file","Vyzkoušet ukázku":"Try demo","Nastavit RSS ↗":"Set up RSS ↗","DOWNLOAD MANAGER":"DOWNLOAD MANAGER","Napojte místní torrent klient a spravujte stahování přímo v Sourbase.":"Connect your local torrent client and manage downloads directly in Sourbase.","Odpojeno":"Disconnected","Připojeno":"Connected","Web UI adresa":"Web UI address","Uživatelské jméno":"Username","Heslo":"Password","Heslo Web UI":"Web UI password","Připojit":"Connect","Odpojit":"Disconnect","Fronta stahování":"Download queue","Obnovit":"Refresh","Řadit":"Sort","Nejnovější":"Newest","Název A–Z":"Title A–Z","Seriály / TV":"Series / TV","Moje knihovna":"My library","RSS není připojeno · lze importovat lokální RSS":"RSS is not connected · you can import a local RSS file","SKTorrent katalog čeká na připojení":"SKTorrent catalogue is waiting for a connection","Vložte vlastní RSS URL nebo importujte RSS XML soubor. Položky se uloží do lokální knihovny Sourbase.":"Paste your own RSS URL or import an RSS XML file. Items are saved to your local Sourbase library.","Otevřít nastavení RSS trackeru":"Open tracker RSS settings","PREFERENCES":"PREFERENCES","Playlisty, programový průvodce a lokální data.":"Playlists, TV guide and local data.","Datové zdroje":"Data sources","Playlisty, EPG a katalogy se ukládají lokálně do tohoto zařízení. Vzdálené zdroje se načítají přímo od vašeho poskytovatele.":"Playlists, EPG and catalogues are stored locally on this device. Remote sources are loaded directly from your provider.","Aktuální playlist":"Current playlist","Ukázkový playlist":"Sample playlist","Přidat zdroj":"Add source","Uložené M3U playlisty":"Saved M3U playlists","Přepínejte mezi dříve importovanými seznamy.":"Switch between previously imported playlists.","Žádné uložené playlisty":"No saved playlists","Otevřít":"Open","Odebrat":"Remove","Programový průvodce (EPG)":"TV guide (EPG)","Ukázková data · XMLTV lze importovat":"Sample data · XMLTV can be imported","Přidat EPG":"Add EPG","Přehrávání a soukromí":"Playback and privacy","Ve Windows jsou knihovna, stream adresy i uložené přihlašovací údaje chráněny šifrováním DPAPI pro aktuální účet Windows. Qbittorrent přihlašovací údaje zůstávají pouze v paměti po dobu běhu aplikace.":"On Windows, the library, stream addresses and saved credentials are protected with DPAPI encryption for the current Windows account. qBittorrent credentials stay in memory only while the app is running.","Automaticky spustit stream po výběru kanálu":"Automatically play a stream when a channel is selected","Po kliknutí na kanál zahájí přehrávání.":"Playback starts when you select a channel.","Vymazat lokální data":"Clear local data","Odstraní uložené playlisty, EPG, katalogy a přihlašovací údaje.":"Deletes saved playlists, EPG, catalogues and credentials.","Vymazat data":"Clear data","Ukončit aplikaci":"Exit application","Ukončit Sourbase":"Exit Sourbase","Zavře lokální server aplikace.":"Closes the local application server.","O aplikaci Sourbase":"About Sourbase","Lokální IPTV přehrávač pro M3U/M3U8, Xtream Codes a XMLTV EPG. Aplikace neodesílá playlisty do žádného vlastního cloudu. HLS přehrávání závisí na podpoře prohlížeče; pro spolehlivé HLS lze použít VLC / MPV.":"A local IPTV player for M3U/M3U8, Xtream Codes and XMLTV EPG. The app does not upload playlists to a cloud service. HLS playback depends on browser support; VLC / MPV can be used for more reliable HLS playback.","Přidat nový vstup":"Add a new source","Vyberte zdroj médií. Všechny vstupy jsou dostupné z tohoto menu a jejich nastavení zůstává přehledně oddělené.":"Choose a media source. All source types are available from this menu, with their settings kept separate.","IPTV playlist URL":"IPTV playlist URL","M3U / M3U8 · internetový odkaz":"M3U / M3U8 · internet URL","Playlist soubor":"Playlist file","Import M3U / M3U8 z disku":"Import M3U / M3U8 from disk","Server, uživatel a heslo · Live / VOD":"Server, username and password · Live / VOD","TV program · XMLTV":"TV guide · XMLTV","EPG průvodce z URL nebo souboru":"EPG guide from URL or file","Lokální média":"Local media","Video soubory z tohoto zařízení":"Video files from this device","RSS katalog":"RSS catalogue","Vlastní RSS feed nebo XML import":"Custom RSS feed or XML import","Lokální klient a fronta stahování":"Local client and download queue","Lokální knihovna · bez vlastního cloudu":"Local library · no proprietary cloud","Přidání do klienta předá magnet nebo torrent odkaz systému Windows. Stažené MP4/WebM soubory lze přehrávat přímo v Sourbase. MKV a další formáty lze předat do VLC / MPV. Samotné stahování zajišťuje váš torrent klient.":"Adding an item passes the magnet or torrent link to Windows. Downloaded MP4/WebM files can play directly in Sourbase. MKV and other formats can be opened in VLC / MPV. Downloads are handled by your torrent client.","Přidat TV program (EPG)":"Add TV guide (EPG)","M3U URL":"M3U URL","Soubor M3U":"M3U file","Xtream Codes":"Xtream Codes","Název playlistu":"Playlist name","Např. Moje IPTV":"e.g. My IPTV","URL playlistu (.m3u / .m3u8)":"Playlist URL (.m3u / .m3u8)","URL se načítá přes lokální aplikaci. Přístupové údaje ve stream URL zůstávají pouze v lokálních datech.":"The URL is loaded through the local app. Credentials in stream URLs remain in local data only.","Vyberte soubor .m3u nebo .m3u8":"Select an .m3u or .m3u8 file","Importovaný playlist":"Imported playlist","Soubor bude načten přímo v zařízení. Obsah playlistu se uloží lokálně pro příští návštěvu.":"The file is loaded directly on this device. The playlist is stored locally for your next visit.","Server / Portal URL":"Server / Portal URL","Připojení probíhá přímo k serveru poskytovatele. Načtou se Live TV, filmy, seriály a dostupné EPG. Ve Windows Sourbase ukládá knihovnu i tajné údaje do DPAPI chráněného lokálního úložiště, svázaného s vaším účtem Windows. Přístupové údaje se neodesílají do cloudu.":"The connection goes directly to your provider. Live TV, movies, series and available EPG are loaded. On Windows, Sourbase stores the library and secrets in DPAPI-protected local storage tied to your Windows account. Credentials are not sent to the cloud.","Vložte vlastní RSS URL ze SKTorrent":"Enter your own RSS URL from SKTorrent","password":"password","Na SKTorrent otevřete Custom RSS XML Feed, vyberte kategorie Movies a TV a jako Feed Type zvolte Download link, chcete-li do torrent klienta předávat přímo torrent. Pokud tracker nabízí Alternative (no cookies), lze tuto variantu použít pro externí čtečku. Sourbase ukládá vygenerovanou RSS adresu do DPAPI chráněného lokálního úložiště, ne vaše heslo ani cookies. Feed standardně obsahuje posledních 50 položek.":"On SKTorrent, open Custom RSS XML Feed, select Movies and TV categories, and choose Download link as the Feed Type to pass torrent files directly to your client. If the tracker offers Alternative (no cookies), you can use it with an external reader. Sourbase stores the generated RSS address in DPAPI-protected local storage, not your password or cookies. The feed usually contains the latest 50 items.","Načíst playlist":"Load playlist","Načíst EPG":"Load EPG","Zavřít":"Close","Zrušit":"Cancel","URL adresa":"URL","XMLTV soubor":"XMLTV file","URL XMLTV (.xml / .xml.gz)":"XMLTV URL (.xml / .xml.gz)","Podporovaný formát je XMLTV. Komprimované XMLTV .gz soubory se rozbalí při importu.":"XMLTV is the supported format. Compressed XMLTV .gz files are decompressed during import.","Vyberte XMLTV soubor":"Select an XMLTV file","Přehrát":"Play","Přehrát stažené video":"Play downloaded video","Zobrazit vše":"Show all","Zobrazit stránku":"View page","Žádné kanály":"No channels","Upravte filtr nebo přidejte M3U playlist.":"Adjust the filter or add an M3U playlist.","Nic tu zatím není":"Nothing here yet","Importujte M3U playlist nebo upravte vyhledávání.":"Import an M3U playlist or adjust your search.","Žádné oblíbené kanály":"No favourite channels","Označte kanál hvězdičkou v seznamu kanálů.":"Mark a channel as a favourite in the channel list.","Vaše knihovna je zatím prázdná":"Your library is empty","Tato kategorie je prázdná":"This category is empty","Otevřete detail filmu nebo epizody a zvolte Přidat do knihovny.":"Open a movie or episode and choose Add to library.","Změňte filtr Filmy / Seriály.":"Change the Movies / Series filter.","Zkuste jiný hledaný výraz.":"Try another search term.","Žádné výsledky":"No results","Nebyly nalezeny žádné seriály":"No series found","Načítám…":"Loading…","Nová epizoda":"New episode","Výběr týdne":"Pick of the week","Ostatní":"Other","Film":"Movie","Seriál":"Series","Ukázková data":"Sample data","Popis není v RSS feedu dostupný.":"Description is not available in the RSS feed.","Popis není dostupný":"Description unavailable","Připojte qBittorrent pro zobrazení stahování.":"Connect qBittorrent to view downloads.","Fronta je prázdná. Přidejte titul z katalogu nebo otevřete torrent ve SKTorrent detailu.":"The queue is empty. Add a title from the catalogue or open a torrent from its SKTorrent details.","Průběh":"Progress","Aktivních / uložených torrentů":"Active / saved torrents","Rychlost stahování":"Download speed","Rychlost odesílání":"Upload speed","Přidat do torrent klienta":"Add to torrent client","Přidat do qBittorrent":"Add to qBittorrent","Pokračovat":"Resume","Pozastavit":"Pause","SERIÁL":"SERIES","PŘEHRÁT":"PLAY","LOKÁLNÍ VIDEO":"LOCAL VIDEO","SKTORRENT":"SKTORRENT","Tento zdroj nelze uložit jako katalogový titul.":"This source cannot be saved as a catalogue title.","Tento záznam neobsahuje platný odkaz.":"This item does not contain a valid link.","Tento záznam neobsahuje platný torrent odkaz.":"This item does not contain a valid torrent link.","Odkaz předán výchozímu torrent klientu.":"Link passed to the default torrent client.","Odkaz otevřen ve výchozí aplikaci.":"Link opened in the default application.","Magnet odkaz byl předán torrent klientu.":"Magnet link passed to the torrent client.","Odkaz se nepodařilo otevřít.":"Could not open the link.","Torrent se nepodařilo předat klientu.":"Could not pass the torrent to the client.","Nejprve vyberte kanál.":"Select a channel first.","TV průvodce byl obnoven.":"TV guide refreshed.","Lokální data byla vymazána.":"Local data has been cleared.","Opravdu odstranit všechny lokálně uložené playlisty, EPG a oblíbené kanály?":"Delete all locally stored playlists, EPG and favourite channels?","Lokální katalog obnoven z profilu aplikace.":"Local catalogue restored from the application profile.","Lokální import":"Local import","Položky se uloží lokálně.":"Items are saved locally.","Ukázkový RSS katalog není dostupný.":"Sample RSS catalogue is unavailable.","Načtena offline ukázka. Položky neobsahují skutečné torrent odkazy.":"Offline demo loaded. Items do not contain real torrent links.","Vložte vlastní RSS URL vygenerovanou na trackeru, nebo importujte RSS XML soubor. Položky se uloží lokálně.":"Enter an RSS URL generated by your tracker, or import an RSS XML file. Items are saved locally.","Přihlášení bylo odmítnuto. Zkontrolujte server, jméno a heslo.":"Login was rejected. Check the server, username and password.","Server nevrátil platnou odpověď Xtream API.":"The server did not return a valid Xtream API response.","Rozbalení XMLTV .gz není v tomto prohlížeči podporováno. Rozbalte soubor do .xml.":"XMLTV .gz decompression is not supported in this browser. Extract the file to .xml.","Přepnout jazyk na English":"Switch language to English","Přepnout jazyk na češtinu":"Switch language to Czech","Přepnout na světlý motiv":"Switch to light theme","Přepnout na tmavý motiv":"Switch to dark theme","Světlý motiv":"Light theme","Tmavý motiv":"Dark theme","Jazyk":"Language","Motiv":"Theme","Vaše streamovací místo":"Your media space","Přehrávání":"Playback","Sledování":"Watching","Ready":"Ready","LOADING":"LOADING","PLAYING":"PLAYING","BUFFERING":"BUFFERING","ERROR":"ERROR","STOPPED":"STOPPED","Žádné výsledky pro tento filtr.":"No results for this filter.","Filmový katalog zatím není načten. Připojte Xtream Codes účet.":"The movie catalogue has not loaded yet. Connect an Xtream Codes account.","Katalog seriálů zatím není načten. Připojte Xtream Codes účet.":"The series catalogue has not loaded yet. Connect an Xtream Codes account.","Pro tento seriál nebyly vráceny žádné epizody.":"No episodes were returned for this series.","Přidejte vlastní obsah":"Add your own content","Zatím nemáte žádný obsah":"You do not have any content yet","Importujte lokální M3U, URL playlist nebo Xtream Codes.":"Import a local M3U file, playlist URL or Xtream Codes account.","Dnes":"Today","Název položky":"Item title","Otevřít stránku":"Open page","Otevřít přehrávač":"Open player","LOKÁLNÍ PŘEHRÁVAČ · OFFLINE KNIHOVNA":"LOCAL PLAYER · OFFLINE LIBRARY","Připojení je pouze k qBittorrent na tomto počítači. Web UI musí být zapnuté v Nastavení → Web UI. Přihlašovací údaje zůstávají jen v paměti po dobu běhu aplikace.":"The connection is only to qBittorrent on this computer. Web UI must be enabled in Settings → Web UI. Credentials remain in memory only while the app is running.","Sourbase MEDIA":"SOURBASE MEDIA","Sourbase LIBRARY":"SOURBASE LIBRARY","Sourbase INPUT CENTER":"SOURBASE INPUT CENTER","Sourbase MEDIA CENTER":"SOURBASE MEDIA CENTER","Oblíbené":"Favourite","Server vrátil HTTP ":"Server returned HTTP ","qBittorrent připojen":"qBittorrent connected","Titul byl uložen do knihovny.":"Title added to library.","Titul byl odebrán z knihovny.":"Title removed from the library.","RSS zatím nebylo načteno":"RSS has not been loaded yet","Přidat vybranou epizodu do qBittorrent":"Add selected episode to qBittorrent","Přidat vybranou epizodu":"Add selected episode","Torrent odkaz není ve feedu":"No torrent link in the feed","Uložit epizodu":"Save episode","Vyberte epizodu ze seznamu a přidejte ji do torrent klienta.":"Select an episode from the list and add it to your torrent client.","Ukázkový katalog":"Sample catalogue","Torrent soubor byl předán klientu:":"Torrent file passed to the client:","Můj playlist":"My playlist","Stahování":"Downloading","Sdílení":"Seeding","Čeká na stahování":"Waiting to download","Čeká na sdílení":"Waiting to seed","Pozastaveno":"Paused","Ve frontě":"Queued","Kontrola":"Checking","Kontrola dat":"Checking data","Přesun souborů":"Moving files","Chyba":"Error","Chybí soubory":"Missing files","Vynucené stahování":"Force downloading","Vynucené sdílení":"Force seeding","Příprava":"Allocating","Neznámý stav":"Unknown status","Aktivní":"Active","Otevřít vybranou položku":"Open selected item","Stream otevřen v ":"Stream opened in ","Načteno ":"Loaded "," kanálů":" channels"," filmů":" movies"," seriálů":" series"," z playlistu.":" from the playlist.","Xtream načteno: ":"Xtream loaded: "," EPG se načítá na pozadí.":" EPG is loading in the background.","Xtream EPG načteno: ":"Xtream EPG loaded: ","EPG načteno: ":"EPG loaded: "," pořadů.":" programmes.","Aktivní playlist: ":"Active playlist: ","Xtream XMLTV · načítám…":"Xtream XMLTV · loading…","Xtream · EPG bez shody":"Xtream · EPG has no channel matches","Xtream · EPG není dostupné":"Xtream · EPG unavailable","Vaše TV kanály":"Your TV channels","Rychlý přístup k oblíbeným stanicím":"Quick access to favourite stations","Filmový katalog z aktivního zdroje":"Movie catalogue from the active source","Váš katalog se zobrazí zde":"Your catalogue will appear here","Filmová knihovna čeká na zdroj":"Movie library is waiting for a source","Přidejte Xtream Codes účet a načtěte svůj VOD katalog.":"Connect an Xtream Codes account to load your VOD catalogue.","Sezóny a epizody z vašeho katalogu":"Seasons and episodes from your catalogue","Všechny sezóny na jednom místě":"All seasons in one place","Seriálová knihovna je připravena":"Series library is ready","Po připojení Xtream zdroje se zde zobrazí vaše seriály.":"Your series will appear here after connecting an Xtream source.","Položky z vašeho osobního RSS katalogu":"Items from your personal RSS catalogue","Právě v TV":"On TV now","Co právě běží na vašich kanálech":"What's on your channels now","Začněte tady":"Get started here","Pro tento výraz neodpovídají žádné kanály, filmy ani seriály.":"No channels, movies or series match this search.","Zobrazit podrobnosti":"View details","VÝBĚR Z FILMOVÉ KNIHOVNY":"PICK FROM YOUR MOVIE LIBRARY","VÝBĚR ZE SERIÁLŮ":"PICK FROM YOUR SERIES","FILM Z VAŠÍ KNIHOVNY":"MOVIE FROM YOUR LIBRARY","SERIÁL Z VAŠÍ KNIHOVNY":"SERIES FROM YOUR LIBRARY","Zobrazit epizody":"View episodes","Výsledky vyhledávání":"Search results","Žádné filmy pro tento filtr.":"No movies for this filter.","Žádné seriály pro tento filtr.":"No series for this filter.","Pro načtení epizod je potřeba znovu zadat Xtream přihlašovací údaje.":"Re-enter your Xtream credentials to load episodes.","Načítám epizody…":"Loading episodes…","Načítám Xtream katalog…":"Loading Xtream catalogue…","Živý kanál":"Live channel","TV kanál":"TV channel","Přehrávané médium":"Media currently playing","Naposledy přehráno":"Last played","Tato položka nemá dostupnou stream adresu.":"This item does not have an available stream URL.","Tento záznam už nemá dostupnou stream adresu.":"This item no longer has an available stream URL.","Výběr lokálních videí je dostupný v desktopové aplikaci.":"Local video selection is available in the desktop app.","Místní úložiště je plné. Playlist se nemusí uložit.":"Local storage is full. The playlist may not be saved.","Ukázkový kanál nemá připojený stream. Přidejte vlastní playlist.":"The sample channel has no stream. Add your own playlist.","Tento ukázkový kanál nemá stream. Importujte vlastní playlist.":"This sample channel has no stream. Import your own playlist.","Nejprve vyberte kanál, film nebo epizodu.":"Select a channel, movie or episode first.","HLS není v tomto přehrávači dostupné. Zkuste VLC / MPV.":"HLS is not available in this player. Try VLC / MPV.","Stream se nepodařilo přehrát. Zkontrolujte formát a adresu.":"Could not play the stream. Check the format and URL.","Playlist byl odebrán z lokální knihovny.":"Playlist removed from the local library.","Playlist se nepodařilo načíst.":"Could not load the playlist.","EPG se nepodařilo stáhnout. Server může blokovat CORS.":"Could not download EPG. The server may be blocking CORS.","qBittorrent katalog":"qBittorrent catalogue","Připojuji…":"Connecting…","Obnovit spojení":"Reconnect","Torrent předán qBittorrent.":"Torrent sent to qBittorrent.","SKTorrent RSS načteno: ":"SKTorrent RSS loaded: ","Lokální RSS importováno: ":"Local RSS imported: "," položek.":" items.","nikdy":"never","Odebrat z knihovny":"Remove from library","Správce stahování":"Download manager","Přidáno do knihovny.":"Added to the library.","Odebráno z knihovny.":"Removed from the library.","Ukázkový kanál. Přidejte vlastní playlist pro přehrávání.":"Sample channel. Add your own playlist to play it.","Lokální knihovnu nebo přihlašovací údaje se nepodařilo bezpečně uložit.":"Could not securely save the local library or credentials.","Sezóna ":"Season "," řada · ":" season · ","Epizody":"Episodes","Přehrát film":"Play movie","Informace o pořadu nejsou v EPG dostupné.":"Programme information is not available in the EPG.","Informace z TV průvodce":"TV guide information","Výběr stand-upu a komediálních pořadů.":"A selection of stand-up and comedy programmes.","Šest přátel, jejich každodenní příběhy, vztahy a nezapomenutelné chvíle v New Yorku.":"Six friends, their everyday stories, relationships and unforgettable moments in New York.","Birminghamský gang vedený ambiciózní rodinou Shelbyových rozšiřuje svůj vliv.":"A Birmingham gang led by the ambitious Shelby family expands its influence.","Animovaný seriál o rodině Simpsonových a jejich životě ve Springfieldu.":"An animated series about the Simpson family and their life in Springfield.","Aktuální dění, satira a komentáře k tématům, která hýbou světem.":"Current affairs, satire and commentary on the topics shaping the world.","Nekonvenční diagnostik a jeho tým řeší komplikované medicínské případy.":"An unconventional diagnostician and his team solve complex medical cases.","Dva agenti FBI vyšetřují nevysvětlitelné jevy a záhadné případy.":"Two FBI agents investigate unexplained phenomena and mysterious cases.","Dokumentární cesta do fascinujících ekosystémů a divoké přírody.":"A documentary journey into fascinating ecosystems and the wild.","Večerní talk show, rozhovory, hudba a humor.":"An evening talk show with interviews, music and humour.","Filmový večer s výběrem oblíbených příběhů.":"A movie night featuring a selection of favourite stories.","Mladý chirurg s výjimečnými schopnostmi čelí náročným případům.":"A young surgeon with exceptional abilities faces challenging cases.","Dramatický seriál o dospívání, přátelství a hledání vlastní identity.":"A drama series about growing up, friendship and finding one's identity.","Pro zvolený filtr nejsou v tomto časovém okně žádné pořady.":"There are no programmes for the selected filter in this time window.","Vyberte kanál.":"Select a channel.","Žádné programy":"No programmes","Více":"More"};
   const SOURBASE_REVERSE=Object.fromEntries(Object.entries(SOURBASE_TRANSLATIONS).map(([cs,en])=>[en,cs]));
   const SOURBASE_ENGLISH_TO_CZECH={"YOUR LINEUP":"VAŠE NABÍDKA","YOUR LIBRARY":"VAŠE KNIHOVNA","YOUR VIDEO LIBRARY":"VAŠE FILMOVÁ KNIHOVNA","YOUR SERIES LIBRARY":"VAŠE SERIÁLOVÁ KNIHOVNA","LIVE TELEVISION":"ŽIVÁ TELEVIZE","PREFERENCES":"PŘEDVOLBY","DOWNLOAD MANAGER":"SPRÁVCE STAHOVÁNÍ","CONTENT SOURCE PLUGIN":"ZDROJ OBSAHU","NOW PLAYING":"PRÁVĚ SE PŘEHRÁVÁ","READY":"PŘIPRAVENO","LOADING":"NAČÍTÁNÍ","PLAYING":"PŘEHRÁVÁ SE","BUFFERING":"NAČÍTÁNÍ DAT","ERROR":"CHYBA","STOPPED":"ZASTAVENO","Sourbase INPUT CENTER":"CENTRUM VSTUPŮ SOURBASE","Sourbase MEDIA CENTER":"SOURBASE MEDIA CENTER","Sourbase LIBRARY":"KNIHOVNA SOURBASE","Sourbase Player":"PŘEHRÁVAČ SOURBASE","CONTINUE WATCHING":"POKRAČOVAT VE SLEDOVÁNÍ","LIVE":"ŽIVĚ","LOCAL PLAYER":"LOKÁLNÍ PŘEHRÁVAČ","LOCAL PLAYER · OFFLINE LIBRARY":"LOKÁLNÍ PŘEHRÁVAČ · OFFLINE KNIHOVNA","SEARCH RESULTS":"VÝSLEDKY VYHLEDÁVÁNÍ"};
   const SOURBASE_TRANSLATION_ENTRIES={
