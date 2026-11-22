@@ -2099,7 +2099,7 @@
           (item.rating?'<small>ČSFD '+esc(String(item.rating))+' %</small>':'')+'</span>'+
           '<span class="csfd-result-action">Vybrat</span></button>';
       }).join('');
-      $('#csfdSearchResults [data-csfd-id]').forEach(button=>button.addEventListener('click',()=>selectCSFDMatch(button.dataset.csfdId,items)));
+      $('#csfdSearchResults').querySelectorAll('[data-csfd-id]').forEach(button=>button.addEventListener('click',()=>selectCSFDMatch(button.dataset.csfdId,items)));
     } finally {
       button.disabled=false;
     }
@@ -2110,7 +2110,7 @@
     const kind=pending.kind,item=pending.item;
     const status=$('#csfdSearchStatus');
     status.textContent='Načítám detail z ČSFD…';
-    $('#csfdSearchResults [data-csfd-id]').forEach(button=>button.disabled=true);
+    $('#csfdSearchResults').querySelectorAll('[data-csfd-id]').forEach(button=>button.disabled=true);
     try {
       const detail=await csfdRequest('/api/csfd/movie/'+encodeURIComponent(id));
       const match=(results||[]).find(result=>String(result.id)===String(id))||{};
@@ -2144,7 +2144,7 @@
       toast('Metadata ČSFD byla připojena.');
     } catch(e) {
       status.textContent=e.message;
-      $('#csfdSearchResults [data-csfd-id]').forEach(button=>button.disabled=false);
+      $('#csfdSearchResults').querySelectorAll('[data-csfd-id]').forEach(button=>button.disabled=false);
     }
   }
   function renderHome() {
