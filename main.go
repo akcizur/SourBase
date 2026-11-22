@@ -856,7 +856,7 @@ func (a *appServer) fetchCSFDJSON(r *http.Request, creds privateCredentials, end
 	client := &http.Client{
 		Timeout: 25 * time.Second,
 		CheckRedirect: func(next *http.Request, via []*http.Request) error {
-			if len(via) >= 3 || !strings.EqualFold(next.URL.Hostname(), base.Hostname()) {
+			if len(via) >= 3 || next.URL.Scheme != base.Scheme || !strings.EqualFold(next.URL.Host, base.Host) {
 				return errors.New("ČSFD API přesměrovalo mimo lokální službu")
 			}
 			return nil
