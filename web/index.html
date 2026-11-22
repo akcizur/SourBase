@@ -1752,6 +1752,7 @@
     $('#homeHeroArt').innerHTML=cover?`<img src="${attr(cover)}" alt="" referrerpolicy="no-referrer" onerror="this.remove()">`:'<div class="hero-art-orbit orbit-one"></div><div class="hero-art-orbit orbit-two"></div><div class="hero-art-core"><span>S</span></div>';
     $('#homeChannelCount').textContent=state.channels.filter(c=>c.url).length||state.channels.length;
     $('#homeMovieCount').textContent=state.vod.length+(state.sktorrentItems||[]).filter(x=>x.kind==='movie').length;$('#homeSeriesCount').textContent=state.series.length+(state.sktorrentItems||[]).filter(x=>x.kind==='series').length;
+    const sections=[];
     const resumeEntries=(state.watchHistory||[])
       .filter(item=>item&&(item.url||item.localPath)&&Number(item.currentTime||0)>15&&(!Number(item.duration)||Number(item.currentTime||0)<Number(item.duration)-15))
       .slice().sort((a,b)=>Number(b.updatedAt||0)-Number(a.updatedAt||0)).slice(0,12);
@@ -1764,7 +1765,6 @@
       }).join('');
       sections.push(homeShelf('Pokračovat ve sledování','', '<div class="resume-row-track">'+resumeCards+'</div>', 'player'));
     }
-    const sections=[];
     const channels=visibleChannels.slice(0,12);
     if(channels.length) {
       const channelTiles=channels.map(ch=>`<button class="home-channel-card" data-home-channel="${attr(ch.id)}">${logoHTML(ch)}<span style="min-width:0"><span class="home-channel-name">${esc(ch.name)}</span><span class="home-channel-group">${esc(ch.group||'TV kanál')}</span></span></button>`).join('');
