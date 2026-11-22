@@ -233,25 +233,13 @@ fun LiveTvSection(modifier: Modifier = Modifier) {
         ) {
             SourceUrlField(
                 value = playlistUrl,
-                onValueChange = {
-                    playlistUrl = it
-                    if (it.isNotBlank() && playlistDocumentUri != null) {
-                        releasePersistedDocumentReadPermission(context, playlistDocumentUri)
-                        playlistDocumentUri = null
-                    }
-                },
+                onValueChange = { playlistUrl = it },
                 label = "M3U / M3U8 URL",
                 modifier = Modifier.weight(1f)
             )
             SourceUrlField(
                 value = xmltvUrl,
-                onValueChange = {
-                    xmltvUrl = it
-                    if (it.isNotBlank() && xmltvDocumentUri != null) {
-                        releasePersistedDocumentReadPermission(context, xmltvDocumentUri)
-                        xmltvDocumentUri = null
-                    }
-                },
+                onValueChange = { xmltvUrl = it },
                 label = "XMLTV EPG URL",
                 modifier = Modifier.weight(1f)
             )
@@ -283,26 +271,32 @@ fun LiveTvSection(modifier: Modifier = Modifier) {
         ) {
             Button(
                 onClick = {
-                    if (playlistUrl.isBlank() && playlistDocumentUri.isNullOrBlank()) {
-                        status = "Nejdříve zadejte URL M3U/M3U8 playlistu."
+                    val requestUrl = playlistUrl
+                    val requestDocumentUri = playlistDocumentUri
+                    if (requestUrl.isBlank() && requestDocumentUri.isNullOrBlank()) {
+                        status = "Nejdříve zadejte URL nebo vyberte M3U/M3U8 soubor."
                     } else {
                         scope.launch {
                             loadingPlaylist = true
                             status = "Načítám playlist…"
                             val result = runCatching {
-                                if (playlistUrl.isNotBlank()) {
-                                    repository.loadM3u(playlistUrl)
+                                if (requestUrl.isNotBlank()) {
+                                    repository.loadM3u(requestUrl)
                                 } else {
-                                    repository.loadM3u(context, Uri.parse(playlistDocumentUri))
+                                    repository.loadM3u(context, Uri.parse(requireNotNull(requestDocumentUri)))
                                 }
                             }
                             result.onSuccess { parsed ->
                                 channels = parsed.channels
                                 selectedChannel = null
                                 playingError = null
+                                if (requestUrl.isNotBlank() && playlistDocumentUri != null) {
+                                    releasePersistedDocumentReadPermission(context, playlistDocumentUri)
+                                    playlistDocumentUri = null
+                                }
                                 persistSourceUrls(
                                     store = sourceStore,
-                                    playlistUrl = playlistUrl,
+                                    playlistUrl = requestUrl,
                                     xmltvUrl = xmltvUrl,
                                     playlistUri = playlistDocumentUri,
                                     xmltvUri = xmltvDocumentUri,
@@ -341,25 +335,31 @@ fun LiveTvSection(modifier: Modifier = Modifier) {
 
             Button(
                 onClick = {
-                    if (xmltvUrl.isBlank() && xmltvDocumentUri.isNullOrBlank()) {
+                    val requestUrl = xmltvUrl
+                    val requestDocumentUri = xmltvDocumentUri
+                    if (requestUrl.isBlank() && requestDocumentUri.isNullOrBlank()) {
                         status = "Nejdříve zadejte URL nebo vyberte XMLTV soubor."
                     } else {
                         scope.launch {
                             loadingGuide = true
                             status = "Načítám EPG…"
                             val result = runCatching {
-                                if (xmltvUrl.isNotBlank()) {
-                                    repository.loadXmltv(xmltvUrl)
+                                if (requestUrl.isNotBlank()) {
+                                    repository.loadXmltv(requestUrl)
                                 } else {
-                                    repository.loadXmltv(context, Uri.parse(xmltvDocumentUri))
+                                    repository.loadXmltv(context, Uri.parse(requireNotNull(requestDocumentUri)))
                                 }
                             }
                             result.onSuccess { parsed ->
                                 guide = parsed
+                                if (requestUrl.isNotBlank() && xmltvDocumentUri != null) {
+                                    releasePersistedDocumentReadPermission(context, xmltvDocumentUri)
+                                    xmltvDocumentUri = null
+                                }
                                 persistSourceUrls(
                                     store = sourceStore,
                                     playlistUrl = playlistUrl,
-                                    xmltvUrl = xmltvUrl,
+                                    xmltvUrl = requestUrl,
                                     playlistUri = playlistDocumentUri,
                                     xmltvUri = xmltvDocumentUri,
                                     canPersist = !sourceReadError,
