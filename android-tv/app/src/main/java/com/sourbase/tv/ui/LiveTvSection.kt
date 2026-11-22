@@ -228,6 +228,36 @@ fun LiveTvSection(modifier: Modifier = Modifier) {
                 }
             }
 
+            if ((playlistUrl.isNotBlank() || xmltvUrl.isNotBlank()) && !sourceReadError) {
+                Button(
+                    onClick = {
+                        scope.launch {
+                            val cleared = runCatching {
+                                withContext(Dispatchers.IO) { sourceStore.clear() }
+                            }
+                            cleared.onSuccess {
+                                playerEngine.stop()
+                                playlistUrl = ""
+                                xmltvUrl = ""
+                                channels = emptyList()
+                                guide = null
+                                selectedChannel = null
+                                playingError = null
+                                showEpgGrid = false
+                                sourceStorageError = false
+                                status = "Uložené zdroje, kanály a EPG byly odebrány."
+                            }.onFailure {
+                                sourceStorageError = true
+                                status = "Uložené zdroje se nepodařilo bezpečně odebrat."
+                            }
+                        }
+                    },
+                    enabled = sourcesReady && !loadingPlaylist && !loadingGuide
+                ) {
+                    Text("Odebrat zdroje")
+                }
+            }
+
             Spacer(Modifier.weight(1f))
             Text(
                 text = "${channels.size} kanálů",
