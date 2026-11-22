@@ -982,33 +982,122 @@
       .main { padding-left:30px; padding-right:30px; }
     }
 
+  
+    /* One navigation only — the media wall uses a single top menu on every screen. */
+    .app { display:block !important; min-height:100vh; }
+    .main { display:block; width:100%; max-width:none; margin:0; padding:0 30px 58px; }
+    .rail { display:none !important; }
+    .topbar {
+      position:sticky;
+      top:0;
+      z-index:35;
+      width:100%;
+      margin:0;
+      padding:0;
+      gap:20px;
+      display:flex;
+      flex-wrap:nowrap;
+    }
+    .topnav {
+      display:flex !important;
+      flex:1 1 auto;
+      min-width:0;
+      align-items:center;
+      gap:3px;
+      margin:0;
+      overflow:visible;
+    }
+    .nav-link { white-space:nowrap; }
+    .nav-more { position:relative; flex:none; }
+    .nav-more summary {
+      list-style:none;
+      display:flex;
+      align-items:center;
+      height:36px;
+      padding:0 13px;
+      border-radius:9px;
+      color:#878995;
+      font-size:12px;
+      font-weight:600;
+      cursor:pointer;
+      white-space:nowrap;
+    }
+    .nav-more summary::-webkit-details-marker { display:none; }
+    .nav-more summary:after { content:""; width:6px; height:6px; margin:0 0 3px 9px; border-right:1.5px solid currentColor; border-bottom:1.5px solid currentColor; transform:rotate(45deg); }
+    .nav-more[open] summary,.nav-more summary:hover { background:rgba(255,255,255,.055); color:#f4f2ff; }
+    .nav-more-menu {
+      position:absolute;
+      top:calc(100% + 9px);
+      left:0;
+      z-index:60;
+      display:grid;
+      min-width:174px;
+      padding:6px;
+      gap:2px;
+      border:1px solid rgba(255,255,255,.09);
+      border-radius:10px;
+      background:#1b1c24;
+      box-shadow:0 16px 40px rgba(0,0,0,.3);
+    }
+    .nav-more-menu button {
+      width:100%;
+      padding:10px 11px;
+      border:0;
+      border-radius:7px;
+      background:transparent;
+      color:#c7c7d0;
+      text-align:left;
+      font-size:12px;
+      cursor:pointer;
+    }
+    .nav-more-menu button:hover,.nav-more-menu button.active { background:rgba(255,255,255,.07); color:#fff; }
+    html[data-theme="light"] .nav-more summary { color:#697184; }
+    html[data-theme="light"] .nav-more summary:hover,html[data-theme="light"] .nav-more[open] summary { color:#202334; background:rgba(35,39,58,.07); }
+    html[data-theme="light"] .nav-more-menu { background:#fff; border-color:rgba(25,31,48,.13); box-shadow:0 16px 40px rgba(20,28,48,.15); }
+    html[data-theme="light"] .nav-more-menu button { color:#424b5d; }
+    html[data-theme="light"] .nav-more-menu button:hover,html[data-theme="light"] .nav-more-menu button.active { background:#edf0f7; color:#202334; }
+    @media(max-width:1050px) {
+      .main { padding-left:24px; padding-right:24px; }
+      .topbar { gap:12px; }
+      .nav-link,.nav-more summary { padding-left:9px; padding-right:9px; }
+    }
+    @media(max-width:760px) {
+      .main { padding:0 14px 88px; }
+      .topbar { height:auto; min-height:62px; gap:8px; }
+      .wordmark { font-size:10px; letter-spacing:1.3px; }
+      .topnav {
+        flex:1 1 100%;
+        gap:1px;
+        overflow-x:auto;
+        overflow-y:visible;
+        scrollbar-width:none;
+        white-space:nowrap;
+      }
+      .topnav::-webkit-scrollbar { display:none; }
+      .nav-link,.nav-more summary { height:35px; padding:0 8px; font-size:10px; }
+      .nav-more-menu { position:fixed; top:auto; left:auto; right:14px; margin-top:0; }
+      .top-actions { gap:5px; }
+      .search { width:min(175px,30vw); height:35px; }
+      #refreshBtn { display:none; }
+      #addPlaylistBtn { width:35px; min-width:35px; padding:0; font-size:0; }
+      #addPlaylistBtn svg { width:16px; height:16px; }
+    }
+    @media(max-width:480px) {
+      .wordmark { display:none; }
+      .topbar { gap:5px; }
+      .topnav { min-width:0; }
+      .nav-link,.nav-more summary { padding:0 7px; font-size:9px; }
+      .search { width:clamp(88px,25vw,120px); }
+    }
+
   </style>
 </head>
 <body>
 <div class="app">
-  <aside class="rail" aria-label="Hlavní navigace">
-    <button class="brand" data-page="home" title="Sourbase Home" aria-label="Domů"><span>S</span></button>
-    <div class="rail-menu">
-      <div class="rail-section-label">MENU</div>
-      <button class="rail-btn active" data-page="home" data-label="Domů" title="Domů"><svg viewBox="0 0 24 24"><path d="m3 10 9-7 9 7v10a1 1 0 0 1-1 1h-5v-7H9v7H4a1 1 0 0 1-1-1z"/></svg><span>Domů</span></button>
-      <button class="rail-btn" data-page="player" data-label="Přehrávač" title="Přehrávač"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="m10 8 6 4-6 4z"/></svg><span>Přehrávač</span></button>
-      <button class="rail-btn" data-page="movies" data-label="Objevit" title="Objevit"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4M11 7v8m-4-4h8"/></svg><span>Objevit</span></button>
-      <button class="rail-btn" data-page="favorites" data-label="Knihovna" title="Knihovna"><svg viewBox="0 0 24 24"><path d="M5 4.5A2.5 2.5 0 0 1 7.5 2H20v18H7.5A2.5 2.5 0 0 1 5 17.5z"/><path d="M5 5v13M9 7h7M9 11h7"/></svg><span>Knihovna</span></button>
-      <div class="rail-separator"></div>
-      <div class="rail-section-label">TELEVIZE</div>
-      <button class="rail-btn" data-page="guide" data-label="TV program" title="TV program"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="15" rx="2"/><path d="M8 22h8M12 19v3M10 9l5 3-5 3z"/></svg><span>TV program</span></button>
-      <button class="rail-btn" data-page="channels" data-label="Kanály" title="Kanály"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M7 8h10M7 12h4M7 16h7"/></svg><span>Kanály</span></button>
-      <button class="rail-btn" data-page="series" data-label="Seriály" title="Seriály"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="m10 8 6 4-6 4z"/></svg><span>Seriály</span></button>
-      <button class="rail-btn" data-page="sktorrent" data-label="SKTorrent" title="SKTorrent"><svg viewBox="0 0 24 24"><path d="M8 5.5 5.5 8a5 5 0 0 0 7.1 7.1l2-2M16 18.5l2.5-2.5a5 5 0 0 0-7.1-7.1l-2 2"/><path d="m9 15 6-6"/></svg><span>SKTorrent</span></button>
-    </div>
-    <div class="rail-spacer"></div>
-    <button class="rail-btn" data-page="settings" data-label="Nastavení" title="Nastavení"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="m19.4 15 .1.1 1.1 1.8-1.8 3.1-2.1-.5a8 8 0 0 1-1.7 1l-.5 2.1h-3.6l-.5-2.1a8 8 0 0 1-1.7-1l-2.1.5-1.8-3.1 1.1-1.8a8 8 0 0 1 0-2l-1.1-1.8 1.8-3.1 2.1.5a8 8 0 0 1 1.7-1l.5-2.1h3.6l.5 2.1a8 8 0 0 1 1.7 1l2.1-.5 1.8 3.1-1.1 1.8a8 8 0 0 1 0 2z" transform="translate(-1 -1) scale(1.08)"/></svg><span>Nastavení</span></button>
-    <div class="rail-user" title="Lokální profil">A+</div>
-  </aside>
   <main class="main">
     <header class="topbar">
       <div class="wordmark">Sourbase</div>
-      <nav class="topnav" aria-label="Obsah"><button class="nav-link active" data-page="home">Domů</button><button class="nav-link" data-page="movies">Filmy</button><button class="nav-link" data-page="series">Seriály</button><button class="nav-link" data-page="favorites">Knihovna</button><button class="nav-link" data-page="guide">Live TV</button></nav>
+      <nav class="topnav" aria-label="Obsah"><button class="nav-link active" data-page="home">Domů</button><button class="nav-link" data-page="guide">Live TV</button><button class="nav-link" data-page="movies">Filmy</button><button class="nav-link" data-page="series">Seriály</button><button class="nav-link" data-page="favorites">Knihovna</button><details class="nav-more"><summary>Více</summary><div class="nav-more-menu"><button type="button" data-page="player">Přehrávač</button><button type="button" data-page="channels">Kanály</button><button type="button" data-page="sktorrent">SKTorrent</button><button type="button" data-page="settings">Nastavení</button></div></details></nav>
       <div class="top-actions">
         <label class="search"><svg viewBox="0 0 24 24"><circle cx="10.8" cy="10.8" r="6.8"/><path d="m16 16 5 5"/></svg><input id="globalSearch" type="search" placeholder="Hledat filmy, seriály, kanály…" autocomplete="off"></label>
         <button class="icon-btn preference-toggle language-toggle" id="languageToggle" title="Switch language to English" aria-label="Switch language to English">EN</button>
@@ -2273,7 +2362,8 @@
 
   function bindEvents() {
     bindSourbasePreferences();
-    $$('[data-page]').forEach(b=>b.addEventListener('click',()=>navigate(b.dataset.page)));
+    $('[data-page]').forEach(b=>b.addEventListener('click',()=>navigate(b.dataset.page)));
+    $('.nav-more-menu [data-page]').forEach(b=>b.addEventListener('click',()=>{const menu=b.closest('.nav-more');if(menu)menu.open=false;}));
     $('#addPlaylistBtn').addEventListener('click',()=>openModal('sourceHubModal'));$('#managePlaylistBtn').addEventListener('click',()=>openModal('sourceHubModal'));$('#addEpgBtn').addEventListener('click',()=>openModal('epgModal'));$('[data-source-action]').forEach(b=>b.addEventListener('click',()=>openSourceInput(b.dataset.sourceAction)));
     $$('[data-close]').forEach(b=>b.addEventListener('click',()=>closeModal(b.dataset.close)));
     $$('.modal-backdrop').forEach(m=>m.addEventListener('click',e=>{if(e.target===m)m.classList.remove('open');}));
