@@ -1800,14 +1800,14 @@
   let privateCredentialsLastSaved='',privateCredentialsWarningShown=false;
   async function persistPrivateCredentials() {
     if(!IS_LOCAL_APP)return;
-    const body=JSON.stringify({xtreamPass:state.xtreamPass||'',sktorrentFeedUrl:state.sktorrentFeedUrl||''});
+    const body=JSON.stringify({xtreamPass:state.xtreamPass||'',sktorrentFeedUrl:state.sktorrentFeedUrl||'',csfdBaseUrl:state.csfdServerUrl||'http://127.0.0.1:3000',csfdApiKey:state.csfdApiKey||''});
     if(body===privateCredentialsLastSaved)return;
     const response=await fetch(`/api/credentials?token=${encodeURIComponent(APP_TOKEN)}`,{method:'POST',headers:{'Content-Type':'application/json'},body});
     if(!response.ok)throw new Error('Secure credential storage unavailable');
     privateCredentialsLastSaved=body;
   }
   function saveState() {
-    const payload={channels:state.channels,programs:Object.fromEntries(Object.entries(state.programs).map(([k,v])=>[k,v.map(p=>({...p,start:p.start.toISOString(),stop:p.stop.toISOString()}))])),favorites:state.favorites,playlistName:state.playlistName,playlistUrl:state.playlistUrl,epgName:state.epgName,autoplay:state.autoplay,demo:state.demo,vod:state.vod,series:state.series,movieCategories:state.movieCategories,seriesCategories:state.seriesCategories,xtreamBase:state.xtreamBase,xtreamUser:state.xtreamUser,playlists:state.playlists,currentPlaylistId:state.currentPlaylistId,sktorrentSourceName:state.sktorrentSourceName,sktorrentItems:state.sktorrentItems,sktorrentSaved:state.sktorrentSaved,sktorrentSavedItems:state.sktorrentSavedItems,sktorrentUpdatedAt:state.sktorrentUpdatedAt,savedCatalog:state.savedCatalog,localLibrary:state.localLibrary,watchHistory:state.watchHistory,savedAt:Date.now(),waveSchemaVersion:2};
+    const payload={channels:state.channels,programs:Object.fromEntries(Object.entries(state.programs).map(([k,v])=>[k,v.map(p=>({...p,start:p.start.toISOString(),stop:p.stop.toISOString()}))])),favorites:state.favorites,playlistName:state.playlistName,playlistUrl:state.playlistUrl,epgName:state.epgName,autoplay:state.autoplay,demo:state.demo,vod:state.vod,series:state.series,movieCategories:state.movieCategories,seriesCategories:state.seriesCategories,xtreamBase:state.xtreamBase,xtreamUser:state.xtreamUser,playlists:state.playlists,currentPlaylistId:state.currentPlaylistId,sktorrentSourceName:state.sktorrentSourceName,sktorrentItems:state.sktorrentItems,sktorrentSaved:state.sktorrentSaved,sktorrentSavedItems:state.sktorrentSavedItems,sktorrentUpdatedAt:state.sktorrentUpdatedAt,savedCatalog:state.savedCatalog,localLibrary:state.localLibrary,watchHistory:state.watchHistory,csfdMetadata:state.csfdMetadata||{},savedAt:Date.now(),waveSchemaVersion:2};
     state.savedAt=payload.savedAt;
     if(!IS_LOCAL_APP){try{localStorage.setItem(STORAGE_KEY,JSON.stringify(payload));}catch(e){toast('Místní úložiště je plné. Playlist se nemusí uložit.');}}
     if(IS_LOCAL_APP){clearTimeout(window.__waveSaveTimer);window.__waveSaveTimer=setTimeout(async()=>{try{await persistPrivateCredentials();const response=await fetch(`/api/state?token=${encodeURIComponent(APP_TOKEN)}`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});if(!response.ok)throw new Error('State storage failed');localStorage.removeItem(STORAGE_KEY);}catch(e){if(!privateCredentialsWarningShown){privateCredentialsWarningShown=true;toast('Lokální knihovnu nebo přihlašovací údaje se nepodařilo bezpečně uložit.');}}},350);}
@@ -1815,7 +1815,7 @@
   function loadState() {
     try {
       const data=JSON.parse(localStorage.getItem(STORAGE_KEY)||'null');if(!data||!data.channels?.length)return false;
-      state.channels=data.channels;state.programs={};for(const [k,v] of Object.entries(data.programs||{}))state.programs[k]=v.map(p=>({...p,start:new Date(p.start),stop:new Date(p.stop)}));state.favorites=data.favorites||[];state.playlistName=data.playlistName||'Můj playlist';state.playlistUrl=data.playlistUrl||'';state.epgName=data.epgName||'EPG';state.autoplay=data.autoplay!==false;state.demo=!!data.demo;state.vod=data.vod||[];state.series=data.series||[];state.movieCategories=data.movieCategories||[];state.seriesCategories=data.seriesCategories||[];state.xtreamBase=data.xtreamBase||'';state.xtreamUser=data.xtreamUser||'';state.xtreamPass=data.xtreamPass||'';state.playlists=data.playlists||[];state.currentPlaylistId=data.currentPlaylistId||'';state.sktorrentFeedUrl=data.sktorrentFeedUrl||'';state.sktorrentSourceName=data.sktorrentSourceName||'';state.sktorrentItems=data.sktorrentItems||[];state.sktorrentSaved=data.sktorrentSaved||[];state.sktorrentSavedItems=data.sktorrentSavedItems||[];state.sktorrentUpdatedAt=data.sktorrentUpdatedAt||0;state.savedCatalog=data.savedCatalog||[];state.localLibrary=data.localLibrary||[];state.watchHistory=data.watchHistory||[];state.savedAt=data.savedAt||0;
+      state.channels=data.channels;state.programs={};for(const [k,v] of Object.entries(data.programs||{}))state.programs[k]=v.map(p=>({...p,start:new Date(p.start),stop:new Date(p.stop)}));state.favorites=data.favorites||[];state.playlistName=data.playlistName||'Můj playlist';state.playlistUrl=data.playlistUrl||'';state.epgName=data.epgName||'EPG';state.autoplay=data.autoplay!==false;state.demo=!!data.demo;state.vod=data.vod||[];state.series=data.series||[];state.movieCategories=data.movieCategories||[];state.seriesCategories=data.seriesCategories||[];state.xtreamBase=data.xtreamBase||'';state.xtreamUser=data.xtreamUser||'';state.xtreamPass=data.xtreamPass||'';state.playlists=data.playlists||[];state.currentPlaylistId=data.currentPlaylistId||'';state.sktorrentFeedUrl=data.sktorrentFeedUrl||'';state.sktorrentSourceName=data.sktorrentSourceName||'';state.sktorrentItems=data.sktorrentItems||[];state.sktorrentSaved=data.sktorrentSaved||[];state.sktorrentSavedItems=data.sktorrentSavedItems||[];state.sktorrentUpdatedAt=data.sktorrentUpdatedAt||0;state.savedCatalog=data.savedCatalog||[];state.localLibrary=data.localLibrary||[];state.watchHistory=data.watchHistory||[];state.csfdMetadata=data.csfdMetadata||{};state.savedAt=data.savedAt||0;
       // One-time browser-storage migration: the desktop app transfers legacy
       // values to DPAPI storage after the protected state has been restored.
       if(data.xtreamPass||data.sktorrentFeedUrl){const clean={...data};delete clean.xtreamPass;delete clean.sktorrentFeedUrl;if(!IS_LOCAL_APP){try{localStorage.setItem(STORAGE_KEY,JSON.stringify(clean));}catch(e){}}}
@@ -1954,6 +1954,132 @@
     }
     if(!url){toast('Tento záznam už nemá dostupnou stream adresu.');return;}
     playMedia(url,item.title,item.caption,{kind:item.kind||'history',cover:item.cover||'',localPath:item.localPath||'',resumeTime:item.currentTime||0});
+  }
+  let csfdPendingMatch=null;
+  function csfdRequireDesktop() {
+    if(!IS_LOCAL_APP)throw new Error('ČSFD konektor je dostupný v desktopové aplikaci Sourbase.');
+  }
+  async function csfdRequest(path) {
+    csfdRequireDesktop();
+    const separator=path.includes('?')?'&':'?';
+    const response=await fetch(path+separator+'token='+encodeURIComponent(APP_TOKEN),{headers:{'Accept':'application/json'}});
+    let data=null;
+    try{data=await response.json();}catch(e){}
+    if(!response.ok)throw new Error(data?.error||('ČSFD API: HTTP '+response.status));
+    return data;
+  }
+  async function saveCsfdConfig() {
+    csfdRequireDesktop();
+    const url=$('#csfdServerUrl').value.trim().replace(/\/+$/,'');
+    const key=$('#csfdApiKey').value;
+    const body={xtreamPass:state.xtreamPass||'',sktorrentFeedUrl:state.sktorrentFeedUrl||'',csfdBaseUrl:url,csfdApiKey:key};
+    const response=await fetch('/api/credentials?token='+encodeURIComponent(APP_TOKEN),{
+      method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)
+    });
+    let data={};try{data=await response.json();}catch(e){}
+    if(!response.ok)throw new Error(data.error||'ČSFD nastavení se nepodařilo uložit.');
+    state.csfdServerUrl=url;
+    state.csfdApiKey=key;
+    return true;
+  }
+  async function testCsfdConnection() {
+    const status=$('#csfdStatus');
+    status.textContent='Ověřuji spojení…';
+    try {
+      await saveCsfdConfig();
+      const result=await csfdRequest('/api/csfd/search?q=Matrix');
+      const count=(result?.movies||[]).length+(result?.tvSeries||[]).length;
+      status.textContent=count?'Připojeno · '+count+' výsledků':'Připojeno · API odpovídá';
+      toast('ČSFD konektor odpovídá.');
+    } catch(e) {
+      status.textContent='Nepřipojeno';
+      toast(e.message);
+    }
+  }
+  function csfdResultItems(data) {
+    if(Array.isArray(data))return data;
+    return [...(Array.isArray(data?.movies)?data.movies:[]),...(Array.isArray(data?.tvSeries)?data.tvSeries:[])];
+  }
+  function openCsfdMatch() {
+    if(!selectedCatalog)return;
+    csfdPendingMatch={kind:selectedCatalog.kind,item:selectedCatalog.item};
+    const title=safeMediaTitle(selectedCatalog.item);
+    const year=selectedCatalog.item.year||selectedCatalog.item.releaseDate||'';
+    $('#csfdSearchQuery').value=title+(year?' '+year:'');
+    $('#csfdSearchResults').innerHTML='';
+    $('#csfdSearchStatus').textContent='';
+    closeModal('contentModal');
+    openModal('csfdMatchModal');
+    searchCSFD().catch(e=>$('#csfdSearchStatus').textContent=e.message);
+  }
+  async function searchCSFD() {
+    const query=$('#csfdSearchQuery').value.trim();
+    if(query.length<2){$('#csfdSearchStatus').textContent='Zadejte alespoň dva znaky.';return;}
+    const button=$('#csfdSearchButton');
+    button.disabled=true;
+    $('#csfdSearchStatus').textContent='Hledám na ČSFD…';
+    $('#csfdSearchResults').innerHTML='';
+    try {
+      const data=await csfdRequest('/api/csfd/search?q='+encodeURIComponent(query));
+      const items=csfdResultItems(data).slice(0,20);
+      if(!items.length){$('#csfdSearchStatus').textContent='Na ČSFD nebyl nalezen žádný odpovídající titul.';return;}
+      $('#csfdSearchStatus').textContent='Nalezeno '+items.length+' výsledků. Vyberte správnou verzi.';
+      $('#csfdSearchResults').innerHTML=items.map(item=>{
+        const poster=item.poster||item.photo||'';
+        const title=item.title||item.name||'Bez názvu';
+        const image=poster
+          ?'<img loading="lazy" src="'+attr(poster.startsWith('//')?'https:'+poster:poster)+'" alt="" onerror="this.remove()">'
+          :'<span class="csfd-result-fallback">Č</span>';
+        return '<button class="csfd-result-card" data-csfd-id="'+attr(item.id)+'">'+
+          '<span class="csfd-result-poster">'+image+'</span>'+
+          '<span class="csfd-result-copy"><strong>'+esc(title)+'</strong>'+
+          '<small>'+esc(String(item.year||''))+(item.type?' · '+esc(String(item.type)):'')+'</small>'+
+          (item.rating?'<small>ČSFD '+esc(String(item.rating))+' %</small>':'')+'</span>'+
+          '<span class="csfd-result-action">Vybrat</span></button>';
+      }).join('');
+      $('#csfdSearchResults [data-csfd-id]').forEach(button=>button.addEventListener('click',()=>selectCSFDMatch(button.dataset.csfdId,items)));
+    } finally {
+      button.disabled=false;
+    }
+  }
+  async function selectCSFDMatch(id,results) {
+    if(!csfdPendingMatch||!/^[0-9]{1,12}$/.test(String(id)))return;
+    const pending=csfdPendingMatch;
+    const kind=pending.kind,item=pending.item;
+    const status=$('#csfdSearchStatus');
+    status.textContent='Načítám detail z ČSFD…';
+    $('#csfdSearchResults [data-csfd-id]').forEach(button=>button.disabled=true);
+    try {
+      const detail=await csfdRequest('/api/csfd/movie/'+encodeURIComponent(id));
+      const match=(results||[]).find(result=>String(result.id)===String(id))||{};
+      const poster=detail.poster||detail.photo||match.poster||match.photo||'';
+      const linked={
+        csfdId:String(detail.id||id),
+        title:detail.title||match.title||safeMediaTitle(item),
+        year:Number(detail.year||match.year||0)||null,
+        rating:Number(detail.rating??match.rating??0)||null,
+        ratingCount:Number(detail.ratingCount||0)||null,
+        url:detail.url||match.url||('https://www.csfd.cz/film/'+id+'/'),
+        poster:poster?(poster.startsWith('//')?'https:'+poster:poster):'',
+        genres:Array.isArray(detail.genres)?detail.genres:[],
+        origins:Array.isArray(detail.origins)?detail.origins:[],
+        description:Array.isArray(detail.descriptions)?detail.descriptions[0]:(detail.description||detail.plot||''),
+        directors:(detail.creators?.directors||[]).slice(0,5).map(x=>x.name).filter(Boolean),
+        actors:(detail.creators?.actors||[]).slice(0,8).map(x=>x.name).filter(Boolean)
+      };
+      state.csfdMetadata=state.csfdMetadata||{};
+      state.csfdMetadata[kind+':'+item.id]=linked;
+      saveState();
+      closeModal('csfdMatchModal');
+      csfdPendingMatch=null;
+      if(kind==='movie')renderMovies();else renderSeries();
+      renderHome();
+      openContentDetails(kind,item.id);
+      toast('Metadata ČSFD byla připojena.');
+    } catch(e) {
+      status.textContent=e.message;
+      $('#csfdSearchResults [data-csfd-id]').forEach(button=>button.disabled=false);
+    }
   }
   function renderHome() {
     const query=$('#globalSearch').value.trim().toLowerCase();
@@ -2531,6 +2657,7 @@
     $$('[data-close]').forEach(b=>b.addEventListener('click',()=>closeModal(b.dataset.close)));
     $$('.modal-backdrop').forEach(m=>m.addEventListener('click',e=>{if(e.target===m)m.classList.remove('open');}));
     $$('.modal-tab').forEach(b=>b.addEventListener('click',()=>{const modal=b.closest('.modal');$$('.modal-tab',modal).forEach(x=>x.classList.remove('active'));b.classList.add('active');if(b.dataset.mode){$('#playlistUrlMode').style.display=b.dataset.mode==='url'?'block':'none';$('#playlistFileMode').style.display=b.dataset.mode==='file'?'block':'none';$('#playlistXtreamMode').style.display=b.dataset.mode==='xtream'?'block':'none';}else{const mode=b.dataset.epgmode;$('#epgUrlMode').style.display=mode==='url'?'block':'none';$('#epgFileMode').style.display=mode==='file'?'block':'none';}}));
+    $('#contentModalCsfdMatch').addEventListener('click',openCsfdMatch);$('#csfdSearchButton').addEventListener('click',()=>searchCSFD().catch(e=>$('#csfdSearchStatus').textContent=e.message));$('#csfdSearchQuery').addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();searchCSFD().catch(err=>$('#csfdSearchStatus').textContent=err.message);}});$('#csfdSaveButton').addEventListener('click',()=>saveCsfdConfig().then(()=>toast('Nastavení ČSFD bylo uloženo.')).catch(e=>toast(e.message)));$('#csfdTestButton').addEventListener('click',testCsfdConnection);
     $('#contentModalPlay').addEventListener('click',()=>{if(!selectedCatalog)return;const {kind,item}=selectedCatalog;closeModal('contentModal');if(kind==='movie'){playMedia(item.url,safeMediaTitle(item),item.category||'Film',{kind:'movie',cover:mediaCover(item),saveKind:kind,saveItem:item});}else openSeries(item.id);});$('#contentModalSave').addEventListener('click',()=>{if(selectedCatalog)toggleCatalogSave(selectedCatalog.kind,selectedCatalog.item);});$('#playerLibraryToggle').addEventListener('click',()=>{const m=state.activeMediaMeta;if(m?.saveItem){toggleCatalogSave(m.saveKind||m.kind,m.saveItem);}else toast('Tento zdroj nelze uložit jako katalogový titul.');});
     $('#loadPlaylistBtn').addEventListener('click',loadPlaylist);$('#activatePlaylistBtn').addEventListener('click',activateSavedPlaylist);$('#deletePlaylistBtn').addEventListener('click',removeSavedPlaylist);$('#loadEpgBtn').addEventListener('click',loadEpg);$('#externalPlayer').addEventListener('click',openExternalPlayer);$('#playerPickLocal').addEventListener('click',addLocalMedia);$('#libraryAddLocal').addEventListener('click',addLocalMedia);$('#miniPlayerOpen').addEventListener('click',()=>navigate('player'));$('#miniPlayerStop').addEventListener('click',stopPlayer);$('#quitApp')?.addEventListener('click',()=>{if(IS_LOCAL_APP)fetch(`/api/quit?token=${encodeURIComponent(APP_TOKEN)}`,{method:'POST'}).then(()=>window.close());});$$('.library-tab').forEach(b=>b.addEventListener('click',()=>{$$('.library-tab').forEach(x=>x.classList.remove('active'));b.classList.add('active');state.libraryFilter=b.dataset.libraryFilter;renderLibraryView();}));$('#movieCategory').addEventListener('change',renderMovies);$('#seriesCategory').addEventListener('change',renderSeries);$('#sktorrentLoadBtn').addEventListener('click',()=>loadSktorrentFeed().catch(e=>toast(e.message)));$('#sktorrentImportBtn').addEventListener('click',()=>$('#sktorrentFile').click());$('#sktorrentDemoBtn').addEventListener('click',()=>loadSktorrentDemo().catch(e=>toast(e.message)));$('#sktorrentFile').addEventListener('change',e=>importSktorrentFile(e.target.files[0]).catch(err=>toast(err.message)));$('#sktorrentDetailTracker').addEventListener('click',()=>{if(selectedSktorrentItem?.link)openSktorrentSystemLink(selectedSktorrentItem.link);});$('#sktorrentDetailSave').addEventListener('click',()=>{if(selectedSktorrentItem)toggleSktorrentSaved(selectedSktorrentItem);});$('#sktorrentDetailTorrent').addEventListener('click',()=>{if(selectedSktorrentItem?.downloadUrl)openSktorrentTorrent(selectedSktorrentItem.downloadUrl);});$('#sktorrentDetailPlay').addEventListener('click',()=>{closeModal('sktorrentDetailModal');playSktorrentLocalFile();});$$('.sk-filter').forEach(b=>b.addEventListener('click',()=>{state.sktorrentFilter=b.dataset.skfilter;renderSktorrent();}));$('#sktorrentSort').addEventListener('change',e=>{state.sktorrentSort=e.target.value;renderSktorrent();});$('#sktorrentSetupBtn')?.addEventListener('click',openSktorrentSetup);$('#qbtConnectBtn')?.addEventListener('click',connectQbt);$('#qbtDisconnectBtn')?.addEventListener('click',disconnectQbt);$('#qbtRefreshBtn')?.addEventListener('click',()=>refreshQbtTasks());$('#qbtTasks')?.addEventListener('click',e=>{const play=e.target.closest('[data-qbt-play]');if(play){qbtPlayTorrent(play.dataset.qbtPlay);return;}const btn=e.target.closest('[data-qbt-action]');if(btn)qbtTorrentAction(btn.dataset.qbtHash,btn.dataset.qbtAction);});
     $$('.guide-tab').forEach(b=>b.addEventListener('click',()=>{$$('.guide-tab').forEach(x=>x.classList.remove('active'));b.classList.add('active');state.guideFilter=b.dataset.filter;renderGuide();}));
@@ -2538,7 +2665,7 @@
     $('#globalSearch').addEventListener('input',()=>{renderGuide();if(state.currentPage==='home')renderHome();if(state.currentPage==='channels'||state.currentPage==='favorites')renderChannelLibrary();if(state.currentPage==='player')renderPlayerHistory();if(state.currentPage==='movies')renderMovies();if(state.currentPage==='series')renderSeries();if(state.currentPage==='sktorrent')renderSktorrent();});
     $('#playSelected').addEventListener('click',()=>{const ch=state.channels.find(c=>c.id===state.selectedChannel)||state.channels.find(c=>c.url);if(ch)playChannel(ch);else toast('Nejprve vyberte kanál.');});$('#stopPlayer').addEventListener('click',stopPlayer);
     $('#autoplayToggle').addEventListener('click',()=>{state.autoplay=!state.autoplay;$('#autoplayToggle').classList.toggle('on',state.autoplay);saveState();});
-    $('#clearDataBtn').addEventListener('click',()=>{if(confirm(translateText('Opravdu odstranit všechny lokálně uložené playlisty, EPG a oblíbené kanály?'))){localStorage.removeItem(STORAGE_KEY);clearTimeout(window.__waveSaveTimer);if(IS_LOCAL_APP)fetch(`/api/state?token=${encodeURIComponent(APP_TOKEN)}`,{method:'DELETE'}).catch(()=>{});stopPlayer();state.favorites=[];state.vod=[];state.series=[];state.movieCategories=[];state.seriesCategories=[];state.xtreamBase='';state.xtreamUser='';state.xtreamPass='';state.sktorrentFeedUrl='';state.sktorrentSourceName='';state.sktorrentItems=[];state.sktorrentSaved=[];state.sktorrentSavedItems=[];state.sktorrentUpdatedAt=0;state.savedCatalog=[];state.localLibrary=[];state.watchHistory=[];state.activeMediaUrl='';state.programs={};state.savedAt=0;state.playlists=[];state.currentPlaylistId='';setDemoChannels();renderAll();toast('Lokální data byla vymazána.');}});
+    $('#clearDataBtn').addEventListener('click',()=>{if(confirm(translateText('Opravdu odstranit všechny lokálně uložené playlisty, EPG a oblíbené kanály?'))){localStorage.removeItem(STORAGE_KEY);clearTimeout(window.__waveSaveTimer);if(IS_LOCAL_APP)fetch(`/api/state?token=${encodeURIComponent(APP_TOKEN)}`,{method:'DELETE'}).catch(()=>{});stopPlayer();state.favorites=[];state.vod=[];state.series=[];state.movieCategories=[];state.seriesCategories=[];state.xtreamBase='';state.xtreamUser='';state.xtreamPass='';state.sktorrentFeedUrl='';state.sktorrentSourceName='';state.sktorrentItems=[];state.sktorrentSaved=[];state.sktorrentSavedItems=[];state.sktorrentUpdatedAt=0;state.savedCatalog=[];state.localLibrary=[];state.watchHistory=[];state.csfdMetadata={};state.activeMediaUrl='';state.programs={};state.savedAt=0;state.playlists=[];state.currentPlaylistId='';setDemoChannels();renderAll();toast('Lokální data byla vymazána.');}});
     $('#video').addEventListener('pause',()=>{if(state.activeMediaUrl){const key=state.activeMediaMeta?.localPath||state.activeMediaUrl;const item=(state.watchHistory||[]).find(x=>x.key===key);if(item){item.currentTime=Number($('#video').currentTime||0);item.duration=Number($('#video').duration||0);item.updatedAt=Date.now();saveState();renderPlayerHistory();}}});
     document.addEventListener('keydown',e=>{if(e.altKey||e.ctrlKey||e.metaKey)return;if(['ArrowUp','ArrowDown','ArrowLeft','ArrowRight'].includes(e.key)&&!e.target.matches('input,textarea,select,video')&&focusSpatialTarget(e.key)){e.preventDefault();return;}if(e.target.matches('input,textarea,select'))return;const v=$('#video');if(e.key===' '&&state.currentPage==='player'){e.preventDefault();if(v.paused)v.play().catch(()=>{});else v.pause();}else if(e.key.toLowerCase()==='f'&&state.currentPage==='player'){if(document.fullscreenElement)document.exitFullscreen?.();else $('#videoWrap').requestFullscreen?.();}else if(e.key==='Escape'&&document.fullscreenElement)document.exitFullscreen?.();});
   }
@@ -2549,9 +2676,9 @@
         fetch(`/api/state?token=${encodeURIComponent(APP_TOKEN)}`),
         fetch(`/api/credentials?token=${encodeURIComponent(APP_TOKEN)}`).catch(()=>null)
       ]);
-      if(secretResponse?.ok){const secrets=await secretResponse.json();state.xtreamPass=secrets.xtreamPass||state.xtreamPass||'';state.sktorrentFeedUrl=secrets.sktorrentFeedUrl||state.sktorrentFeedUrl||'';}
+      if(secretResponse?.ok){const secrets=await secretResponse.json();state.xtreamPass=secrets.xtreamPass||state.xtreamPass||'';state.sktorrentFeedUrl=secrets.sktorrentFeedUrl||state.sktorrentFeedUrl||'';state.csfdServerUrl=secrets.csfdBaseUrl||state.csfdServerUrl||'http://127.0.0.1:3000';state.csfdApiKey=secrets.csfdApiKey||'';}
       if($('#xtreamPass'))$('#xtreamPass').value=state.xtreamPass||'';
-      if($('#sktorrentFeedUrl'))$('#sktorrentFeedUrl').value=state.sktorrentFeedUrl||'';
+      if($('#sktorrentFeedUrl'))$('#sktorrentFeedUrl').value=state.sktorrentFeedUrl||'';if($('#csfdServerUrl'))$('#csfdServerUrl').value=state.csfdServerUrl||'http://127.0.0.1:3000';if($('#csfdApiKey'))$('#csfdApiKey').value=state.csfdApiKey||'';
       if(!response.ok)return;
       const data=await response.json();if(!data?.channels?.length||Number(data.savedAt||0)<=Number(state.savedAt||0))return;
       state.channels=data.channels;state.programs={};for(const [k,v] of Object.entries(data.programs||{}))state.programs[k]=v.map(p=>({...p,start:new Date(p.start),stop:new Date(p.stop)}));
