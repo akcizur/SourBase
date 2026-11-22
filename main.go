@@ -100,6 +100,7 @@ func run() error {
 	mux.HandleFunc("/api/fetch", app.handleFetch)
 	mux.HandleFunc("/api/state", app.handleState)
 	mux.HandleFunc("/api/credentials", app.handleCredentials)
+	mux.HandleFunc("/api/csfd/status", app.handleCSFDStatus)
 	mux.HandleFunc("/api/csfd/search", app.handleCSFDSearch)
 	mux.HandleFunc("/api/csfd/movie/", app.handleCSFDMovie)
 	mux.HandleFunc("/api/open-player", app.handleOpenPlayer)
@@ -807,8 +808,12 @@ func validateCSFDServiceURL(raw string) (*url.URL, error) {
 func (a *appServer) waitForCSFDSlot(ctx context.Context) error {
 	a.csfdMu.Lock()
 	now := time.Now()
-	wait := time.Until(a.csfdNextRequest)
-	a.csfdNextRequest = now.Add(1200 * time.Millisecond)
+	slot := now
+	if a.csfdNextRequest.After(slot) {
+		slot = a.csfdNextRequest
+	}
+	a.csfdNextRequest = slot.Add(1200 * time.Millisecond)
+	wait := time.Until(slot)
 	a.csfdMu.Unlock()
 	if wait <= 0 {
 		return nil
@@ -904,6 +909,25 @@ func (a *appServer) csfdCredentials(w http.ResponseWriter, r *http.Request) (pri
 		return privateCredentials{}, false
 	}
 	return creds, true
+}
+
+func (a *appServer) handleCSFDStatus(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodGet || !a.authorized(r) {
+		http.Error(w, "unauthorized", http.StatusUnauthorized)
+		return
+	}
+	creds, ok := a.csfdCredentials(w, r)
+	if !ok {
+		return
+	}
+	body, status, err := a.fetchCSFDJSON(r, creds, "/")
+	if err != nil {
+		writeJSONError(w, err.Error(), status)
+		return
+	}
+	w.Header().Set("Content-Type", "application/json; charset=utf-8")
+	w.Header().Set("Cache-Control", "no-store")
+	_, _ = w.Write(body)
 }
 
 func (a *appServer) handleCSFDSearch(w http.ResponseWriter, r *http.Request) {
