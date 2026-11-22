@@ -1,6 +1,7 @@
 package com.sourbase.tv.data
 
 import android.content.Context
+import android.content.Intent
 import android.util.Base64
 import org.json.JSONObject
 import java.io.IOException
@@ -99,6 +100,20 @@ class SecureSourceStore(context: Context) {
         if (!preferences.edit().remove(ENCRYPTED_SOURCES_KEY).commit()) {
             throw IOException("Šifrované zdroje se nepodařilo vymazat.")
         }
+
+        // This store owns the SAF grants used for M3U/XMLTV document imports.
+        // Releasing all app-persisted read grants also handles records that were
+        // too damaged to decrypt and therefore no longer expose their document URIs.
+        appContext.contentResolver.persistedUriPermissions
+            .filter { it.isReadPermission }
+            .forEach { permission ->
+                runCatching {
+                    appContext.contentResolver.releasePersistableUriPermission(
+                        permission.uri,
+                        Intent.FLAG_GRANT_READ_URI_PERMISSION
+                    )
+                }
+            }
 
         // Also remove a possibly invalidated key so a fresh source setup can recover.
         val keyStore = KeyStore.getInstance(ANDROID_KEY_STORE).apply { load(null) }

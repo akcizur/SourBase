@@ -103,9 +103,9 @@ fun LiveTvSection(modifier: Modifier = Modifier) {
                 playlistUrl.isNotBlank() || xmltvUrl.isNotBlank() ||
                 playlistDocumentUri != null || xmltvDocumentUri != null
             ) {
-                "Uložené URL zdrojů byly bezpečně načteny."
+                "Uložené URL a dokumenty byly bezpečně načteny."
             } else {
-                "Přidejte M3U/M3U8 playlist a volitelný XMLTV EPG zdroj."
+                "Zadejte M3U/XMLTV URL nebo vyberte soubor ze zařízení."
             }
         } catch (_: Exception) {
             sourceStorageError = true
@@ -618,7 +618,7 @@ fun LiveTvSection(modifier: Modifier = Modifier) {
         }
 
         Text(
-            text = if (sourceStorageError) "ÚLOŽIŠTĚ ZDROJŮ VYŽADUJE KONTROLU · ULOŽENÁ DATA ZŮSTALA ZACHOVÁNA" else "URL JSOU ŠIFROVÁNA POMOCÍ ANDROID KEYSTORE · POUŽÍVEJTE VLASTNÍ OPRÁVNĚNÉ PLAYLISTY",
+            text = if (sourceStorageError) "ÚLOŽIŠTĚ ZDROJŮ VYŽADUJE KONTROLU · ULOŽENÁ DATA ZŮSTALA ZACHOVÁNA" else "ZDROJE JSOU ŠIFROVÁNY POMOCÍ ANDROID KEYSTORE · POUŽÍVEJTE VLASTNÍ OPRÁVNĚNÉ PLAYLISTY",
             color = Color(0xFF657386),
             fontSize = 9.sp,
             letterSpacing = 1.sp
