@@ -12,9 +12,10 @@ $stateDir = Join-Path $env:LOCALAPPDATA "Sourbase"
 $keyFile = Join-Path $stateDir "csfd-api-key.dpapi"
 New-Item -ItemType Directory -Force -Path $stateDir | Out-Null
 
-# Keep the same API key across restarts, encrypted for the current Windows account.
+# Reuse the current-user DPAPI-protected key across service restarts.
 if ([string]::IsNullOrWhiteSpace($ApiKey) -and (Test-Path $keyFile)) {
-    $secureKey = Get-Content -Raw -Path $keyFile | ConvertTo-SecureString
+    $encryptedKey = [IO.File]::ReadAllText($keyFile)
+    $secureKey = ConvertTo-SecureString -String $encryptedKey
     $pointer = [Runtime.InteropServices.Marshal]::SecureStringToBSTR($secureKey)
     try {
         $ApiKey = [Runtime.InteropServices.Marshal]::PtrToStringBSTR($pointer)
@@ -26,12 +27,19 @@ if ([string]::IsNullOrWhiteSpace($ApiKey) -and (Test-Path $keyFile)) {
 
 if ([string]::IsNullOrWhiteSpace($ApiKey)) {
     $bytes = New-Object byte[] 32
-    [Security.Cryptography.RandomNumberGenerator]::Fill($bytes)
-    $ApiKey = [Convert]::ToHexString($bytes).ToLowerInvariant()
+    $rng = [Security.Cryptography.RandomNumberGenerator]::Create()
+    try {
+        $rng.GetBytes($bytes)
+    }
+    finally {
+        $rng.Dispose()
+    }
+    $ApiKey = ([BitConverter]::ToString($bytes)).Replace("-", "").ToLowerInvariant()
 }
 
-$secureKey = ConvertTo-SecureString $ApiKey -AsPlainText -Force
-$secureKey | ConvertFrom-SecureString | Set-Content -Path $keyFile -Encoding utf8NoBOM
+$secureKey = ConvertTo-SecureString -String $ApiKey -AsPlainText -Force
+$encryptedKey = ConvertFrom-SecureString -SecureString $secureKey
+[IO.File]::WriteAllText($keyFile, $encryptedKey, [Text.Encoding]::ASCII)
 
 Write-Host "Stahuji ČSFD konektor..." -ForegroundColor Cyan
 docker pull bartholomej/node-csfd-api
@@ -40,10 +48,10 @@ if ($LASTEXITCODE -ne 0) { throw "Stažení ČSFD konektoru selhalo." }
 $existing = docker ps -a --filter "name=^/sourbase-csfd$" --format "{{.Names}}"
 if ($existing -eq "sourbase-csfd") {
     docker rm -f sourbase-csfd | Out-Null
-    if ($LASTEXITCODE -ne 0) { throw "Předchozí ČSFD kontejner se nepodařilo ukončit." }
+    if ($LASTEXITCODE -ne 0) { throw "Předchozí ČSFD kontejner se nepodařilo odstranit." }
 }
 
-# The API is reachable only from this PC, never from the LAN or the public internet.
+# Bind the published port only to loopback; never expose it to the LAN.
 $previousApiKey = $env:API_KEY
 try {
     $env:API_KEY = $ApiKey
